@@ -1,0 +1,174 @@
+---
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+const {
+  article,
+  showAuthorAvatar = true
+} = Astro.props;
+
+const iconMap = {
+  github: 'fab fa-github',
+  twitter: 'fab fa-x-twitter',
+  linkedin: 'fab fa-linkedin',
+  website: 'fas fa-globe'
+};
+
+// Get the authors array/object
+const authors = article._author;
+const authorCount = Array.isArray(authors) ? authors.length : 1;
+const primaryAuthor = Array.isArray(authors) ? authors[0] : authors;
+---
+<article class="full-width-article">
+  {article._heroImage?.[0] && (
+    <div class="hero is-large">
+      <figure class="image is-16by9">
+        <img
+          src={article._heroImage[0].attachment._urls.full}
+          alt={article._heroImage[0].attachment.alt || ''}
+          class="object-fit-cover"
+        />
+      </figure>
+    </div>
+  )}
+  <div class="section">
+    <div class="container">
+      <h1 class="title is-1 mb-6">{article.title}</h1>
+      <div class="columns">
+        <div class="column is-8">
+          <div class="content">
+            <AposArea area={article.mainContent} />
+          </div>
+        </div>
+        <div class="column is-4">
+          <h4 class="title is-4">About the Author{authorCount > 1 && 's'}</h4>
+          <div class="box sticky-top">
+            <div class="media mb-4">
+              {showAuthorAvatar && primaryAuthor?.profileImage && (
+                <div class="media-left">
+                  <figure class="image is-64x64">
+                    <AposArea
+                        area={primaryAuthor.profileImage}
+                        imageOptions={{
+                          additionalClasses: 'is-rounded object-fit-cover'
+                        }}
+                      />
+                  </figure>
+                </div>
+              )}
+              <div class="author-content">
+                <p class="title is-4">{primaryAuthor.title}</p>
+                <p class="subtitle is-6">
+                  {new Date(article.publishDate).toLocaleDateString()}
+                </p>
+                <p>{primaryAuthor.email}</p>
+                <div class="buttons">
+                  {primaryAuthor.socialLinks.map((link) => (
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="button is-light"
+                      aria-label={`Visit my ${link.platform} profile`}
+                    >
+                      <span class="icon">
+                        <i class={iconMap[link.platform]}></i>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+                <div class="author-bio">
+                  <AposArea area={article._author[0].biography} />
+                </div>
+              </div>
+            </div>
+            <!-- Additional Authors if they exist -->
+            {authorCount > 1 && (
+              <div class="mt-4">
+                <h5 class="title is-5">Additional Contributors</h5>
+                <div class="additional-author-content">
+                  {authors.slice(1).map((author) => (
+                    <div class="mb-4">
+                      <!-- Additional author content here -->
+                      <p class="has-text-weight-bold">{author.title}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {article._tags?.length > 0 && (
+              <div class="tags">
+                {article._tags.map(tag => (
+                  <span class="tag is-primary is-light">{tag.title}</span>
+                ))}
+              </div>
+            )}
+            {primaryAuthor._articles?.length > 0 && (
+              <div class="related-articles mt-5">
+                <h4 class="title is-5">Other Articles by {primaryAuthor.title}</h4>
+                <div class="menu">
+                  {primaryAuthor._articles.map(article => (
+                    <ul>
+                      <li>
+                        <a href={article._url} class="menu-item">
+                          {article.title}
+                        </a>
+                      </li>
+                      </ul>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+<style>
+  /* Base theme colors */
+  :root {
+  --text-primary: #363636;
+  --text-secondary: #4a4a4a;
+  --background-primary: #fff;
+}
+
+html.theme-dark {
+  --text-primary: #fff;
+  --text-secondary: #eaeaea;
+  --background-primary: #121212;
+}
+
+.full-width-article .title {
+  color: var(--text-primary);
+}
+
+.author-content, 
+.additional-author-content {
+  background: var(--background-primary);
+}
+
+.author-content .title,
+.author-content .subtitle,
+.author-content p,
+.author-bio,
+.additional-author-content p {
+  color: var(--text-primary);
+}
+
+html.theme-dark .box {
+  background: var(--background-primary);
+}
+
+  /* Fix image fitting */
+  .image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  .is-rounded {
+    border-radius: 50%;
+  }
+
+  .has-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+</style>

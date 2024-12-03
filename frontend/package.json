@@ -1,0 +1,30 @@
+{
+  "name": "astro-template-frontend",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "serve": "node ./dist/server/entry.mjs",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@apostrophecms/apostrophe-astro": "^1.0.0",
+    "@astrojs/node": "^7.0.1",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-brands-svg-icons": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "accordion-js": "^3.3.4",
+    "astro": "^4.0.0",
+    "bulma": "^1.0.2",
+    "dayjs": "^1.11.10",
+    "vite": "^5.0.7"
+  },
+  "devDependencies": {
+    "postcss-viewport-to-container-toggle": "^1.0.0",
+    "sass-embedded": "^1.81.0"
+  }
+}

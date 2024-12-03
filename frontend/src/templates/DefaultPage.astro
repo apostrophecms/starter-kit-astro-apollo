@@ -1,0 +1,8 @@
+---
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+const { page, user, query } = Astro.props.aposData;
+const { main } = page;
+---
+<section class="main-content astro-default-content">
+  <AposArea area={main} />
+</section>

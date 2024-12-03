@@ -1,0 +1,339 @@
+---
+const { widget } = Astro.props;
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+// Destructure all needed properties with defaults
+const {
+  background = 'image',
+  backgroundColorType = 'solid',
+  mainColor,
+  secondaryColor,
+  gradientAngle = '180deg',
+  layout = 'full',
+  splitSide = 'left',
+  enableOverlay = true,
+  overlayColor = 'black',
+  overlayOpacity = '50%',
+  height = 'medium',
+  contentAlignment = 'center',
+  _backgroundImage,
+  imagePosition = 'center',
+  videoBackground,
+  videoBackgroundMobile,
+  mainContent = {},
+  callToAction
+} = widget;
+
+const getBackgroundImageUrl = () => {
+  if (!Array.isArray(_backgroundImage) || !_backgroundImage.length) {
+    return `https://picsum.photos/1920/1080?random=${Math.random()}`;
+  }
+  return _backgroundImage[0]?.attachment?._urls?.full;
+};
+
+const getBackgroundImageAlt = () => {
+  if (!Array.isArray(_backgroundImage) || !_backgroundImage.length) return '';
+  return _backgroundImage[0]?.attachment?._alt || '';
+};
+
+const backgroundImageUrl = getBackgroundImageUrl();
+const backgroundImageAlt = getBackgroundImageAlt();
+
+const getVideoSource = (video) => {
+  if (!video?._url || !video?.extension) {
+    return null;
+  }
+  return {
+    url: video._url,
+    type: `video/${video.extension}`
+  };
+};
+
+const mainVideo = getVideoSource(videoBackground);
+const mobileVideo = getVideoSource(videoBackgroundMobile);
+
+// Helper function to convert color values to Bulma classes
+const getBulmaColorClass = (color, type = 'text') => {
+  if (!color) return '';
+
+  switch (type) {
+    case 'text':
+      return `has-text-${color}`;
+    case 'background':
+      return `has-background-${color}`;
+    default:
+      return '';
+  }
+};
+
+const getBackgroundStyle = () => {
+  if (background !== 'color') return '';
+
+  if (backgroundColorType === 'gradient' && secondaryColor) {
+    return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
+  }
+
+  return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${mainColor}))`;
+};
+
+const backgroundStyle = getBackgroundStyle();
+
+// Compute classes based on props
+const heightClass =
+  {
+    small: 'is-small',
+    medium: 'is-medium',
+    large: 'is-large',
+    full: 'is-fullheight'
+  }[height] || 'is-medium';
+
+// Get content alignment class
+const alignmentClass =
+  {
+    left: 'has-text-left',
+    center: 'has-text-centered',
+    right: 'has-text-right'
+  }[contentAlignment] || 'has-text-centered';
+
+  const pretitleClass = `is-size-6-mobile is-size-6-tablet is-size-6-desktop ${getBulmaColorClass(
+  mainContent?.pretitleColor,
+  'text'
+)}`;
+
+const titleClass = `is-size-5-mobile is-size-1-tablet is-size-1-desktop ${getBulmaColorClass(
+  mainContent?.titleColor,
+  'text'
+)}`;
+
+const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${getBulmaColorClass(
+  mainContent?.subtitleColor,
+  'text'
+)}`;
+---
+
+{
+  layout === 'full' ? (
+    <section class={`hero ${heightClass}`}>
+      {/* Background layer with conditional rendering */}
+      <div class='hero-background'>
+  {background === 'image' && backgroundImageUrl ? (
+    <img
+      src={backgroundImageUrl}
+      alt={getBackgroundImageAlt()}
+      style={`object-position: center ${imagePosition}`}
+    />
+    ) : background === 'video' && (mainVideo || mobileVideo) ? (
+      <video autoplay muted loop playsinline class='background-video'>
+        {mainVideo && <source src={mainVideo.url} type={mainVideo.type} />}
+        {mobileVideo && <source src={mobileVideo.url} type={mobileVideo.type} />}
+      </video>
+    ) : (
+      <div class='color-background' />
+    )}
+  </div>
+
+      {/* Overlay layer - show for both image and video */}
+      {enableOverlay && (background === 'image' || background === 'video') && (
+        <div class='hero-overlay' />
+      )}
+
+      {/* Content */}
+      <div class='hero-body'>
+        <div class={`container px-4 ${alignmentClass}`}>
+          {mainContent?.pretitle && (
+            <p class={`subtitle mb-3 ${pretitleClass}`}>
+              {mainContent.pretitle}
+            </p>
+          )}
+          <h1 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
+          {mainContent?.subtitle && (
+            <p class={`subtitle mb-5 ${subtitleClass}`}>
+              {mainContent.subtitle}
+            </p>
+          )}
+          {callToAction && (
+            <div class='mt-4 mt-5-desktop'>
+              <AposArea area={callToAction} />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class='hero-split'>
+      <div
+        class={`split-content ${alignmentClass}`}
+        style={splitSide === 'right' ? 'order: 2' : ''}
+      >
+        <div class='container px-4'>
+          {mainContent?.pretitle && (
+            <p class={`subtitle mb-3 ${pretitleClass}`}>
+              {mainContent.pretitle}
+            </p>
+          )}
+          <h1 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
+          {mainContent?.subtitle && (
+            <p class={`subtitle mb-5 ${subtitleClass}`}>
+              {mainContent.subtitle}
+            </p>
+          )}
+          {callToAction && (
+            <div class='mt-4 mt-5-desktop'>
+              <AposArea area={callToAction} />
+            </div>
+          )}
+        </div>
+      </div>
+      <div class='split-media' style={splitSide === 'right' ? 'order: 1' : ''}>
+        {background === 'image' ? (
+          <>
+            <img
+              src={backgroundImageUrl}
+              alt={backgroundImageAlt}
+              class='hero-background'
+              style={`object-position: center ${imagePosition}`}
+            />
+            {enableOverlay && <div class='split-overlay' />}
+          </>
+        ) : background === 'video' ? (
+          <>
+            <video autoplay muted loop playsinline class='background-video'>
+              <source
+                src={videoBackground?._url}
+                type={`video/${videoBackground?.extension}`}
+              />
+            </video>
+            {enableOverlay && <div class='split-overlay' />}
+          </>
+        ) : (
+          background === 'color' && <div class='split-color-background' />
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style
+  define:vars={{
+    overlayBackground: `color-mix(in hsl,var(--bulma-${overlayColor}) ${overlayOpacity}, transparent)`,
+    colorBackground: backgroundStyle
+  }}
+>
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-background img,
+  .background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .color-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--colorBackground);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlayBackground);
+    z-index: 2;
+  }
+
+  .hero-body {
+    position: relative;
+    z-index: 3;
+  }
+
+  /* Height variations */
+  .hero.is-small {
+    min-height: 400px;
+  }
+  .hero.is-medium {
+    min-height: 600px;
+  }
+  .hero.is-large {
+    min-height: 800px;
+  }
+  .hero.is-fullheight {
+    min-height: 100vh;
+  }
+
+  .hero-split {
+    display: flex;
+    min-height: 600px;
+    width: 100%;
+  }
+
+  .split-content {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+  }
+
+  .split-media {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .split-color-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--colorBackground);
+  }
+  .split-media img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .split-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlayBackground);
+    z-index: 2;
+  }
+
+  @media screen and (max-width: 768px) {
+    .split-content {
+      padding: 2rem 1rem;
+    }
+  }
+
+  @media screen and (min-width: 769px) {
+    .split-content {
+      padding: 3rem 2rem;
+    }
+  }
+</style>

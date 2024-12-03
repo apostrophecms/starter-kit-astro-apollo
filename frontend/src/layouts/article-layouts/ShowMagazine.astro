@@ -1,0 +1,75 @@
+---
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+const { article } = Astro.props;
+---
+
+<article class="magazine-article">
+  <div class="section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="has-text-centered mb-6">
+            <p class="subtitle is-6 mb-2">
+              By {article._author[0].title} · {new Date(article.publishDate).toLocaleDateString()}
+            </p>
+            <h1 class="title is-1 mb-4">{article.title}</h1>
+            <p class="subtitle is-4">{article.excerpt}</p>
+          </div>
+
+          {article._heroImage?.[0] && (
+            <figure class="image is-2by1 mb-6">
+              <img
+                src={article._heroImage[0].attachment._urls.full}
+                alt={article._heroImage[0].attachment.alt || ''}
+                class="object-fit-cover"
+              />
+            </figure>
+          )}
+
+          <div class="content is-large">
+            <AposArea area={article.mainContent} />
+          </div>
+          
+          {article._tags?.length > 0 && (
+            <div class="tags is-centered mt-6">
+              {article._tags.map(tag => (
+                <span class="tag is-primary is-light is-medium">{tag.title}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+<style>
+  .magazine-article {
+  --text-primary: #363636;
+  --text-secondary: #4a4a4a;
+}
+
+html.theme-dark .magazine-article {
+  --text-primary: #fff;
+  --text-secondary: #eaeaea;
+}
+
+.magazine-article .title,
+.magazine-article .subtitle {
+  color: var(--text-primary);
+}
+  /* Fix image fitting */
+  .image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .is-rounded {
+    border-radius: 50%;
+  }
+
+  .has-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+</style>

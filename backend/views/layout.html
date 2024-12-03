@@ -1,0 +1,129 @@
+<style>
+  .info-content {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  h1, h2 {
+    color: #2c3e50;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 22px;
+    margin-top: 20px;
+  }
+  .info-box, .instructions, .status-box {
+    background-color: #f0f0f0;
+    border-left: 5px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+  }
+  .instructions {
+    background-color: #e9f7ef;
+    border-left-color: #27ae60;
+  }
+  .status-box {
+    background-color: #fef9e7;
+    border-left-color: #f1c40f;
+  }
+  .status-box.running {
+    background-color: #e9f7ef;
+    border-left-color: #27ae60;
+  }
+  code {
+    background-color: #f8f8f8;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+  .hidden {
+    display: none;
+  }
+  :is(.status-box, .info-box) > *:first-child {
+    margin-top: 0;
+  }
+  :is(.status-box, .info-box) > *:last-child {
+    margin-bottom: 0;
+  }
+</style>
+
+<div class="info-content">
+  <h1>ApostropheCMS Backend for Astro</h1>
+  
+  <div class="info-box">
+    <p>You are currently viewing the ApostropheCMS backend, used to manage the content for your project. It supplies the Admin UI and in-context editing functionality. The frontend rendering of the website is handled by Astro and is delivered from a separate repository.</p>
+  </div>
+  
+  <div id="status-box" class="status-box">
+    <h2>Astro Frontend Status</h2>
+    <p id="status-message">Checking Astro frontend status...</p>
+  </div>
+  
+  <div id="astro-instructions" class="instructions hidden">
+    <h2>Setting up the Astro Frontend Project</h2>
+    <p>To view the complete project, you need to set up and run the Astro frontend. Follow these steps:</p>
+    <ol>
+      <li>Either <a href="https://github.com/apostrophecms/astro-frontend.git" target="_blank">fork</a> or clone the frontend repository: <code>git clone https://github.com/apostrophecms/astro-frontend.git</code></li>
+      <li>Navigate to the frontend directory: <code>cd astro-frontend</code></li>
+      <li>Install dependencies: <code>npm install</code></li>
+      <li>Export the same <code>APOS_EXTERNAL_FRONT_KEY</code> environment variable you used to start the backend</li>
+      <li>Start the Astro development server: <code>npm run dev</code></li>
+    </ol>
+  </div>
+  
+  <div id="astro-running" class="hidden">
+    <p>The Astro frontend is running. You can access the complete site at: <a href="http://localhost:4321" id="astro-link">http://localhost:4321</a></p>
+  </div>
+</div>
+
+<script>
+  const statusBox = document.getElementById('status-box');
+  const statusMessage = document.getElementById('status-message');
+  const astroInstructions = document.getElementById('astro-instructions');
+  const astroRunning = document.getElementById('astro-running');
+  const astroLink = document.getElementById('astro-link');
+
+  let checkInterval;
+
+  function updateUI(isRunning) {
+    if (isRunning) {
+      statusBox.classList.add('running');
+      statusMessage.textContent = 'Astro frontend is running!';
+      astroInstructions.classList.add('hidden');
+      astroRunning.classList.remove('hidden');
+    } else {
+      statusBox.classList.remove('running');
+      statusMessage.textContent = 'Astro frontend is not running.';
+      astroInstructions.classList.remove('hidden');
+      astroRunning.classList.add('hidden');
+    }
+  }
+
+  function checkAstroConnection() {
+    fetch('http://localhost:4321')
+      .then(() => {
+        updateUI(true);
+        if (checkInterval) {
+          clearInterval(checkInterval);
+          console.log('Astro frontend detected. Stopping periodic checks.');
+        }
+      })
+      .catch((error) => {
+        updateUI(false);
+        console.log('Astro frontend not detected:', error);
+      });
+  }
+
+  // Check for Astro connection immediately
+  checkAstroConnection();
+
+  // Set up interval for checking, but store the interval ID
+  checkInterval = setInterval(checkAstroConnection, 5000);
+</script>

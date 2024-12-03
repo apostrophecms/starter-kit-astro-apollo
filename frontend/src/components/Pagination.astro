@@ -1,0 +1,54 @@
+---
+import setParameter from '@apostrophecms/apostrophe-astro/lib/aposSetQueryParameter.js';
+
+const { class: className = '', currentPage, totalPages, url } = Astro.props;
+
+const pages = Array.from({ length: totalPages }, (_, i) => ({
+  number: i + 1,
+  current: i + 1 === currentPage,
+  url: setParameter(url, 'page', i + 1)
+}));
+
+const showPrevNext = totalPages > 1;
+const prevUrl = currentPage > 1 ? setParameter(url, 'page', currentPage - 1) : null;
+const nextUrl = currentPage < totalPages ? setParameter(url, 'page', currentPage + 1) : null;
+---
+
+<nav class:list={['pagination', className]} role="navigation" aria-label="pagination">
+  {showPrevNext && (
+    <a
+      href={prevUrl}
+      class="pagination-previous"
+      aria-label="Previous page"
+      disabled={!prevUrl}
+    >
+      Previous
+    </a>
+    <a
+      href={nextUrl}
+      class="pagination-next"
+      aria-label="Next page"
+      disabled={!nextUrl}
+    >
+      Next
+    </a>
+  )}
+
+  <ul class="pagination-list">
+    {pages.map((p) => (
+      <li>
+        <a
+          href={p.url}
+          class:list={[
+            'pagination-link',
+            { 'is-current': p.current }
+          ]}
+          aria-label={`Page ${p.number}`}
+          aria-current={p.current ? 'page' : undefined}
+        >
+          {p.number}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

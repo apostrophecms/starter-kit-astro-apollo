@@ -1,0 +1,21 @@
+# build output
+/public/apos-minified
+/apos-build
+/public/apos-frontend
+/modules/asset/ui/public/site.js
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log
+
+# content
+/public/uploads
+
+# local env data
+/data
+/data/temp/uploadfs
+
+# macOS-specific files
+.DS_Store

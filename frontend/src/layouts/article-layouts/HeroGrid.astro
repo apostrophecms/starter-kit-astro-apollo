@@ -1,0 +1,116 @@
+---
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+import ArticlesFilter from '../../components/ArticlesFilter.astro';
+
+const {
+  pieces,
+  gridColumns = 3,
+  heroImageClass = 'is-3by2'
+} = Astro.props;
+
+// Get the current category from URL params
+const currentCategory = Astro.url.searchParams.get('category') || '';
+---
+{pieces[0] && (
+  <div class='columns is-vcentered mb-6'>
+    <div class='column is-two-thirds'>
+      <a href={pieces[0]._url} class='image hero-image'>
+        {pieces[0]?._heroImage?.[0] && (
+          <figure class={`image ${heroImageClass}`}>
+            <img
+              src={pieces[0]._heroImage[0].attachment._urls.full}
+              alt={pieces[0]._heroImage[0].attachment.alt || ''}
+              class='has-ratio'
+              style='object-fit: cover;'
+            />
+          </figure>
+        )}
+      </a>
+    </div>
+    <div class='column'>
+      <a href={pieces[0]._url}>
+        <h1 class='title is-2 mb-4'>{pieces[0].title}</h1>
+      </a>
+      <p class='subtitle is-5 mb-4'>{pieces[0].excerpt}</p>
+      <div class='author-info mb-4'>
+        <div class='media'>
+          {pieces[0]._author[0]?.profileImage && (
+            <div class='media-left'>
+              <figure class='image is-48x48'>
+                <AposArea
+                  area={pieces[0]._author[0].profileImage}
+                  imageOptions={{
+                    additionalClasses: 'is-rounded object-fit-cover'
+                  }}
+                />
+              </figure>
+            </div>
+          )}
+          <div class='media-content'>
+            <p>
+              <strong>{pieces[0]._author[0].title}</strong>
+              <br />
+              {new Date(pieces[0].publishDate).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      </div>
+      <a href={pieces[0]._url} class='button is-primary is-medium'>
+        Read More
+      </a>
+    </div>
+  </div>
+  <div class="container">
+    <ArticlesFilter
+      currentUrl={Astro.url}
+      currentCategory={currentCategory}
+      articles={pieces}
+    />
+  </div>
+  <div class='columns is-multiline'>
+    {pieces.slice(1).map((article) => (
+      <div class={`column is-${12/gridColumns}`}>
+        <div class='card h-100'>
+          <a href={article._url}>
+            {article?._heroImage?.[0] && (
+              <div class='card-image'>
+                <figure class='image is-3by2'>
+                  <img
+                    src={article._heroImage[0].attachment._urls.full}
+                    alt={article.title}
+                    class='has-ratio'
+                    style='object-fit: cover;'
+                  />
+                </figure>
+              </div>
+            )}
+          </a>
+          <div class='card-content'>
+            <a href={article._url} class='has-text-dark'>
+              <h3 class='title is-4'>{article.title}</h3>
+            </a>
+            <p class='subtitle is-6'>
+              By {article._author[0].title} |
+              {new Date(article.publishDate).toLocaleDateString()}
+            </p>
+            <p class='content'>{article.excerpt}</p>
+          </div>
+          <footer class='card-footer mt-auto'>
+            <a href={article._url} class='card-footer-item button is-info is-medium'>
+              Read More
+            </a>
+          </footer>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+html.theme-dark .title,
+html.theme-dark .subtitle {
+  color: #fff !important;
+}
+
+</style>

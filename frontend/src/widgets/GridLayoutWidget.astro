@@ -1,0 +1,176 @@
+---
+const { widget } = Astro.props;
+const widgetId = widget._id;
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+// Helper to get content areas based on layout type
+import { getLayoutAreas } from '../lib/get-layout-areas.js';
+
+// Get layout configuration
+const getLayoutConfig = (widget) => {
+  const presetConfigs = {
+    asideMainThree: { rows: 3 },
+    mainAsideThree: { rows: 3 },
+    asideTwoMain: { rows: 4 },
+    twoMainAside: { rows: 4 },
+    headerTwoColFooter: { rows: 3 },
+    featuredThreeGrid: { rows: 2 },
+    magazineLayout: { rows: 3, gap: '1.5rem' },
+    contentHub: { rows: 5, gap: '2rem' },
+    galleryMasonry: { rows: 3 },
+    dashboardLayout: { rows: 2, gap: '1.5rem' },
+    productShowcase: { rows: 3, gap: '2rem' }
+  };
+
+  const defaultConfig = {
+    columns: 12,
+    gap: '1rem',
+    padding: '1rem',
+    margin: 'auto',
+    mobileGap: '0.5rem',
+    mobilePadding: '0.5rem'
+  };
+
+  if (widget.layoutType === 'custom') {
+    return {
+      ...defaultConfig,
+      rows: widget.customGrid.rows,
+      columns: widget.customGrid.columns,
+      gap: widget.customGrid.gap,
+      padding: widget.customGrid.padding,
+      margin: widget.customGrid.margin
+    };
+  }
+
+  return {
+    ...defaultConfig,
+    ...(presetConfigs[widget.layoutType] || { rows: 1 })
+  };
+};
+
+const areas = getLayoutAreas(widget);
+const config = getLayoutConfig(widget);
+
+const maxWidth = widget.maxWidth ? widget.maxWidth : '';
+
+const layoutClasses = [
+  'custom-layout-widget',
+  `custom-layout-widget-${widgetId}`,
+  `layout-type-${widget.layoutType}`,
+  `${widget.overrideClass || ''}`,
+  maxWidth
+]
+  .filter(Boolean)
+  .join(' ');
+---
+<div class="container is-fluid mb-3">
+  <div
+    id={`custom-layout-widget-${widgetId}`}
+    class={layoutClasses}
+    data-widget-id={widgetId}
+    data-layout-type={widget.layoutType}
+  >
+    {areas.map((area) => (
+      <div
+        class={`custom-layout-area area-${area.name} layout-${widget.layoutType}-${area.name}`}
+        data-area-name={area.name}
+        style={{
+          '--col-start': area.colStart,
+          '--col-span': area.colSpan,
+          '--row-start': area.rowStart,
+          '--row-span': area.rowSpan,
+          '--tablet-col-span': area.tabletColSpan,
+          '--mobile-col-span': area.mobileColSpan,
+          ...(area.minHeight ? { '--min-height': area.minHeight } : {}),
+          ...(area.verticalAlign ? { '--align-self': area.verticalAlign } : {})
+        }}
+      >
+        <AposArea area={area.content} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<style
+  define:vars={{
+    columns: config.columns,
+    rows: config.rows,
+    gap: widget.areaStyles?.gapOverride || config.gap,
+    padding: config.padding,
+    margin: config.margin
+  }}
+>
+  .custom-layout-widget {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-rows: repeat(var(--rows), auto);
+    gap: var(--gap);
+    padding: var(--padding);
+    margin: var(--margin);
+    height: auto;
+    place-items: start stretch;
+  }
+
+  .custom-layout-area {
+    grid-column: var(--col-start) / span var(--col-span);
+    grid-row: var(--row-start) / span var(--row-span);
+    min-height: var(--min-height, auto);
+    align-self: var(--align-self, stretch);
+  }
+
+  @media (max-width: 1023px) {
+    .custom-layout-widget {
+      grid-template-columns: repeat(12, 1fr);
+      gap: calc(var(--gap) * 0.75);
+    }
+
+    .custom-layout-area {
+      grid-column: span var(--tablet-col-span);
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .custom-layout-widget {
+      grid-template-columns: 1fr;
+      gap: calc(var(--gap) * 0.5);
+    }
+
+    .custom-layout-area {
+      grid-column: span var(--mobile-col-span);
+      grid-row: auto;
+    }
+  }
+</style>
+<style is:global>
+  /* Layout Preview Styles - Used in widget editor UI */
+  .layout-preview-container {
+  margin: 0.5rem 0;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.2rem;
+}
+
+.layout-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.75rem;
+  background: white;
+}
+
+.layout-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.preview-svg {
+  width: 100%;
+  height: auto;
+  background: white;
+}
+</style>

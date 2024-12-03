@@ -1,0 +1,254 @@
+---
+const { widget } = Astro.props;
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+const {
+  cardType = 'basic',
+  cardTitle,
+  subtitle,
+  titleSize = 'is-4',
+  titleColor = '',
+  headerAlignment = 'has-text-left',
+  contentAlignment = 'has-text-left',
+  contentColor = '',
+  content,
+  backgroundColor = '',
+  _mainImage,
+  useImageRatio = false,
+  imageRatio = 'is-4by3',
+  _avatar,
+  hasFooter,
+  footerContent,
+  minHeight = '',
+  overlayColor = 'black',
+  overlayOpacity = '50%',
+  showOverlay = false,
+  addFooterBorder = false,
+  footerBorderWidth = 'thin',
+  footerBorderColor = 'primary'
+} = widget;
+
+const hasMainImage = _mainImage[0]?.attachment._urls?.['full'];
+const hasAvatar = _avatar[0]?.attachment._urls?.['one-sixth'];
+
+// Dynamic classes for border width and color
+const borderWidthClass = addFooterBorder ? `border-${footerBorderWidth}` : '';
+const borderColorClass = addFooterBorder ? 'has-border-color' : '';
+
+const cardClasses = [
+  'card',
+  backgroundColor ? `has-background-${backgroundColor}` : '',
+  cardType === 'image-overlay' ? 'has-image-overlay' : '',
+  minHeight,
+  borderWidthClass,
+  borderColorClass
+].filter(Boolean).join(' ');
+
+const titleClasses = [
+  'title',
+  titleSize,
+  titleColor ? `has-text-${titleColor}` : ''
+].filter(Boolean).join(' ');
+
+const subtitleClasses = [
+  'subtitle', 
+  'is-6',
+  titleColor ? `has-text-${titleColor}` : ''
+].filter(Boolean).join(' ');
+
+const titleWrapperClasses = [
+  'title-wrapper',
+  'p-2',
+  headerAlignment
+].filter(Boolean).join(' ');
+
+const contentClasses = [
+  'content',,
+  'p-2',
+  contentAlignment,
+  contentColor ? `has-text-${contentColor}` : ''
+].filter(Boolean).join(' ');
+
+const imageContainerClasses = [
+  'card-image',
+  useImageRatio ? imageRatio : ''
+].filter(Boolean).join(' ');
+
+---
+<div class={cardClasses}>
+  {(cardType === 'image' || cardType === 'image-overlay' || cardType === 'media') && (
+    <div class={imageContainerClasses}>
+      <figure class="image">
+        {hasMainImage ? (
+          <img src={hasMainImage} alt={_mainImage.alt || _mainImage.title || 'Card image'} />
+        ) : (
+          <img src={`https://picsum.photos/800/600`} alt="Placeholder image" />
+        )}
+      </figure>
+
+      {/* Add overlay if needed */}
+      {(cardType === 'image-overlay' || (cardType === 'image' && showOverlay)) && (
+        <div
+          class="overlay"
+        ></div>
+      )}
+
+      {/* Overlay content only for 'image-overlay' card type */}
+      {cardType === 'image-overlay' && (
+      <div class="overlay-content">
+        {cardTitle && (
+          <div class={titleWrapperClasses}>
+            <p class={titleClasses}>{cardTitle}</p>
+            {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+          </div>
+        )}
+        <div class={contentClasses}>
+          <AposArea area={content} />
+        </div>
+      </div>
+    )}
+    </div>
+  )}
+
+  {/* Card content for types other than 'image-overlay' */}
+  {cardType !== 'image-overlay' && (
+    <div class="card-content">
+      {cardType === 'media' && (
+        <div class="media">
+          <div class="media-left">
+            <figure class="image is-48x48">
+              {hasAvatar ? (
+                <img src={hasAvatar} alt={_avatar[0].alt || _avatar[0].title || 'Profile image'} class="is-rounded" />
+              ) : (
+                <img src="https://picsum.photos/96/96" alt="Placeholder avatar" class="is-rounded" />
+              )}
+            </figure>
+          </div>
+          <div class={`media-content ${headerAlignment}`}>
+            <p class={titleClasses}>{cardTitle}</p>
+            {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+          </div>
+        </div>
+      )}
+      {cardType !== 'media' && cardTitle && (
+        <div class={titleWrapperClasses}>
+          <p class={titleClasses}>{cardTitle}</p>
+          {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+        </div>
+      )}
+      <div class={contentClasses}>
+        <AposArea area={content} />
+      </div>
+    </div>
+  )}
+
+  {hasFooter && footerContent && (
+    <footer class="card-footer p-0">
+      <div class="is-flex-grow-1">
+        <AposArea area={footerContent} />
+      </div>
+    </footer>
+  )}
+</div>
+
+<style define:vars={{
+  overlayBackground: `color-mix(in hsl,var(--bulma-${overlayColor}) ${overlayOpacity}, transparent)`,
+  footerBorderColor: `var(--bulma-${footerBorderColor})`
+}}>
+
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.is-small { min-height: 200px; }
+.is-medium { min-height: 300px; }
+.is-large { min-height: 400px; }
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image handling */
+.card-image {
+  flex-shrink: 0;
+  position: relative; /* Required for overlay positioning */
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Overlay styling */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlayBackground);
+  z-index: 2;
+}
+
+/* Overlay content styling */
+.overlay-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.overlay-content .title-wrapper,
+.overlay-content .content {
+  width: 100%;
+}
+
+/* Media layout specifics */
+.media-left .image.is-48x48 {
+  height: 48px;
+  width: 48px;
+  overflow: hidden;
+}
+
+.media-left img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Footer positioning and borders */
+.card-footer {
+  margin-top: auto;
+  border-top: none;
+}
+
+/* Footer borders */
+.has-border-color.border-thin .card-footer {
+  border-top: 1px solid var(--footerBorderColor);
+}
+
+.has-border-color.border-medium .card-footer {
+  border-top: 2px solid var(--footerBorderColor);
+}
+
+.has-border-color.border-thick .card-footer {
+  border-top: 3px solid var(--footerBorderColor);
+}
+
+/* Clean up editor UI */
+:global(.apos-area-widget) {
+  margin: 0;
+}
+</style>

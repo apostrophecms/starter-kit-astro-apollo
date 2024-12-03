@@ -1,0 +1,279 @@
+---
+import { useSiteConfig } from '../lib/use-site-config.js';
+
+const { aposData } = Astro.props;
+const { footerGroup: footer = {}, brandingGroup: branding = {} } =
+  aposData.global || {};
+const currentYear = new Date().getFullYear();
+const footerNav = aposData.home?._children || [];
+
+// Social platform icons mapping
+const platformIcons = {
+  facebook: 'facebook',
+  twitter: 'x-twitter',
+  instagram: 'instagram',
+  linkedin: 'linkedin',
+  youtube: 'youtube',
+  github: 'github',
+  tiktok: 'tiktok',
+  pinterest: 'pinterest',
+  discord: 'discord',
+  mastodon: 'mastodon'
+} as const;
+
+// Get theme-based classes
+const footerClasses = [
+  'footer-modern',
+  footer.footerBackgroundColor
+    ? `has-background-${footer.footerBackgroundColor}`
+    : '',
+  footer.footerTextColor ? `has-text-${footer.footerTextColor}` : '',
+  footer.footerLayout ? `layout-${footer.footerLayout}` : 'layout-grid'
+]
+  .filter(Boolean)
+  .join(' ');
+
+const linkClasses = [
+  `has-text-${footer.footerLinkColor || 'grey-light'}`,
+  'hover-fade'
+].join(' ');
+
+// Extract footer sections
+const footerSections = footer.footerSections || [];
+
+// Get link attributes for external links
+const getLinkAttributes = (url: string, openInNewTab?: boolean) => ({
+  ...(openInNewTab || url.startsWith('http')
+    ? {
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    : {})
+});
+
+const socialPosition = footer.socialPosition || 'top';
+const { renderBranding } = useSiteConfig(aposData.global);
+---
+
+<footer class={footerClasses} role="contentinfo">
+  <div class="container">
+    {/* Top Social Links */}
+    {footer.socialLinks?.length > 0 && socialPosition === 'top' && (
+      <div class="social-links has-text-centered mb-4">
+        {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
+          const iconName = platformIcons[platform as keyof typeof platformIcons];
+          if (!iconName) return null;
+          
+          return (
+            <a 
+              href={url}
+              class={`${linkClasses} social-icon icon-${footer.socialIconStyle || 'rounded'} ${
+                footer.socialIconSize === 'sm' ? 'is-size-5' : 
+                footer.socialIconSize === 'lg' ? 'is-size-3' : 
+                'is-size-4'
+              }`}
+              {...getLinkAttributes(url)}
+              aria-label={ariaLabel || `Visit our ${platform} page`}
+            >
+              <span class={`icon ${
+                footer.socialIconSize === 'sm' ? 'is-small' : 
+                footer.socialIconSize === 'lg' ? 'is-large' : 
+                'is-medium'
+              }`}>
+                <i class={`fab fa-${iconName}`} aria-hidden="true"></i>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    )}
+
+    {/* Main Content Section */}
+    <div class="columns is-multiline is-centered">
+      {footer.showBranding && (
+        <div class="column is-narrow has-text-centered mb-0">
+          <a href="/" class="navbar-item is-size-2" set:html={renderBranding()} />
+        </div>
+      )}
+
+      {/* Navigation Links Section */}
+      {(footerNav.length > 0 || footerSections.length > 0) && (
+        <nav class="column is-12-mobile is-6-tablet is-4-desktop" aria-label="Footer navigation">
+          <div class="columns is-multiline is-centered">
+            {/* Main Navigation */}
+            {footerNav.length > 0 && (
+              <div class="column is-narrow has-text-centered mb-0">
+                <ul class="footer-list">
+                  {footerNav.map((page) => (
+                    <li>
+                      <a 
+                        href={page._url} 
+                        class={`${linkClasses} ${page._url === aposData.page?._url ? 'is-active' : ''}`}
+                      >
+                        {page.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Custom Sections with Links */}
+            {footerSections.map((section) => (
+              <div class="column is-narrow has-text-centered mb-0">
+                <h2 class="footer-heading">{section.sectionTitle}</h2>
+                <ul class="footer-list">
+                  {section.links.map((link) => (
+                    <li>
+                      <a 
+                        href={link.linkUrl} 
+                        class={linkClasses}
+                        {...getLinkAttributes(link.linkUrl, link.openInNewTab)}
+                      >
+                        {link.linkText}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </nav>
+      )}
+    </div>
+
+    {/* Bottom Social Links */}
+    {footer.socialLinks?.length > 0 && socialPosition === 'bottom' && (
+      <div class="social-links has-text-centered mt-4">
+        {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
+          const iconName = platformIcons[platform as keyof typeof platformIcons];
+          if (!iconName) return null;
+          
+          return (
+            <a 
+              href={url}
+              class={`${linkClasses} social-icon icon-${footer.socialIconStyle || 'rounded'} ${
+                footer.socialIconSize === 'sm' ? 'is-size-5' : 
+                footer.socialIconSize === 'lg' ? 'is-size-3' : 
+                'is-size-4'
+              }`}
+              {...getLinkAttributes(url)}
+              aria-label={ariaLabel || `Visit our ${platform} page`}
+            >
+              <span class={`icon ${
+                footer.socialIconSize === 'sm' ? 'is-small' : 
+                footer.socialIconSize === 'lg' ? 'is-large' : 
+                'is-medium'
+              }`}>
+                <i class={`fab fa-${iconName}`} aria-hidden="true"></i>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    )}
+
+    {/* Copyright Section */}
+    <div class="has-text-centered">
+      <p class="is-size-7">
+        <small>
+          {branding.siteTitle || 'Company Name'}
+          {footer.showYear !== false && ` © ${currentYear}`}
+          {footer.copyrightText && ` - ${footer.copyrightText}`}
+        </small>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style lang="scss">
+  .footer-modern {
+    padding: 3rem 1.5rem 2rem;
+
+    .footer-heading {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .footer-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 0.75rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    a {
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      &.is-active {
+        font-weight: 500;
+      }
+    }
+
+    // Branding image adjustments
+    .navbar-item img {
+      max-height: none;
+      height: auto;
+      width: auto;
+      max-width: 100%;
+      width: 200px; /* Adjust this value as needed */
+    }
+
+    // Social icon styles
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--social-bg-color, rgba(255, 255, 255, 0.1));
+      transition: all 0.2s ease-in-out;
+      width: 2.5em;
+      height: 2.5em;
+
+      &.icon-rounded {
+        border-radius: 8px;
+      }
+
+      &.icon-circle {
+        border-radius: 50%;
+      }
+
+      &.icon-square {
+        border-radius: 0;
+      }
+
+      &.icon-square-rounded {
+        border-radius: 4px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        opacity: 0.8;
+      }
+
+      @media (pointer: coarse) {
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+  }
+</style>

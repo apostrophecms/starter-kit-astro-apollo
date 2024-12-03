@@ -1,0 +1,26 @@
+---
+const { widget, imageOptions = {} } = Astro.props;
+const placeholder = widget?.aposPlaceholder;
+const image = widget?._image[0]?.attachment;
+const src = placeholder ? '/images/image-widget-placeholder.jpg' : image?._urls['full'];
+const alt = image?.alt || '';
+
+const classes = ['img-widget', imageOptions.additionalClasses].filter(Boolean).join(' ');
+---
+
+<style>
+  .img-widget {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<img
+  class={classes}
+  src={src}
+  alt={alt}
+  loading={imageOptions.loading || 'lazy'}
+  decoding={imageOptions.decoding || 'async'}
+  sizes={imageOptions.sizes}
+/>

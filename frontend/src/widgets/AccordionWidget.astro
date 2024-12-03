@@ -1,0 +1,120 @@
+---
+const { widget } = Astro.props;
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+const {
+  itemBackgroundColor = 'white',
+  headerAlignment = 'left',
+  allowMultipleOpen = false,
+  openIndex = -1,
+  items = []
+} = widget;
+
+const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
+---
+<!-- Only add the data attribute if allowMultipleOpen is true -->
+<div class='accordion-widget' data-allow-multiple={allowMultipleOpen}>
+  {
+    items.map((item, index) => (
+      <details
+        class={`accordion has-background-${itemBackgroundColor}`}
+        open={index === convertedIndex}
+      >
+        <summary class={`accordion-header has-text-${headerAlignment}`}>
+          <p class={`has-text-${item.headerColor} has-text-weight-semibold`}>
+            {item.header}
+          </p>
+        </summary>
+        <div class='accordion-content p-4'>
+          <div class='content'>
+            <AposArea area={item.content} />
+          </div>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .accordion {
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .accordion-header {
+    padding: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .accordion-header::after {
+    content: '+';
+    margin-left: auto;
+    padding: 0 1rem;
+    transition: transform 0.2s ease;
+  }
+
+  details[open] .accordion-header::after {
+    content: '-';
+  }
+
+  .accordion-content {
+    border-top: 1px solid #dbdbdb;
+  }
+
+  .accordion-header.has-text-center {
+    justify-content: center;
+  }
+
+  .accordion-header.has-text-right {
+    justify-content: flex-end;
+  }
+</style>
+
+<script>
+function initializeAccordion() {
+  const accordionContainers = document.querySelectorAll('.accordion-widget');
+
+  accordionContainers.forEach((accordionContainer) => {
+    const allowMultipleOpen = accordionContainer.hasAttribute('data-allow-multiple');
+    const detailsElements = Array.from(accordionContainer.querySelectorAll('details'));
+
+    detailsElements.forEach((detailsElement) => {
+      detailsElement.addEventListener('toggle', () => {
+        // Only close other panels if allowMultipleOpen is false
+        if (detailsElement.open && !allowMultipleOpen) {
+          detailsElements
+            .filter(details => details !== detailsElement)
+            .forEach(details => {
+              details.open = false;
+            });
+        }
+      });
+    });
+  });
+}
+
+// Initialize on DOM content loaded
+document.addEventListener('DOMContentLoaded', initializeAccordion);
+
+// Handle dynamically added accordions
+const observer = new MutationObserver((mutations) => {
+  const hasRelevantChanges = mutations.some(mutation =>
+    Array.from(mutation.addedNodes).some(node =>
+      node.nodeType === 1 && 
+      (node.classList?.contains('accordion-widget') || node.querySelector?.('.accordion-widget'))
+    )
+  );
+
+  if (hasRelevantChanges) {
+    initializeAccordion();
+  }
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+</script>

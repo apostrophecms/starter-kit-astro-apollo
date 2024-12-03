@@ -1,0 +1,87 @@
+---
+import setParameter from '@apostrophecms/apostrophe-astro/lib/aposSetQueryParameter.js';
+
+const { darkTheme = true, currentUrl, currentCategory, articles } = Astro.props;
+
+// Convert the string to a boolean if needed
+const darkThemeBool = darkTheme === true || darkTheme === 'true';
+
+// Extract unique categories from articles
+const uniqueCategories = [...new Set(articles.map(article => article.category))].filter(Boolean);
+
+// Create category objects array with counts
+const categories = [
+  {
+    label: 'All Articles', 
+    value: '',
+    count: articles.length
+  },
+  ...uniqueCategories.map(cat => ({
+    label: cat.charAt(0).toUpperCase() + cat.slice(1),
+    value: cat,
+    count: articles.filter(article => article.category === cat).length
+  }))
+];
+
+function buildUrl(currentUrl, category) {
+  let url = currentUrl;
+  if (category) {
+    url = setParameter(url, 'category', category);
+  } else {
+    url = setParameter(url, 'category', null); // Removes the parameter
+  }
+  if (url.searchParams.get('page')) {
+    url = setParameter(url, 'page', null); // Reset to first page
+  }
+  return url;
+}
+---
+
+<div class={`box mb-5 ${darkThemeBool ? 'enable-dark-theme' : ''}`}>
+  <h3 class="title is-4 mb-4">Filter by Category</h3>
+  <div class="tabs is-boxed">
+    <ul>
+      {categories.map((cat) => (
+        <li class={cat.value === currentCategory ? 'is-active' : ''}>
+          <a href={buildUrl(currentUrl, cat.value)}>
+            <span>{cat.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .tabs.is-boxed li.is-active a {
+    background-color: var(--primary-color, #485fc7);
+    border-color: var(--primary-color, #485fc7);
+    color: #fff;
+  }
+
+  .tabs.is-boxed li.is-active a .tag {
+    background-color: #fff;
+    color: var(--primary-color, #485fc7);
+  }
+
+  /* Dark theme styles only apply when enable-dark-theme class is present */
+  html.theme-dark .enable-dark-theme {
+    &.box {
+      background-color: #2b2b2b;
+      color: #fff;
+    }
+
+    & .tabs.is-boxed a {
+      color: #fff;
+    }
+
+    & .tabs.is-boxed li.is-active a {
+      background-color: var(--primary-color, #485fc7);
+      color: #fff;
+    }
+
+    & .title {
+      color: #fff;
+    }
+  }
+</style>

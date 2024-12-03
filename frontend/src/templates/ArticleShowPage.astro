@@ -1,0 +1,22 @@
+---
+import FullWidth from '../layouts/article-layouts/ShowFullWidth.astro';
+import Magazine from '../layouts/article-layouts/ShowMagazine.astro';
+import Minimal from '../layouts/article-layouts/ShowMinimal.astro';
+
+const {
+  page,
+  piece
+} = Astro.props.aposData;
+
+const layouts = {
+  fullWidth: FullWidth,
+  magazine: Magazine,
+  minimal: Minimal
+};
+
+const SelectedLayout = layouts[page.showLayout] || FullWidth;
+---
+
+<div class="article-show-page">
+  <SelectedLayout article={piece} />
+</div>

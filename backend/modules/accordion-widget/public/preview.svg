@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="209px" height="136px" viewBox="0 0 209 136" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Accordion Widget Preview</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="208.771084" height="135.477876" rx="3"></rect>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="preview">
+            <use id="background" fill="#F9F9F9" fill-rule="nonzero" xlink:href="#path-1"></use>
+            <g id="accordion" transform="translate(77, 30)" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Three accordion sections -->
+                <rect x="0" y="0" width="55" height="15" rx="2.5"></rect>
+                <rect x="0" y="20" width="55" height="15" rx="2.5"></rect>
+                <rect x="0" y="40" width="55" height="15" rx="2.5"></rect>
+                
+                <!-- Plus symbols -->
+                <line x1="42" y1="7.5" x2="48" y2="7.5"></line>
+                <line x1="45" y1="4.5" x2="45" y2="10.5"></line>
+                
+                <line x1="42" y1="27.5" x2="48" y2="27.5"></line>
+                <line x1="45" y1="24.5" x2="45" y2="30.5"></line>
+                
+                <line x1="42" y1="47.5" x2="48" y2="47.5"></line>
+                <line x1="45" y1="44.5" x2="45" y2="50.5"></line>
+            </g>
+        </g>
+    </g>
+</svg>

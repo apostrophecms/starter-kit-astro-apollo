@@ -1,0 +1,68 @@
+---
+const { widget } = Astro.props;
+
+// Determine the link path based on type
+const path =
+  widget.linkType === 'page'
+    ? widget._linkPage?._url
+    : widget.linkType === 'file'
+      ? widget._linkFile?._url
+      : widget.linkUrl;
+
+const getButtonStyle = (style) => {
+  return style ? `is-${style}` : '';
+};
+// Build button classes
+const isButton = widget.linkStyle === 'button';
+const buttonClasses = isButton
+  ? [
+      'button',
+      // Main color class
+      widget.buttonColor ? `is-${widget.buttonColor}` : '',
+      // Button style (outlined, light, rounded)
+      getButtonStyle(widget.buttonStyle),
+      // Size
+      widget.buttonSize ? `is-${widget.buttonSize}` : '',
+      // Disabled state
+      widget.buttonDisabled ? 'is-disabled' : '',
+    ].filter(Boolean).join(' ')
+  : '';
+
+const linkTarget = widget.linkTarget?.includes('_blank') ? '_blank' : '';
+
+// Build link attributes
+const attributes = {
+  target: linkTarget,
+  class: isButton ? buttonClasses : 'link',
+  href: path,
+  ...(widget.buttonDisabled ? { disabled: true } : {}),
+};
+
+const hasIcon = widget.icon && widget.icon !== '';
+
+// Define alignment class based on buttonAlignment
+const alignmentMap = {
+  'left': 'is-justify-content-flex-start',
+  'center': 'is-justify-content-center',
+  'right': 'is-justify-content-flex-end'
+};
+const alignmentClass = alignmentMap[widget.buttonAlignment || 'left'];
+---
+
+<div class={`columns ${alignmentClass} m-0`}>
+  <div class="column is-narrow">
+    <a {...attributes}>
+      {hasIcon && widget.iconPosition !== 'right' && (
+        <span class="icon">
+          <i class={`fa-solid fa-${widget.icon}`}></i>
+        </span>
+      )}
+      <span>{widget.linkText}</span>
+      {hasIcon && widget.iconPosition === 'right' && (
+        <span class="icon">
+          <i class={`fa-solid fa-${widget.icon}`}></i>
+        </span>
+      )}
+    </a>
+  </div>
+</div>

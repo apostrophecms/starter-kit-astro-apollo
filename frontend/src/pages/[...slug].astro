@@ -1,0 +1,97 @@
+---
+import aposPageFetch from '@apostrophecms/apostrophe-astro/lib/aposPageFetch.js';
+import AposLayout from '@apostrophecms/apostrophe-astro/components/layouts/AposLayout.astro';
+import AposTemplate from '@apostrophecms/apostrophe-astro/components/AposTemplate.astro';
+
+const aposData = await aposPageFetch(Astro.request);
+
+if (aposData.redirect) {
+  return Astro.redirect(aposData.url, aposData.status);
+}
+if (aposData.notFound) {
+  Astro.response.status = 404;
+}
+// Extract header information
+const headerPosition = aposData.global?.headerGroup.headerPosition || 'static';
+
+const theme = aposData.global?.themeGroup.theme || 'light';
+
+// Initialize an array to hold body classes
+const bodyClasses = [];
+
+// Conditionally add 'has-navbar-fixed-top' based on headerPosition
+if (headerPosition === 'fixed' || headerPosition === 'fixed-fade') {
+  bodyClasses.push('has-navbar-fixed-top');
+}
+
+// Join the classes into a single string
+const bodyClass = bodyClasses.join(' ');
+
+import '../styles/main.scss';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<AposLayout title={aposData.page?.title} {aposData} {bodyClass}>
+  <Fragment slot='standardHead'>
+    <meta name='description' content={aposData.page?.seoDescription} />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta charset='UTF-8' />
+    <link
+      rel='stylesheet'
+      href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'
+    />
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const updateThemeAndNavbar = () => {
+          const themeMarker = document.getElementById('theme-marker');
+          if (themeMarker) {
+            const selectedTheme =
+              themeMarker.getAttribute('data-selected-theme') || 'light';
+            const newThemeClass = `theme-${selectedTheme}`;
+
+            // Update theme classes
+            const html = document.documentElement;
+            const existingHtmlClasses = html.className.split(' ');
+            const filteredHtmlClasses = existingHtmlClasses.filter(
+              (className) => !className.startsWith('theme-')
+            );
+            html.className = [...filteredHtmlClasses, newThemeClass].join(' ');
+
+            // Update navbar classes
+            const isFixedNav =
+              themeMarker.getAttribute('data-fixed-nav') === 'true';
+
+            document.body.classList.remove(
+              'has-navbar-fixed-top',
+              'has-navbar-static'
+            );
+            document.body.classList.add(
+              isFixedNav ? 'has-navbar-fixed-top' : 'has-navbar-static'
+            );
+          }
+        };
+
+        // Initialize immediately if apos is available
+        if (window.apos) {
+          updateThemeAndNavbar();
+          apos.bus.$on('refreshed', updateThemeAndNavbar);
+        } else {
+          // Poll for apos availability
+          const waitForApos = setInterval(() => {
+            if (window.apos) {
+              clearInterval(waitForApos);
+              updateThemeAndNavbar();
+              apos.bus.$on('refreshed', updateThemeAndNavbar);
+            }
+          }, 100);
+        }
+      });
+    </script>
+  </Fragment>
+
+  <Header slot='beforeMain' {aposData} />
+  <AposTemplate {aposData} slot='main' />
+  <Footer {aposData} slot='afterMain' />
+</AposLayout>

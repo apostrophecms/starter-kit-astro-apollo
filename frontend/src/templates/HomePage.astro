@@ -1,0 +1,41 @@
+---
+import Hero from '../widgets/HeroWidget.astro';
+import Slideshow from '../widgets/SlideshowWidget.astro';
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+import { heroDefaults, slideshowDefaults } from '../lib/homepage-defaults.js';
+
+const { page, user, query, global } = Astro.props.aposData;
+const { layout = 'foundation', heroSection = {}, showcaseSlideshow = {}, main = {} } = page;
+
+// Use default data if no data is provided
+const heroData = heroSection?.mainContent?.title ? heroSection : heroDefaults;
+const slideshowData = showcaseSlideshow?.slides?.length ? showcaseSlideshow : slideshowDefaults;
+
+---
+<div class="main-content astro-hp-content">
+  {/* Foundation Layout */}
+  {layout === 'foundation' && (
+    <>
+      {heroData && <Hero widget={heroData} />}
+    </>
+  )}
+
+  {/* Showcase Layout */}
+  {layout === 'showcase' && (
+    <>
+      {slideshowData && (
+        <div class="showcase-slideshow">
+          <Slideshow widget={slideshowData} />
+        </div>
+      )}
+    </>
+  )}
+
+    {/* Main Content Area */}
+  <div class="minimal-container">
+    <AposArea area={main} />
+  </div>
+</div>
+
+</style>

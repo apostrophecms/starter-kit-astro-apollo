@@ -1,0 +1,212 @@
+---
+import { useSiteConfig } from '../lib/use-site-config.js';
+
+const { aposData } = Astro.props;
+const mainNav = aposData.home?._children || [];
+const {
+  getNavItemClasses,
+  getDropdownClasses,
+  renderBranding,
+  getHeaderClasses,
+  getHeaderTransparency,
+  theme
+} = useSiteConfig(aposData.global);
+
+function formatNavItem(page) {
+  if (!page) return null;
+  return {
+    title: page.title || '',
+    url: page._url || '#',
+    active: page._url === aposData.page?._url,
+    children: page._children?.map(formatNavItem).filter(Boolean) || []
+  };
+}
+
+const headerGroup = aposData.global?.headerGroup || {};
+
+const navMenuClasses = () => {
+  const classes = [];
+  const alignment = headerGroup.navAlignment || 'end';
+  classes.push(`navbar-${alignment}`);
+  if (headerGroup.headerBackgroundColor) {
+    classes.push(`has-background-${headerGroup.headerBackgroundColor}`);
+  }
+  return classes.join(' ');
+};
+
+const addFixedHeaderClass = () => {
+  const fixedHeader = headerGroup.headerPosition === 'static' ? false : true;
+  return fixedHeader.toString();
+};
+
+const navItems = mainNav.map(formatNavItem).filter(Boolean);
+
+const shouldShowItems = navItems.length > 0;
+---
+
+<header class={getHeaderClasses()} data-transparency={getHeaderTransparency()}>
+  <div class='container'>
+    <div class='navbar-brand'>
+      <a href='/' class='navbar-item' set:html={renderBranding()} />
+      { shouldShowItems && (
+        <a
+          role='button'
+          aria-label='menu'
+          aria-expanded='false'
+          class={`navbar-burger has-text-${headerGroup.mobileMenuColor || 'current'}`}
+          data-target='navMenu'
+        >
+          <span aria-hidden='true' />
+          <span aria-hidden='true' />
+          <span aria-hidden='true' />
+          <span aria-hidden='true' />
+        </a>
+      )}
+    </div>
+
+    <div class="navbar-end-wrapper">
+      {shouldShowItems && (
+        <div id='navMenu' class='navbar-menu'>
+          <div class={navMenuClasses()}>
+            {navItems.map((item) => (
+              <div
+                class={`navbar-item ${item.children.length > 0 ? 'has-dropdown is-hoverable' : ''}`}
+              >
+                {item.children.length > 0 ? (
+                  <>
+                    <a href={item.url} class='navbar-link'>
+                      {item.title}
+                    </a>
+                    <div class={getDropdownClasses()}>
+                      <a href={item.url} class={getNavItemClasses()}>
+                        {item.title}
+                      </a>
+                      <hr class='navbar-divider' />
+                      {item.children.map((child) => (
+                        <a href={child.url} class={getNavItemClasses()}>
+                          {child.title}
+                        </a>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <a
+                    href={item.url}
+                    class={`${getNavItemClasses(item.active)}`}
+                  >
+                    {item.title}
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+  <div
+    id='theme-marker'
+    data-selected-theme={theme.theme}
+    data-fixed-nav={addFixedHeaderClass()}
+    style='display: none;'
+  >
+  </div>
+</header>
+
+<style>
+  /* Adjusted Navbar Height */
+  .navbar {
+    transition: opacity 0.4s ease-in-out;
+    margin-bottom: 10px;
+  }
+
+  .navbar-end-wrapper {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .navbar-burger {
+    margin-left: 0.5rem;
+  }
+
+  /* Ensure navbar-menu doesn't push theme switcher down on mobile */
+  @media screen and (max-width: 1023px) {
+    .navbar-menu {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 100%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeNavbar();
+  });
+
+  // Initialize navbar functionalities
+  function initializeNavbar() {
+    setupBurgerMenu();
+    setupScrollFade();
+    updateHeaderTransparency();
+
+    // Reinitialize on ApostropheCMS refresh
+    if (window.apos) {
+      apos.bus.$on('refreshed', initializeNavbar);
+    }
+  }
+
+  // Burger menu functionality
+  function setupBurgerMenu() {
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    $navbarBurgers.forEach((el) => {
+      el.addEventListener('click', () => {
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+        el.classList.toggle('is-active');
+        $target?.classList.toggle('is-active');
+      });
+    });
+  }
+
+  // Scroll fade functionality for navbar
+  function setupScrollFade() {
+    const header = document.querySelector('.navbar.is-fixed-fade');
+    if (!header) return;
+
+    const maxScroll = 300;
+    let lastScroll = 0;
+    let fadeStartPosition = 0;
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        const currentScroll = window.scrollY;
+        const scrollingUp = currentScroll < lastScroll;
+
+        if (scrollingUp) {
+          header.style.opacity = 1;
+          fadeStartPosition = currentScroll;
+        } else {
+          const scrollDistance = currentScroll - fadeStartPosition;
+          const opacity = 1 - Math.min(scrollDistance / maxScroll, 1);
+          header.style.opacity = opacity;
+        }
+
+        lastScroll = currentScroll;
+      },
+      { passive: true }
+    );
+  }
+
+  // Apply initial header transparency based on data attribute
+  function updateHeaderTransparency() {
+    const header = document.querySelector('.navbar');
+    if (!header || header.classList.contains('is-fixed-fade')) return;
+
+    const transparency = Number(header.dataset.transparency) || 100;
+    header.style.opacity = transparency / 100;
+  }
+</script>

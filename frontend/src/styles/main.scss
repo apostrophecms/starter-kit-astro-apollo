@@ -1,0 +1,73 @@
+@charset "utf-8";
+@use 'bulma/bulma.scss';
+
+
+:root {
+  // Your custom CSS variables
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(
+    --family-primary,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    'Helvetica',
+    'Arial',
+    sans-serif
+  );
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--family-primary, inherit);
+}
+
+// Overrides for the Apostrophe Admin UI
+body {
+  & [data-apos-refreshable] .navbar.is-fixed-top {
+    top: 112px;
+  }
+
+  &[data-apos-generated].has-navbar-fixed-top .main-content {
+    padding-top: 118px;
+  }
+
+
+  &.has-navbar-fixed-top .apos-admin-bar-spacer {
+    height: 0 !important;
+  }
+
+  &:not(.has-navbar-fixed-top) .navbar {
+    margin-bottom: 0;
+  }
+}
+
+.apos-area-widget-controls.apos-area-widget-controls--modify,
+.apos-area-widget-controls.apos-area-widget-controls {
+  z-index: 100 !important;
+}
+
+.apos-rich-text-editor__editor {
+  margin-left: 20px;
+}
+
+// helper for has-backround-transparent
+.has-background-transparent {
+  background-color: transparent;
+}

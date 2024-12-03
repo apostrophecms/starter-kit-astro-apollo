@@ -1,0 +1,97 @@
+---
+const { widget } = Astro.props;
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+// Column layout configurations
+const layouts = {
+  'single': {
+    classes: ['is-12'],
+    areas: ['columnOneContent']
+  },
+  'two-equal': {
+    classes: ['is-6', 'is-6'],
+    areas: ['columnOneContent', 'columnTwoContent']
+  },
+  'three-equal': {
+    classes: ['is-4', 'is-4', 'is-4'],
+    areas: ['columnOneContent', 'columnTwoContent', 'columnThreeContent']
+  },
+  'four-equal': {
+    classes: ['is-3', 'is-3', 'is-3', 'is-3'],
+    areas: ['columnOneContent', 'columnTwoContent', 'columnThreeContent', 'columnFourContent']
+  },
+  'one-third-two-thirds': {
+    classes: ['is-4', 'is-8'],
+    areas: ['columnOneContent', 'columnTwoContent']
+  },
+  'two-thirds-one-third': {
+    classes: ['is-8', 'is-4'],
+    areas: ['columnOneContent', 'columnTwoContent']
+  },
+  'quarter-half-quarter': {
+    classes: ['is-3', 'is-6', 'is-3'],
+    areas: ['columnOneContent', 'columnTwoContent', 'columnThreeContent']
+  }
+};
+
+// Spacing configurations
+const spacingClasses = {
+  'none': 'is-gapless',
+  'tight': 'is-1',
+  'normal': 'is-3',
+  'wide': 'is-5'
+};
+
+// Vertical alignment configurations
+const verticalAlignmentClasses = {
+  'top': 'is-align-items-start',
+  'center': 'is-align-items-center',
+  'bottom': 'is-align-items-end'
+};
+
+// Horizontal alignment configurations
+const horizontalAlignmentClasses = {
+  'left': 'is-justify-content-flex-start',
+  'center': 'is-justify-content-center',
+  'right': 'is-justify-content-flex-end',
+  'space-between': 'is-justify-content-space-between'
+};
+
+const currentLayout = layouts[widget.columnLayout || 'two-equal'];
+const spacingClass = spacingClasses[widget.spacing || 'normal'];
+const verticalAlignClass = verticalAlignmentClasses[widget.verticalAlignment || 'top'];
+const horizontalAlignClass = horizontalAlignmentClasses[widget.horizontalAlignment || 'left'];
+const maxWidth = widget.maxWidth ? widget.maxWidth : '';
+
+// Build columns classes
+const columnsClasses = [
+  'columns',
+  spacingClass,
+  verticalAlignClass,
+  horizontalAlignClass,
+  maxWidth,
+  'mx-auto'
+].filter(Boolean).join(' ');
+---
+
+<div class="column-layout container is-fluid mt-3 mb-3">
+  <div class={columnsClasses}>
+    {currentLayout.areas.map((areaName, index) => (
+      widget[areaName] && (
+        <div class={`column ${currentLayout.classes[index]} editor-column`} data-column-index={index + 1}>
+          <div class="column-content">
+            <AposArea area={widget[areaName]} />
+          </div>
+        </div>
+      )
+    ))}
+  </div>
+</div>
+
+
+<style>
+  .max-width-768 { max-width: 768px; }
+  .max-width-960 { max-width: 960px; }
+  .max-width-1152 { max-width: 1152px; }
+  .max-width-1344 { max-width: 1344px; }
+</style>

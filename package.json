@@ -1,0 +1,32 @@
+{
+  "name": "combined-astro-starter-kit",
+  "version": "1.0.0",
+  "description": "Combined ApostropheCMS plus Astro starter kit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd frontend && echo '\\n💡 running npm install in frontend/' && npm install && cd ../backend && echo '\\n💡 running npm install in backend/' && npm install && echo '\\n💡 combined npm install complete'",    
+    "update": "cd frontend && echo '\\n💡 running npm update in frontend/' && npm update && cd ../backend && echo '\\n💡 running npm update in backend/' && npm update && echo '\\n💡 combined npm update complete'",    
+    "build": "npm run build-frontend && npm run build-backend && echo '\\n💡 combined build complete'",
+    "build-frontend": "echo '\\n💡 running npm run build in frontend/' && cd frontend && npm run build",
+    "build-backend": "echo '\\n💡 running npm run build in backend/' && cd backend && npm run build",
+    "migrate": "cd backend && npm run migrate",
+    "serve-frontend": "cd frontend && npm run serve",
+    "serve-backend": "cd backend && npm run serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apostrophecms/combined-astro-starter-kit.git"
+  },
+  "keywords": [
+    "astro",
+    "apostrophecms",
+    "apostrophe"
+  ],
+  "author": "Apostrophe Technologies Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apostrophecms/combined-astro-starter-kit/issues"
+  },
+  "homepage": "https://github.com/apostrophecms/combined-astro-starter-kit#readme"
+}
