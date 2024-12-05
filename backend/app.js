@@ -2,7 +2,7 @@ import apostrophe from 'apostrophe';
 
 export default apostrophe({
   root: import.meta,
-  shortName: 'starter-kit-astro-template-alex',
+  shortName: 'apollo-backend',
   modules: {
     // Apostrophe module configuration
     // *******************************
