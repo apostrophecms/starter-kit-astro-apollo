@@ -1,12 +1,13 @@
 {
-  "name": "astro-template-frontend",
+  "name": "apollo-frontend",
   "type": "module",
+  "description": "Astro frontend for the ApostropheCMS + Astro Apollo template",
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "serve": "node ./dist/server/entry.mjs",
+    "serve": "HOST=0.0.0.0 PORT=4321 node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
