@@ -6,6 +6,9 @@ import path from 'path';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  build: {
+    assets: '_astro'
+  },
   adapter: node({
     mode: 'standalone'
   }),
