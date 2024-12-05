@@ -41,4 +41,3 @@ This project provides the core ApostropheCMS widgets, plus seven additional widg
     - link-widget: adds links that can be styled as text or a highly customizable button
 
 ### Pieces
-PIECES WILL BE LISTED HERE
