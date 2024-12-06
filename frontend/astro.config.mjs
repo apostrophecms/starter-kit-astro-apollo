@@ -5,10 +5,7 @@ import path from 'path';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  build: {
-    assets: '_astro'
-  },
+  output: "server",
   adapter: node({
     mode: 'standalone'
   }),
@@ -23,14 +20,6 @@ export default defineConfig({
       // Do not externalize the @apostrophecms/apostrophe-astro plugin, we need
       // to be able to use virtual: URLs there
       noExternal: ['@apostrophecms/apostrophe-astro']
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve('./src'),
-        '@lib': path.resolve('./src/lib'),
-        '@components': path.resolve('./src/components'),
-        '@layouts': path.resolve('./src/layouts')
-      }
     }
   },
   css: {
