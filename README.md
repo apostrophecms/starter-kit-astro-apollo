@@ -13,11 +13,12 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 - Node.js v20 or later
 - MongoDB v6.0 or later running on a local server or access to Atlas. See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for set-up details.
 
+### Getting Started
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
 
-As a convenience, this repo has several scripts that can be run at the root of the project including `postinstall`, that runs `npm install` for both the `frontend` and `backend` repositories, `update` for `npm update` in both, and `build` to build both codebases.
+As a convenience, this repo has several scripts that can be run at the root of the project including a `postinstall` scripts, that runs `npm install` for both the `frontend` and `backend` repositories when you run install any dependencies at the root of the repository, `update` for `npm update` in both, and `build` to build both codebases.
 
-- To start, execute `npm run postinstall` from a terminal in the root of this repo
+- To start, execute `npm install` from a terminal in the root of this repo
 - Next, open a terminal instance at the root of each folder (`frontend` and `backend`). Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
 - The `astro.config.mjs` file is already set to the normal default values, but if you are running the backend server on a different port, you will also have to set the `APOS_HOST` environment variable.
 - Then, you can start the projects using the accompanying scripts. For example, in a local development environment you can start each with `npm run dev`.
@@ -34,13 +35,13 @@ Where this project differs from a normal ApostropheCMS project is that no fronte
 
 Equally, certain [module customization functions](https://docs.apostrophecms.org/reference/module-api/module-overview.html#customization-functions) that deal with front-end functionality should not be used. This includes the `helper()` and `extendHelpers()` functions for providing Nunjucks template helpers, the `components()` method that provide asynchronous template components, and the `renderRoutes()` function to return a rendered template.
 
-Unlike an ApostropheCMS-only project, using Astro as a frontend allows for the widget templates to be used outside specialized `area` schema fields. While this removes the ability to edit the widgets in-context, it does provide flexibility for page design without code repetition. However, this means that the widget schema needs to be added to the schema fields of the page. To facilitate this, some of the widget schema fields have been moved to the `lib/schema-mixins` folder. This allows them to be imported and used in both the main widget module and in the home page template.
+Unlike an ApostropheCMS-only project, using Astro as a frontend allows for the widget templates to be used outside specialized `area` schema fields. This provides flexibility for page design without code repetition. However, this means that the widget schema needs to be added to the schema fields of the page. To facilitate this, some of the widget schema fields have been moved to the `lib/schema-mixins` folder. This allows them to be imported and used in both the main widget module and in the home page template.
 
 ### Similarities to a stand-alone Astro project
 The Astro half of this project has standard components and templates.
 
 ### Important Astro differences
-Unlike an Astro project with multiple routes in the `pages` folder, this project has a single `[...slug].astro` that handles all the routing using pages mapped to the `templates` folder. Each of the templates corresponds to one of the registered ApostropheCMS page or piece-page types. The content of these templates is populated by data from the CMS backend and is added into the slots in the `[...slug].astro` file. There is also a `widgets` folder containing templates for the ApostropheCMS widgets. The ApostropheCMS page and widget types are mapped to the corresponding ApostropheCMS modules through an `index.js` file in each folder.
+Unlike an Astro project with multiple routes in the `pages` folder, this project has a single slug.astro route that handles all the routing using pages mapped to the `templates` folder. Each of the templates corresponds to one of the registered ApostropheCMS page or piece-page types. The content of these templates is populated by data from the CMS backend and is added into the slots in the `[...slug].astro` file. There is also a `widgets` folder containing templates for the ApostropheCMS widgets. The ApostropheCMS page and widget types are mapped to the corresponding ApostropheCMS modules through an `index.js` file in each folder.
 
 ## Project highlights
 This project is more opinionated than some of our other project starter kits. It uses the [Bulma CSS framework](https://bulma.io/). For a more streamlined starting point you can use the [combined-astro-starter-kit](https://github.com/apostrophecms/combined-astro-starter-kit) repository.
