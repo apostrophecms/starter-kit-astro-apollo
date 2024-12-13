@@ -1,5 +1,6 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../../lib/attachments.js';
 
 import ArticlesFilter from '../../components/ArticlesFilter.astro';
 
@@ -81,7 +82,8 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
                   loading='lazy'
                   decoding='async'
                   sizes='(max-width: 768px) 100vw, 50vw'
-                  src={article._heroImage[0].attachment._urls.full}
+                  src={getAttachmentUrl(article._heroImage[0].attachment, { size: 'full' })}
+                  srcset={getAttachmentSrcset(article._heroImage[0].attachment)}
                   alt={article._heroImage[0].attachment._alt || ''}
                 />
               </figure>

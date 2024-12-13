@@ -30,8 +30,14 @@ export const slideshowDefaults = {
       _image: [
         {
           attachment: {
+            extension: 'jpg',
             _urls: {
-              full: 'https://picsum.photos/seed/slide1/1600/900'
+              'max': 'https://picsum.photos/seed/slide1/1600/1600',
+              'full': 'https://picsum.photos/seed/slide1/1600/900',
+              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
+              'one-half': 'https://picsum.photos/seed/slide1/570/700',
+              'one-third': 'https://picsum.photos/seed/slide1/380/700',
+              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
             },
             alt: 'Welcome slide'
           }
@@ -48,8 +54,14 @@ export const slideshowDefaults = {
       _image: [
         {
           attachment: {
+            extension: 'jpg',
             _urls: {
-              full: 'https://picsum.photos/seed/slide2/1600/900'
+              'max': 'https://picsum.photos/seed/slide1/1600/1600',
+              'full': 'https://picsum.photos/seed/slide1/1600/900',
+              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
+              'one-half': 'https://picsum.photos/seed/slide1/570/700',
+              'one-third': 'https://picsum.photos/seed/slide1/380/700',
+              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
             },
             alt: 'Design slide'
           }
@@ -66,8 +78,14 @@ export const slideshowDefaults = {
       _image: [
         {
           attachment: {
+            extension: 'jpg',
             _urls: {
-              full: 'https://picsum.photos/seed/slide3/1600/900'
+              'max': 'https://picsum.photos/seed/slide1/1600/1600',
+              'full': 'https://picsum.photos/seed/slide1/1600/900',
+              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
+              'one-half': 'https://picsum.photos/seed/slide1/570/700',
+              'one-third': 'https://picsum.photos/seed/slide1/380/700',
+              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
             },
             alt: 'Getting started slide'
           }

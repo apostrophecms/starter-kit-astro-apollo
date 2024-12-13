@@ -1,6 +1,7 @@
 ---
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../lib/attachments.js';
 
 // Destructure all needed properties with defaults
 const {
@@ -24,20 +25,18 @@ const {
   callToAction
 } = widget;
 
-const getBackgroundImageUrl = () => {
-  if (!Array.isArray(_backgroundImage) || !_backgroundImage.length) {
-    return `https://picsum.photos/1920/1080?random=${Math.random()}`;
-  }
-  return _backgroundImage[0]?.attachment?._urls?.full;
-};
+const backgroundImage = getFirstAttachment(_backgroundImage);
+const backgroundImageUrl = backgroundImage
+  ? {
+      src: getAttachmentUrl(backgroundImage.attachment, { size: 'full' }),
+      srcset: getAttachmentSrcset(backgroundImage.attachment)
+    }
+  : {
+      src: `https://picsum.photos/1920/1080?random=${Math.random()}`,
+      srcset: ''
+    };
 
-const getBackgroundImageAlt = () => {
-  if (!Array.isArray(_backgroundImage) || !_backgroundImage.length) return '';
-  return _backgroundImage[0]?.attachment?._alt || '';
-};
-
-const backgroundImageUrl = getBackgroundImageUrl();
-const backgroundImageAlt = getBackgroundImageAlt();
+const backgroundImageAlt = backgroundImage?.attachment?.alt || '';
 
 const getVideoSource = (video) => {
   if (!video?._url || !video?.extension) {
@@ -118,8 +117,10 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
       <div class='hero-background'>
   {background === 'image' && backgroundImageUrl ? (
     <img
-      src={backgroundImageUrl}
-      alt={getBackgroundImageAlt()}
+      src={backgroundImageUrl.src}
+      srcset={backgroundImageUrl.srcset}
+      sizes="100vw"
+      alt={backgroundImage?.attachment?.alt || ''}
       style={`object-position: center ${imagePosition}`}
     />
     ) : background === 'video' && (mainVideo || mobileVideo) ? (
@@ -188,9 +189,10 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
         {background === 'image' ? (
           <>
             <img
-              src={backgroundImageUrl}
-              alt={backgroundImageAlt}
-              class='hero-background'
+              src={backgroundImageUrl.src}
+              srcset={backgroundImageUrl.srcset}
+              sizes="100vw"
+              alt={backgroundImage?.attachment?.alt || ''}
               style={`object-position: center ${imagePosition}`}
             />
             {enableOverlay && <div class='split-overlay' />}

@@ -25,7 +25,6 @@
     "vite": "^5.0.7"
   },
   "devDependencies": {
-    "postcss-viewport-to-container-toggle": "^1.0.0",
     "sass-embedded": "^1.81.0"
   }
 }

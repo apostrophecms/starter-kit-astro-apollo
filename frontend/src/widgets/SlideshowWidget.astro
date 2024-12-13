@@ -1,5 +1,7 @@
 ---
 const { widget } = Astro.props;
+import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../lib/attachments.js';
+
 
 const {
   slideDuration = 5000,
@@ -61,6 +63,7 @@ const getContentSize = (selectedSize) => {
   <div class='slides'>
     {
       slides.map((slide, index) => {
+        const slideImage = getFirstAttachment(slide._image);
         return (
           <div
             class='slide'
@@ -71,8 +74,10 @@ const getContentSize = (selectedSize) => {
             <figure class='image is-16by9'>
               {slide._image?.[0] && (
                 <img
-                  src={slide._image[0].attachment._urls['full']}
-                  alt={slide._image[0].attachment.alt || slide.slideTitle}
+                  src={getAttachmentUrl(slideImage.attachment, { size: 'full' })}
+                  srcset={getAttachmentSrcset(slideImage.attachment)}
+                  sizes="100vw"
+                  alt={slideImage.attachment.alt || slide.slideTitle}
                   loading={index === 0 ? 'eager' : 'lazy'}
                 />
               )}

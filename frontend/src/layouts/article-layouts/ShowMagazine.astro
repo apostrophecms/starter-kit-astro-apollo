@@ -1,7 +1,9 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../../lib/attachments.js';
 
 const { article } = Astro.props;
+const heroImage = getFirstAttachment(article._heroImage);
 ---
 
 <article class="magazine-article">
@@ -17,11 +19,13 @@ const { article } = Astro.props;
             <p class="subtitle is-4">{article.excerpt}</p>
           </div>
 
-          {article._heroImage?.[0] && (
+          {heroImage && (
             <figure class="image is-2by1 mb-6">
               <img
-                src={article._heroImage[0].attachment._urls.full}
-                alt={article._heroImage[0].attachment.alt || ''}
+                src={getAttachmentUrl(heroImage.attachment, { size: 'full' })}
+                srcset={getAttachmentSrcset(heroImage.attachment)}
+                sizes="(min-width: 1200px) 1920px, 100vw"
+                alt={heroImage.attachment.alt || ''}
                 class="object-fit-cover"
               />
             </figure>

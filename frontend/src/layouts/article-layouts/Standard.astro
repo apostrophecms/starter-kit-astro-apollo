@@ -1,6 +1,10 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset
+} from '../../lib/attachments.js';
 import ArticlesFilter from '../../components/ArticlesFilter.astro';
 
 const {
@@ -12,81 +16,86 @@ const {
 } = Astro.props;
 const textWidth = showImage ? 12 - imageWidth : 12;
 
-// Get the current category from URL params
 const currentCategory = Astro.url.searchParams.get('category') || '';
 ---
-<div class="container">
+<div class='container'>
   <ArticlesFilter
     currentUrl={Astro.url}
     currentCategory={currentCategory}
     articles={pieces}
   />
-<div class='content'>
-  {pieces.map((article) => (
-    <article class='mb-6 pb-6 border-bottom'>
-      <div class='columns is-vcentered'>
-        <div class={`column is-${textWidth}`}>
-          <a href={article._url}>
-            <h2 class='title is-3'>{article.title}</h2>
-          </a>
-          <div class='author-info mb-3'>
-            <div class='media'>
-              {showAuthorAvatar && article._author[0]?.profileImage && (
-                <div class='media-left'>
-                  <figure class='image is-32x32'>
-                    <AposArea 
-                      area={article._author[0].profileImage}
-                      imageOptions={{ 
-                        additionalClasses: 'is-rounded object-fit-cover',
-                        sizes: '32px'
-                      }}
+  <div class='content'>
+    {
+      pieces.map((article) => {
+        const heroImage = getFirstAttachment(article._heroImage);
+        return (
+          <article class='mb-6 pb-6 border-bottom'>
+            <div class='columns is-vcentered'>
+              <div class={`column is-${textWidth}`}>
+                <a href={article._url}>
+                  <h2 class='title is-3'>{article.title}</h2>
+                </a>
+                <div class='author-info mb-3'>
+                  <div class='media'>
+                    {showAuthorAvatar && article._author[0]?.profileImage && (
+                      <div class='media-left'>
+                        <figure class='image is-32x32'>
+                          <AposArea
+                            area={article._author[0].profileImage}
+                            imageOptions={{
+                              additionalClasses: 'is-rounded object-fit-cover',
+                              sizes: '32px'
+                            }}
+                          />
+                        </figure>
+                      </div>
+                    )}
+                    <div class='media-content'>
+                      <p class='has-text-grey'>
+                        By <strong>{article._author[0].title}</strong> |
+                        {new Date(article.publishDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p class='mb-4'>
+                  {excerptLength
+                    ? article.excerpt.slice(0, excerptLength) +
+                      (article.excerpt.length > excerptLength ? '...' : '')
+                    : article.excerpt}
+                </p>
+                <a href={article._url} class='button is-link'>
+                  Read Full Article
+                </a>
+              </div>
+              {showImage && heroImage && (
+                <div class={`column is-${imageWidth}`}>
+                  <figure class='image is-3by2'>
+                    <img
+                      class='has-shadow object-fit-cover'
+                      loading='lazy'
+                      decoding='async'
+                      sizes={`(max-width: 768px) 100vw, ${(imageWidth / 12) * 100}vw`}
+                      src={getAttachmentUrl(heroImage.attachment, {
+                        size: 'full'
+                      })}
+                      srcset={getAttachmentSrcset(heroImage.attachment)}
+                      alt={heroImage.attachment.alt || ''}
                     />
                   </figure>
                 </div>
               )}
-              <div class='media-content'>
-                <p class='has-text-grey'>
-                  By <strong>{article._author[0].title}</strong> |
-                  {new Date(article.publishDate).toLocaleDateString()}
-                </p>
-              </div>
             </div>
-          </div>
-          <p class='mb-4'>
-            {excerptLength 
-              ? article.excerpt.slice(0, excerptLength) + (article.excerpt.length > excerptLength ? '...' : '')
-              : article.excerpt
-            }
-          </p>
-          <a href={article._url} class='button is-link'>
-            Read Full Article
-          </a>
-        </div>
-        {showImage && article?._heroImage?.[0] && (
-          <div class={`column is-${imageWidth}`}>
-            {article?._heroImage?.[0] && (
-              <figure class='image is-3by2'>
-                <img
-                  class='has-shadow object-fit-cover'
-                  loading='lazy'
-                  decoding='async'
-                  sizes='(max-width: 768px) 100vw, ${imageWidth/12 * 100}vw'
-                  src={article._heroImage[0].attachment._urls.full}
-                  alt={article._heroImage[0].attachment._alt || ''}
-                />
-              </figure>
-            )}
-          </div>
-        )}
-      </div>
-    </article>
-  ))}
+          </article>
+        );
+      })
+    }
+  </div>
 </div>
 <style>
-  html.theme-dark .title {
-    color: #fff !important;
-  }
-  
+html.theme-dark .title {
+  color: #fff !important;
+}
   html.theme-dark .subtitle,
   html.theme-dark p {
     color: #dbdbdb !important;
@@ -97,12 +106,10 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
     width: 100%;
     height: 100%;
   }
-  
   .is-rounded {
     border-radius: 50%;
   }
-
   .has-shadow {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 </style>

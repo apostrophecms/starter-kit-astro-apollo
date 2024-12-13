@@ -1,9 +1,8 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-const {
-  article,
-  showAuthorAvatar = true
-} = Astro.props;
+import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../../lib/attachments.js';
+
+const { article, showAuthorAvatar = true } = Astro.props;
 
 const iconMap = {
   github: 'fab fa-github',
@@ -12,18 +11,21 @@ const iconMap = {
   website: 'fas fa-globe'
 };
 
-// Get the authors array/object
 const authors = article._author;
 const authorCount = Array.isArray(authors) ? authors.length : 1;
 const primaryAuthor = Array.isArray(authors) ? authors[0] : authors;
+
+const heroImage = getFirstAttachment(article._heroImage);
 ---
 <article class="full-width-article">
-  {article._heroImage?.[0] && (
+  {heroImage && (
     <div class="hero is-large">
       <figure class="image is-16by9">
         <img
-          src={article._heroImage[0].attachment._urls.full}
-          alt={article._heroImage[0].attachment.alt || ''}
+          src={getAttachmentUrl(heroImage.attachment, { size: 'full' })}
+          srcset={getAttachmentSrcset(heroImage.attachment)}
+          sizes="(min-width: 1200px) 1920px, 100vw"
+          alt={heroImage.attachment.alt || ''}
           class="object-fit-cover"
         />
       </figure>
