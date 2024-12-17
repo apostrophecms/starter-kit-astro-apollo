@@ -28,9 +28,17 @@ export default defineConfig({
       'host',
       'x-forwarded-for',
       'x-forwarded-proto',
-      'x-request-start',
-      'connect-time'
-    ]
+      'x-real-ip',
+      'connection',
+      'accept',
+      'accept-encoding',
+      'user-agent'
+    ],
+    timeout: 30000, // 30 seconds
+    proxy: {
+      secure: true,
+      rejectUnauthorized: false
+    }
   })],
   vite: {
     ssr: {
