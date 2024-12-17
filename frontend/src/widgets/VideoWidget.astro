@@ -12,14 +12,8 @@ const url = widget?.video?.url;
   url={placeholder ? 'https://youtu.be/Q5UX9yexEyM' : url }
 >
 </video-widget>
-<script>
+<script defer>
   class VideoWidget extends HTMLElement {
-    result: {
-      width: number,
-      height: number,
-      html: string
-    };
-    canvasEl: HTMLElement;
     constructor() {
       super();
       this.init();

@@ -2,7 +2,15 @@
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 
-import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../lib/attachments.js';
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
 
 const {
   cardType = 'basic',
@@ -92,15 +100,24 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
         <figure class='image'>
           {mainImage ? (
             <img
-              src={getAttachmentUrl(mainImage.attachment, { size: 'full' })}
-              srcset={getAttachmentSrcset(mainImage.attachment)}
+              src={getAttachmentUrl(mainImage, { size: 'full' })}
+              srcset={getAttachmentSrcset(mainImage)}
               sizes='(max-width: 800px) 100vw, 800px'
               alt={mainImage.alt || mainImage.title || 'Card image'}
+              width={getWidth(mainImage) || '800'}
+              height={getHeight(mainImage) || '600'}
+              style={
+                hasFocalPoint(mainImage)
+                  ? `object-position: ${getFocalPoint(mainImage)};`
+                  : 'object-position: center center'
+              }
             />
           ) : (
             <img
               src={`https://picsum.photos/800/600`}
               alt='Placeholder image'
+              width='800'
+              height='600'
             />
           )}
         </figure>
@@ -137,17 +154,24 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
               <figure class='image is-48x48'>
                 {avatar ? (
                   <img
-                    src={getAttachmentUrl(avatar.attachment, {
-                      size: 'one-sixth'
-                    })}
+                    src={getAttachmentUrl(avatar, { size: 'one-sixth' })}
                     alt={avatar.alt || avatar.title || 'Profile image'}
                     class='is-rounded'
+                    width={getWidth(avatar) || '48'}
+                    height={getHeight(avatar) || '48'}
+                    style={
+                      hasFocalPoint(avatar)
+                        ? `object-position: ${getFocalPoint(avatar)};`
+                        : 'object-position: center center'
+                    }
                   />
                 ) : (
                   <img
                     src='https://picsum.photos/96/96'
                     alt='Placeholder avatar'
                     class='is-rounded'
+                    width='48'
+                    height='48'
                   />
                 )}
               </figure>

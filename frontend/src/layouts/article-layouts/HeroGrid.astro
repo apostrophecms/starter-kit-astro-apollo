@@ -1,6 +1,14 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../../lib/attachments.js';
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../../lib/attachments.js';
 
 import ArticlesFilter from '../../components/ArticlesFilter.astro';
 
@@ -10,9 +18,8 @@ const {
   heroImageClass = 'is-3by2'
 } = Astro.props;
 
-const heroImage = getFirstAttachment(pieces[0]?._heroImage);
-const heroSrcset = heroImage ? getAttachmentSrcset(heroImage.attachment) : '';
-
+const heroImageObject = getFirstAttachment(pieces[0]?._heroImage);
+const heroSrcset = heroImageObject ? getAttachmentSrcset(heroImageObject) : '';
 
 // Get the current category from URL params
 const currentCategory = Astro.url.searchParams.get('category') || '';
@@ -21,15 +28,19 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   <div class='columns is-vcentered mb-6'>
     <div class='column is-two-thirds'>
       <a href={pieces[0]._url} class='image hero-image'>
-        {heroImage && (
+        {heroImageObject && (
           <figure class={`image ${heroImageClass}`}>
             <img
-              src={getAttachmentUrl(heroImage.attachment, { size: 'full' })}
+              src={getAttachmentUrl(heroImageObject, { size: 'full' })}
               srcset={heroSrcset}
               sizes="(min-width: 1200px) 2400px, (min-width: 800px) 1200px, 800px"
-              alt={heroImage.attachment.alt || ''}
-              class='has-ratio'
-              style='object-fit: cover;'
+              alt={heroImageObject.alt || ''}
+              class="has-ratio"
+              style={`object-fit: cover; ${
+                hasFocalPoint(heroImageObject) ? `object-position: ${getFocalPoint(heroImageObject)};` : ''
+              }`}
+              width={getWidth(heroImageObject)}
+              height={getHeight(heroImageObject)}
             />
           </figure>
         )}
@@ -86,12 +97,14 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
               <div class='card-image'>
                 <figure class='image is-3by2'>
                   <img
-                  src={getAttachmentUrl(cardImage.attachment, { size: 'full' })}
-                  alt={article.title}
-                  class='has-ratio'
-                  style='object-fit: cover;'
-                  loading="lazy"
-                />
+                    src={getAttachmentUrl(cardImage, { size: 'full' })}
+                    alt={article.title}
+                    class='has-ratio'
+                    style={`object-fit: cover; ${hasFocalPoint(cardImage.attachment) ? `object-position: ${getFocalPoint(cardImage.attachment)};` : ''}`}
+                    width={getWidth(cardImage)}
+                    height={getHeight(cardImage)}
+                    loading="lazy"
+                  />
                 </figure>
               </div>
             )}

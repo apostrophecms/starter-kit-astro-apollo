@@ -13,6 +13,7 @@ export default defineConfig({
     aposHost: 'http://localhost:3000',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
+    viewTransitionWorkaround: true,
     forwardHeaders: ['content-security-policy', 'strict-transport-security', 'x-frame-options', 'referrer-policy', 'cache-control', 'host']
   })],
   vite: {

@@ -66,7 +66,14 @@ export default {
         type: 'relationship',
         label: 'Related Articles',
         withType: 'article',
-        max: 4
+        max: 4,
+        builders: {
+          project: {
+            title: 1,
+            _url: 1
+          }
+        },
+        withRelationships: [ '_heroImage' ]
       }
     },
     group: {

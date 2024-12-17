@@ -1,7 +1,15 @@
 ---
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../lib/attachments.js';
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
 
 // Destructure all needed properties with defaults
 const {
@@ -28,12 +36,22 @@ const {
 const backgroundImage = getFirstAttachment(_backgroundImage);
 const backgroundImageUrl = backgroundImage
   ? {
-      src: getAttachmentUrl(backgroundImage.attachment, { size: 'full' }),
-      srcset: getAttachmentSrcset(backgroundImage.attachment)
+      src: getAttachmentUrl(backgroundImage, { size: 'full' }),
+      srcset: getAttachmentSrcset(backgroundImage),
+      alt: backgroundImage.alt || '',
+      width: getWidth(backgroundImage) || '1920',
+      height: getHeight(backgroundImage) || '1080',
+      style: hasFocalPoint(backgroundImage)
+        ? `object-position: ${getFocalPoint(backgroundImage)}`
+        : `object-position: center ${imagePosition}`
     }
   : {
       src: `https://picsum.photos/1920/1080?random=${Math.random()}`,
-      srcset: ''
+      srcset: '',
+      alt: '',
+      width: '1920',
+      height: '1080',
+      style: `object-position: center ${imagePosition}`
     };
 
 const backgroundImageAlt = backgroundImage?.attachment?.alt || '';
@@ -94,7 +112,7 @@ const alignmentClass =
     right: 'has-text-right'
   }[contentAlignment] || 'has-text-centered';
 
-  const pretitleClass = `is-size-6-mobile is-size-6-tablet is-size-6-desktop ${getBulmaColorClass(
+const pretitleClass = `is-size-6-mobile is-size-6-tablet is-size-6-desktop ${getBulmaColorClass(
   mainContent?.pretitleColor,
   'text'
 )}`;
@@ -115,23 +133,31 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
     <section class={`hero ${heightClass}`}>
       {/* Background layer with conditional rendering */}
       <div class='hero-background'>
-  {background === 'image' && backgroundImageUrl ? (
-    <img
-      src={backgroundImageUrl.src}
-      srcset={backgroundImageUrl.srcset}
-      sizes="100vw"
-      alt={backgroundImage?.attachment?.alt || ''}
-      style={`object-position: center ${imagePosition}`}
-    />
-    ) : background === 'video' && (mainVideo || mobileVideo) ? (
-      <video autoplay muted loop playsinline class='background-video'>
-        {mainVideo && <source src={mainVideo.url} type={mainVideo.type} />}
-        {mobileVideo && <source src={mobileVideo.url} type={mobileVideo.type} />}
-      </video>
-    ) : (
-      <div class='color-background' />
-    )}
-  </div>
+        {background === 'image' && backgroundImageUrl ? (
+          <img
+            src={getAttachmentUrl(backgroundImage, { size: 'full' })}
+            srcset={getAttachmentSrcset(backgroundImage)}
+            sizes='100vw'
+            alt={backgroundImage?.alt || ''}
+            width={getWidth(backgroundImage) || '1920'}
+            height={getHeight(backgroundImage) || '1080'}
+            style={`object-position: ${
+              hasFocalPoint(backgroundImage)
+                ? getFocalPoint(backgroundImage)
+                : `center ${imagePosition}`
+            }`}
+          />
+        ) : background === 'video' && (mainVideo || mobileVideo) ? (
+          <video autoplay muted loop playsinline class='background-video'>
+            {mainVideo && <source src={mainVideo.url} type={mainVideo.type} />}
+            {mobileVideo && (
+              <source src={mobileVideo.url} type={mobileVideo.type} />
+            )}
+          </video>
+        ) : (
+          <div class='color-background' />
+        )}
+      </div>
 
       {/* Overlay layer - show for both image and video */}
       {enableOverlay && (background === 'image' || background === 'video') && (
@@ -191,9 +217,11 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
             <img
               src={backgroundImageUrl.src}
               srcset={backgroundImageUrl.srcset}
-              sizes="100vw"
-              alt={backgroundImage?.attachment?.alt || ''}
-              style={`object-position: center ${imagePosition}`}
+              sizes={layout === 'full' ? '100vw' : '50vw'}
+              alt={backgroundImageUrl.alt}
+              width={backgroundImageUrl.width}
+              height={backgroundImageUrl.height}
+              style={backgroundImageUrl.style}
             />
             {enableOverlay && <div class='split-overlay' />}
           </>

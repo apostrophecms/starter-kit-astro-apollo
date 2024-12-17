@@ -27,22 +27,6 @@ export const slideshowDefaults = {
       contentColor: 'success',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            extension: 'jpg',
-            _urls: {
-              'max': 'https://picsum.photos/seed/slide1/1600/1600',
-              'full': 'https://picsum.photos/seed/slide1/1600/900',
-              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
-              'one-half': 'https://picsum.photos/seed/slide1/570/700',
-              'one-third': 'https://picsum.photos/seed/slide1/380/700',
-              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
-            },
-            alt: 'Welcome slide'
-          }
-        }
-      ]
     },
     {
       slideTitle: 'Customizable Design',
@@ -51,22 +35,6 @@ export const slideshowDefaults = {
       contentColor: 'warning',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            extension: 'jpg',
-            _urls: {
-              'max': 'https://picsum.photos/seed/slide1/1600/1600',
-              'full': 'https://picsum.photos/seed/slide1/1600/900',
-              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
-              'one-half': 'https://picsum.photos/seed/slide1/570/700',
-              'one-third': 'https://picsum.photos/seed/slide1/380/700',
-              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
-            },
-            alt: 'Design slide'
-          }
-        }
-      ]
     },
     {
       slideTitle: 'Getting Started',
@@ -75,22 +43,6 @@ export const slideshowDefaults = {
       contentColor: 'white',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            extension: 'jpg',
-            _urls: {
-              'max': 'https://picsum.photos/seed/slide1/1600/1600',
-              'full': 'https://picsum.photos/seed/slide1/1600/900',
-              'two-thirds': 'https://picsum.photos/seed/slide1/760/760',
-              'one-half': 'https://picsum.photos/seed/slide1/570/700',
-              'one-third': 'https://picsum.photos/seed/slide1/380/700',
-              'one-sixth': 'https://picsum.photos/seed/slide1/190/350'
-            },
-            alt: 'Getting started slide'
-          }
-        }
-      ]
     }
   ]
 };

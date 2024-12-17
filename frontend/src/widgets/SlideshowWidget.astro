@@ -1,316 +1,123 @@
 ---
 const { widget } = Astro.props;
-import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../lib/attachments.js';
-
-
-const {
-  slideDuration = 5000,
-  transitionSpeed = 300,
-  autoplay = true,
-  showControls = true,
-  slides = []
-} = widget;
-
-const slideshowId = `slideshow-${Math.random().toString(36).substr(2, 9)}`;
-
-const getBulmaColorClass = (color, type = 'text') => {
-  if (!color) return '';
-
-  switch (type) {
-    case 'text':
-      return `has-text-${color}`;
-    case 'background':
-      return `has-background-${color}`;
-    default:
-      return '';
-  }
-};
-
-const getTextBlockBackground = (color, opacity) => {
-  return `color-mix(in hsl, var(--bulma-${color}) ${opacity}%, transparent)`;
-};
-
-const getTitleSize = (selectedSize) => {
-  const sizeMap = {
-    'is-1': 'is-2-tablet is-3-mobile',
-    'is-2': 'is-3-tablet is-4-mobile',
-    'is-3': 'is-4-tablet is-5-mobile',
-    'is-4': 'is-5-tablet is-6-mobile',
-    'is-5': 'is-6-tablet is-6-mobile',
-    'is-6': 'is-6-tablet is-6-mobile'
-  };
-  return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
-};
-
-const getContentSize = (selectedSize) => {
-  const sizeMap = {
-    'is-size-4': 'is-size-5-tablet is-size-6-mobile',
-    'is-size-5': 'is-size-6-tablet is-size-6-mobile',
-    'is-size-6': 'is-size-6-tablet is-size-7-mobile',
-    'is-size-7': 'is-size-7-tablet is-size-7-mobile'
-  };
-  return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
-};
-
+const placeholder = widget?.aposPlaceholder ? 'true' : '';
+const url = widget?.video?.url;
 ---
-
-<div
-  class='slideshow-container'
-  data-autoplay={autoplay ? '' : null}
-  data-slide-duration={slideDuration}
-  data-slideshow-id={slideshowId}
->
-  <div class='slides'>
-    {
-      slides.map((slide, index) => {
-        const slideImage = getFirstAttachment(slide._image);
-        return (
-          <div
-            class='slide'
-            data-slide={index}
-            data-active={index === 0 ? 'true' : 'false'}
-            style={`transition: opacity ${transitionSpeed}ms ease-in-out;`}
-          >
-            <figure class='image is-16by9'>
-              {slide._image?.[0] && (
-                <img
-                  src={getAttachmentUrl(slideImage.attachment, { size: 'full' })}
-                  srcset={getAttachmentSrcset(slideImage.attachment)}
-                  sizes="100vw"
-                  alt={slideImage.attachment.alt || slide.slideTitle}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                />
-              )}
-            </figure>
-            <div class="slide-content-wrapper">
-              <div
-                class={`slide-content`}
-                style={`background-color:${getTextBlockBackground(slide.textBlockBackground || 'black', slide.textBlockOpacity || 70)}
-                `}
-              >
-                {slide.slideTitle && (
-                  <h3 class={`title ${getTitleSize(slide.titleSize || 'is-4')} ${getBulmaColorClass(slide.titleColor, 'text')}`}>
-                    {slide.slideTitle}
-                  </h3>
-                )}
-                {slide.cardContent && (
-                  <div class={`content ${getContentSize(slide.contentSize || 'is-size-6')} ${getBulmaColorClass(slide.contentColor, 'text')}`}>
-                    {slide.cardContent}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })
-    }
-  </div>
-
-  {
-    showControls && (
-      <div class='slideshow-dots'>
-        {slides.map((_, index) => (
-          <button
-            class='dot'
-            data-index={index}
-            data-active={index === 0 ? 'true' : 'false'}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
-    )
-  }
-</div>
-
 <style>
-  .slideshow-container {
-    position: relative;
-    overflow: hidden;
+  video-widget {
     width: 100%;
-    aspect-ratio: 16/9;
-  }
-
-  .slides {
-    position: relative;
-    height: 100%;
-    width: 100%;
-  }
-
-  .slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-
-  .slide[data-active='true'] {
-    opacity: 1;
-    z-index: 1;
-  }
-
-  .image {
-    height: 100%;
-    margin: 0;
-  }
-
-  .image img {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
-
-  .slide-content-wrapper {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 75%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .slide-content {
-    display: inline-block;
-    padding: 1.5rem 2rem;
-    border-radius: 0.5rem;
-    max-width: 100%;
-    width: auto;
-  }
-
-  .slideshow-dots {
-    position: absolute;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 0.5rem;
-    z-index: 10;
-  }
-
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    padding: 0;
-    transition: background-color 0.3s ease;
-  }
-
-  .dot[data-active='true'] {
-    background: white;
   }
 </style>
-
+<video-widget
+  url={placeholder ? 'https://youtu.be/Q5UX9yexEyM' : url }
+>
+</video-widget>
 <script>
-  class Slideshow {
-    constructor(container) {
-      this.container = container;
-      this.slideshowId = container.dataset.slideshowId;
-      this.slides = [...container.querySelectorAll('.slide')];
-      this.dots = [...container.querySelectorAll('.dot')];
-      this.currentIndex = 0;
-      this.autoplayInterval = null;
-      this.init();
+  class VideoWidget extends HTMLElement {
+    result: {
+      width: number,
+      height: number,
+      html: string
+    };
+    canvasEl: HTMLElement;
+    
+    constructor() {
+      super();
     }
 
-    init() {
-      if (this.slides.length === 0) return;
+    async init() {
+      const videoUrl = this.getAttribute('url');
 
-      this.dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => this.showSlide(index));
-      });
+      if (!videoUrl) {
+        return;
+      }
 
-      if (this.container.hasAttribute('data-autoplay')) {
-        this.startAutoplay();
+      try {
+        this.result = await this.oembed(videoUrl);
+        this.renderVideo();
+      } catch (error) {
+        console.error('Error initializing video widget:', error);
       }
     }
 
-    showSlide(index, currentIndex = this.currentIndex) {
-      // Reset all slides and dots to inactive state
-      this.slides.forEach((slide) => {
-        slide.setAttribute('data-active', 'false');
-        slide.classList.toggle('active');
-      });
-      this.dots.forEach((dot) => {
-        dot.setAttribute('data-active', 'false');
-        dot.classList.toggle('active');
-      });
-
-      // Activate the selected slide and dot
-      this.slides[index].setAttribute('data-active', 'true');
-      if (this.dots[index]) {
-        this.dots[index].setAttribute('data-active', 'true');
+    async oembed(url) {
+      const response = await fetch('/api/v1/@apostrophecms/oembed/query?' + new URLSearchParams({
+        url
+      }));
+      if (response.status >= 400) {
+        throw new Error(`oembed error code: ${response.status}`);
       }
-      this.dots[index].style.color = 'green';
-
-      this.currentIndex = index;
-
-      // Restart autoplay if enabled
-      if (this.container.hasAttribute('data-autoplay')) {
-        this.stopAutoplay();
-        this.startAutoplay();
-      }
+      return response.json();
     }
 
-    startAutoplay() {
-      this.stopAutoplay();
-      const duration = parseInt(this.container.dataset.slideDuration) || 5000;
-
-      this.autoplayInterval = setInterval(() => {
-        const nextIndex = (this.currentIndex + 1) % this.slides.length;
-        this.showSlide(nextIndex);
-      }, duration);
-    }
-
-    stopAutoplay() {
-      if (this.autoplayInterval) {
-        clearInterval(this.autoplayInterval);
-        this.autoplayInterval = null;
+    renderVideo() {
+      const shaker = document.createElement('div');
+      shaker.innerHTML = this.result.html;
+      const inner = shaker.firstChild;
+      if (!(inner && (inner instanceof HTMLElement))) {
+        throw new Error('First child must be an HTML element');
       }
+      this.canvasEl = inner;
+      this.innerHTML = '';
+      if (!inner) {
+        return;
+      }
+      inner.removeAttribute('width');
+      inner.removeAttribute('height');
+      this.append(inner);
+      
+      // wait for CSS width to be known
+      setTimeout(() => {
+        if (this.result.width && this.result.height) {
+          inner.style.width = '100%';
+          this.resizeVideo();
+          window.addEventListener('resize', this.resizeHandler.bind(this));
+        }
+      }, 0);
     }
 
-    destroy() {
-      this.stopAutoplay();
+    resizeVideo() {
+      this.canvasEl.style.height = ((this.result.height / this.result.width) * this.canvasEl.offsetWidth) + 'px';
+    }
+
+    resizeHandler() {
+      if (document.contains(this)) {
+        this.resizeVideo();
+      } else {
+        window.removeEventListener('resize', this.resizeHandler);
+      }
     }
   }
 
-  // Store slideshow instances in a Map to track and manage them
-  const slideshows = new Map();
+  // Store video widget instances in a Map
+  const videoWidgets = new Map();
 
-  /**
-   * Initialize all slideshows on the page
-   * Uses a timeout to ensure ApostropheCMS has completed its DOM modifications
-   */
-  function initSlideshows() {
+  function initVideoWidgets() {
     // Clean up existing instances
-    slideshows.forEach((slideshow) => slideshow.destroy());
-    slideshows.clear();
+    videoWidgets.clear();
 
     // Initialize new instances with a delay for ApostropheCMS wrapper setup
     setTimeout(() => {
-      document.querySelectorAll('.slideshow-container').forEach((container) => {
-        const slideshowId = container.dataset.slideshowId;
-        if (slideshowId) {
-          slideshows.set(slideshowId, new Slideshow(container));
-        }
+      document.querySelectorAll('video-widget').forEach((widget, index) => {
+        const instance = widget as VideoWidget;
+        instance.init();
+        videoWidgets.set(`video-${index}`, instance);
       });
     }, 500);
   }
 
-  // Initialize slideshows when the DOM is ready
-  document.addEventListener('DOMContentLoaded', initSlideshows);
+  // Define the custom element
+  customElements.define('video-widget', VideoWidget);
+
+  // Initialize video widgets when the DOM is ready
+  document.addEventListener('DOMContentLoaded', initVideoWidgets);
 
   // Handle ApostropheCMS refreshes and modal updates
   if (window.apos) {
     // Reinitialize on general content refresh
-    apos.bus.$on('refreshed', initSlideshows);
+    apos.bus.$on('refreshed', initVideoWidgets);
 
     // Reinitialize when modal editing is complete
-    apos.bus.$on('modal-resolved', initSlideshows);
+    apos.bus.$on('modal-resolved', initVideoWidgets);
   }
-  </script>
+</script>

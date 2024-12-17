@@ -19,9 +19,10 @@
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "accordion-js": "^3.3.4",
-    "astro": "^5.0.3",
+    "astro": "^5.0.9",
     "bulma": "^1.0.2",
     "dayjs": "^1.11.10",
+    "postcss-viewport-to-container-toggle": "^1.0.0",
     "vite": "^5.0.7"
   },
   "devDependencies": {

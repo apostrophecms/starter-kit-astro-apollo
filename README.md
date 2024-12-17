@@ -70,3 +70,128 @@ The home-page has three potential layouts selected from the utility menus on the
 The default page has a layout that is identical to the 'Minimal' home-page layout.
 
 Piece-type pages in ApostropheCMS-only projects are used to either display multiple pieces (`index.html`) or individual pieces (`show.html`). This project has both types of pages, mapping the index of all pieces to the `ArticleIndexPage.astro` template and the display of the individual pieces to the `ArticleShowPage.astro` template. Both of these page types have three layouts for you to select from. Depending on the index layout, there are three or four additional areas for adding widgets with content before and after the piece content. The index page also demonstrates how to handle pagination in a hybrid project.
+
+# Image Helper Functions
+
+## Overview
+These helper functions are designed to work with images in your Astro frontend that come from ApostropheCMS through relationships or attachment fields. If you're using the image widget within an area, you should use the `AposArea` helper instead - these utilities are specifically for handling images that are part of your content model.
+
+## Common Use Cases
+
+### Working with Image Relationships
+When you have a relationship field to `@apostrophecms/image` in your content type, you'll typically need to:
+1. Get the image URL (potentially at different sizes for responsive images)
+2. Get the image dimensions
+3. Set up proper alt text
+4. Handle focal points if configured
+
+Here's a typical example:
+```js
+import { getAttachmentUrl, getAttachmentSrcset, getWidth, getHeight } from '../path/to/utils';
+
+// In your Astro component:
+---
+// relationshipField._image comes from your schema
+const image = relationshipField._image;
+
+// If you have an array of images, you might need getFirstAttachment
+// const image = getFirstAttachment(relationshipField._images);
+---
+
+<img
+  src={getAttachmentUrl(image, { size: 'full' })}
+  srcset={getAttachmentSrcset(image)}
+  sizes="(max-width: 800px) 100vw, 800px"
+  alt={image.alt || image.title || 'Image description'}
+  width={getWidth(image)}
+  height={getHeight(image)}
+/>
+```
+
+### Working with Direct Attachments
+For attachment fields (like logo fields), the pattern is similar but you don't need to use `getFirstAttachment` since the field already contains the direct attachment:
+
+```js
+<img 
+  src={getAttachmentUrl(attachmentField)}
+  width={getWidth(attachmentField)}
+  height={getHeight(attachmentField)}
+  alt="Logo"
+/>
+```
+
+## Image Cropping and Sizes
+
+### Automatic Crop Handling
+If you set a crop region for an image in the ApostropheCMS Admin UI, all the helper methods will automatically respect that crop. You don't need to do anything special in your code - the cropped version will be used when generating URLs and srcsets.
+
+### Size Variants
+The default size variants are:
+- `one-sixth` (190×350px)
+- `one-third` (380×700px)
+- `one-half` (570×700px)
+- `two-thirds` (760×760px)
+- `full` (1140×1140px)
+- `max` (1600×1600px)
+
+These sizes will be used to generate the srcset and can be selected by name for the `getAttachmentUrl()` method:
+
+```
+getAttachmentUrl(image, { size: 'full' })
+```
+
+You can use custom size names in both `getAttachmentUrl()` and the srcset options. For example:
+```js
+const customUrl = getAttachmentUrl(image, { size: 'custom-banner' });
+
+// Custom srcset configuration
+const srcset = getAttachmentSrcset(image, {
+  sizes: [
+    { name: 'small', width: 300 },
+    { name: 'medium', width: 600 },
+    { name: 'large', width: 900 },
+  ]
+});
+```
+
+Important: These helpers don't generate the image sizes - they just reference sizes that already exist. To use custom sizes, you must configure the [`@apostrophecms/attachment` module](https://docs.apostrophecms.org/reference/modules/attachment.html#configuration) to create those sizes when images are uploaded. You can do this in your backend configuration:
+
+```javascript
+// modules/@apostrophecms/attachment/index.js
+module.exports = {
+  options: {
+    // Define what sizes should be created on upload
+    imageSizes: {
+      'custom-banner': { width: 1200, height: 400 },
+      'square-thumb': { width: 300, height: 300 },
+      'small': { width: 300 },
+      'medium': { width: 600 },
+      'large': { width: 900 }
+    }
+  }
+};
+```
+
+See the [attachment module documentation](https://docs.apostrophecms.org/reference/modules/attachment.html#configuration) for complete configuration options.
+
+### Focal Points
+If you've set focal points in the ApostropheCMS admin UI, you can use them:
+
+```js
+<img
+  src={getAttachmentUrl(image)}
+  style={
+    hasFocalPoint(image)
+      ? `object-position: ${getFocalPoint(image)};`
+      : 'object-position: center center'
+  }
+/>
+```
+
+## Core Functions Reference
+There are JSDocs blocks for the core function that can be used for a more detailed explanation, but as a quick summary:
+- `getAttachmentUrl(attachment, options?)`: Get URL for an image with optional size (defaults to 'full')
+- `getAttachmentSrcset(attachment, options?)`: Generate responsive srcset string
+- `getWidth(attachment)`: Get image width
+- `getHeight(attachment)`: Get image height
+- `getFirstAttachment(attachments)`: Get first image from an array

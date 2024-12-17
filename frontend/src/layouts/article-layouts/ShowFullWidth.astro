@@ -1,6 +1,14 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-import { getFirstAttachment, getAttachmentUrl, getAttachmentSrcset } from '../../lib/attachments.js';
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../../lib/attachments.js';
 
 const { article, showAuthorAvatar = true } = Astro.props;
 
@@ -22,11 +30,15 @@ const heroImage = getFirstAttachment(article._heroImage);
     <div class="hero is-large">
       <figure class="image is-16by9">
         <img
-          src={getAttachmentUrl(heroImage.attachment, { size: 'full' })}
-          srcset={getAttachmentSrcset(heroImage.attachment)}
+          src={getAttachmentUrl(heroImage, { size: 'full' })}
+          srcset={getAttachmentSrcset(heroImage)}
           sizes="(min-width: 1200px) 1920px, 100vw"
-          alt={heroImage.attachment.alt || ''}
+          alt={heroImage.alt || ''}
+          width={getWidth(heroImage) || '1920'}
+          height={getHeight(heroImage) || '1080'}
           class="object-fit-cover"
+          style={hasFocalPoint(heroImage) ? `object-position: ${getFocalPoint(heroImage)}` : 'object-position: center center'}
+          loading="eager"
         />
       </figure>
     </div>
@@ -125,6 +137,7 @@ const heroImage = getFirstAttachment(article._heroImage);
     </div>
   </div>
 </article>
+
 <style>
   /* Base theme colors */
   :root {

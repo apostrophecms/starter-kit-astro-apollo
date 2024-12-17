@@ -3,9 +3,6 @@ export default {
   options: {
     refreshOnRestart: true,
     // HMR must be set to false to prevent the server from crashing
-    hmr: false,
-    breakpointPreviewMode: {
-      enable: false
-    }
+    hmr: false
   }
 };

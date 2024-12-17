@@ -3,7 +3,11 @@ import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro'
 import {
   getFirstAttachment,
   getAttachmentUrl,
-  getAttachmentSrcset
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
 } from '../../lib/attachments.js';
 import ArticlesFilter from '../../components/ArticlesFilter.astro';
 
@@ -18,6 +22,7 @@ const textWidth = showImage ? 12 - imageWidth : 12;
 
 const currentCategory = Astro.url.searchParams.get('category') || '';
 ---
+
 <div class='container'>
   <ArticlesFilter
     currentUrl={Astro.url}
@@ -75,12 +80,17 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
                       class='has-shadow object-fit-cover'
                       loading='lazy'
                       decoding='async'
+                      width={getWidth(heroImage) || '570'}
+                      height={getHeight(heroImage) || '380'}
                       sizes={`(max-width: 768px) 100vw, ${(imageWidth / 12) * 100}vw`}
-                      src={getAttachmentUrl(heroImage.attachment, {
-                        size: 'full'
-                      })}
-                      srcset={getAttachmentSrcset(heroImage.attachment)}
-                      alt={heroImage.attachment.alt || ''}
+                      src={getAttachmentUrl(heroImage, { size: 'full' })}
+                      srcset={getAttachmentSrcset(heroImage)}
+                      alt={heroImage.alt || ''}
+                      style={
+                        hasFocalPoint(heroImage)
+                          ? `object-position: ${getFocalPoint(heroImage)}`
+                          : 'object-position: center center'
+                      }
                     />
                   </figure>
                 </div>
@@ -93,9 +103,9 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   </div>
 </div>
 <style>
-html.theme-dark .title {
-  color: #fff !important;
-}
+  html.theme-dark .title {
+    color: #fff !important;
+  }
   html.theme-dark .subtitle,
   html.theme-dark p {
     color: #dbdbdb !important;

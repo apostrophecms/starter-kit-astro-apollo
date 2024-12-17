@@ -1,11 +1,29 @@
 ---
+import {
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
+
 const { widget, imageOptions = {} } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
-const image = widget?._image[0]?.attachment;
-const src = placeholder ? '/images/image-widget-placeholder.jpg' : image?._urls['full'];
+const image = widget?._image[0];
+
+const src = placeholder
+  ? '/images/image-widget-placeholder.jpg'
+  : getAttachmentUrl(image);
+const srcset = placeholder ? '' : getAttachmentSrcset(image);
+const objectPosition = placeholder ? 'center center' : getFocalPoint(image);
 const alt = image?.alt || '';
 
 const classes = ['img-widget', imageOptions.additionalClasses].filter(Boolean).join(' ');
+
+// Only add width/height if they exist
+const width = image ? getWidth(image) : undefined;
+const height = image ? getHeight(image) : undefined;
 ---
 
 <style>
@@ -13,6 +31,7 @@ const classes = ['img-widget', imageOptions.additionalClasses].filter(Boolean).j
     width: 100%;
     height: auto;
     display: block;
+    object-fit: cover;
   }
 </style>
 
@@ -23,4 +42,8 @@ const classes = ['img-widget', imageOptions.additionalClasses].filter(Boolean).j
   loading={imageOptions.loading || 'lazy'}
   decoding={imageOptions.decoding || 'async'}
   sizes={imageOptions.sizes}
+  srcset={srcset}
+  style={hasFocalPoint(image) ? `object-position: ${objectPosition};` : undefined}
+  width={width}
+  height={height}
 />
