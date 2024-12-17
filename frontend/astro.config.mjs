@@ -6,6 +6,10 @@ import path from 'path';
 // https://astro.build/config
 export default defineConfig({
   output: "server",
+  server: {
+    port: process.env.PORT ? parseInt(process.env.PORT) : 80,
+    host: true // Required for Heroku
+  },
   adapter: node({
     mode: 'standalone'
   }),

@@ -5,9 +5,9 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
+    "start": "node ./dist/server/entry.mjs",
     "build": "astro build",
-    "serve": "DEBUG=* HOST=0.0.0.0 PORT=4321 node ./dist/server/entry.mjs",
+    "serve": "node ./dist/server/entry.mjs",
     "preview": "DEBUG=* astro preview",
     "astro": "astro"
   },
