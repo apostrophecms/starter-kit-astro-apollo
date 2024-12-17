@@ -36,7 +36,7 @@ export default defineConfig({
     ],
     timeout: 30000, // 30 seconds
     proxy: {
-      secure: true,
+      secure: false,
       rejectUnauthorized: false
     }
   })],
