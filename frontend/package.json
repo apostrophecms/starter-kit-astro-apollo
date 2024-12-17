@@ -11,6 +11,10 @@
     "preview": "DEBUG=* astro preview",
     "astro": "astro"
   },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
+  },
   "dependencies": {
     "@apostrophecms/apostrophe-astro": "^1.0.0",
     "@astrojs/node": "^9.0.0",
