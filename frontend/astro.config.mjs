@@ -14,7 +14,7 @@ export default defineConfig({
     mode: 'standalone'
   }),
   integrations: [apostrophe({
-    aposHost: 'http://localhost:3000',
+    aposHost: 'https://apollo-backend-23180cd0fe88.herokuapp.com/',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
     viewTransitionWorkaround: true,
