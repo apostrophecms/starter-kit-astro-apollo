@@ -14,11 +14,23 @@ export default defineConfig({
     mode: 'standalone'
   }),
   integrations: [apostrophe({
-    aposHost: 'https://apollo-backend-23180cd0fe88.herokuapp.com/',
+    aposHost: 'https://apollo-backend-23180cd0fe88.herokuapp.com',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
     viewTransitionWorkaround: true,
-    forwardHeaders: ['content-security-policy', 'strict-transport-security', 'x-frame-options', 'referrer-policy', 'cache-control', 'host']
+    debug: true,
+    forwardHeaders: [
+      'content-security-policy',
+      'strict-transport-security',
+      'x-frame-options',
+      'referrer-policy',
+      'cache-control',
+      'host',
+      'x-forwarded-for',
+      'x-forwarded-proto',
+      'x-request-start',
+      'connect-time'
+    ]
   })],
   vite: {
     ssr: {
