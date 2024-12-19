@@ -39,8 +39,6 @@ export default defineConfig({
         aposHost: 'https://apollo-backend-23180cd0fe88.herokuapp.com',
         widgetsMapping: './src/widgets',
         templatesMapping: './src/templates',
-        viewTransitionWorkaround: true,
-        debug: true,
         forwardHeaders: [
           'content-security-policy',
           'strict-transport-security',
@@ -54,12 +52,7 @@ export default defineConfig({
           'accept',
           'accept-encoding',
           'user-agent'
-        ],
-        timeout: 30000, // 30 seconds
-        proxy: {
-          secure: false,
-          rejectUnauthorized: false
-        }
+        ]
       })],
       vite: {
         ssr: {
@@ -76,12 +69,5 @@ export default defineConfig({
         }
       }
     });
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler',
-      }
-    }
   }
 });
