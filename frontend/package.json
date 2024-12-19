@@ -16,7 +16,7 @@
     "npm": "10.x"
   },
   "dependencies": {
-    "@apostrophecms/apostrophe-astro": "github:apostrophecms/apostrophe-astro#heroku-debugging-test",
+    "@apostrophecms/apostrophe-astro": "github:apostrophecms/apostrophe-astro#heroku-debugging",
     "@astrojs/node": "^9.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
