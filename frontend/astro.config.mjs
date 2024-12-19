@@ -28,7 +28,7 @@ export default defineConfig({
   vite: {
     ssr: {
       // Do not externalize the @apostrophecms/apostrophe-astro plugin, we need
-      // to be able to use virtual: URLs ther
+      // to be able to use virtual: URLs there
       noExternal: ['@apostrophecms/apostrophe-astro']
     }
   },
