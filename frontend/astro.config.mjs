@@ -22,14 +22,7 @@ export default defineConfig({
       'strict-transport-security',
       'x-frame-options',
       'referrer-policy',
-      'cache-control',
-      'x-forwarded-for',
-      'x-forwarded-proto',
-      'x-real-ip',
-      'connection',
-      'accept',
-      'accept-encoding',
-      'user-agent'
+      'cache-control'
     ]
   })],
   vite: {
