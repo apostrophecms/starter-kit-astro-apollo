@@ -15,7 +15,7 @@ export default apostrophe({
 
     // *********************************
     // Add Vite build - uncomment to enable
-    //'@apostrophecms/vite': {},
+    '@apostrophecms/vite': {},
 
     // `className` options set custom CSS classes for Apostrophe core widgets.
     '@apostrophecms/rich-text-widget': {},
@@ -38,6 +38,7 @@ export default apostrophe({
     'hero-widget': {},
     'link-widget': {},
     'slideshow-widget': {},
-    'rows-widget': {}
+    'rows-widget': {},
+    'test-button-widget': {}
   }
 });
