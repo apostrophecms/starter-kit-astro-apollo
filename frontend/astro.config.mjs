@@ -17,14 +17,15 @@ export default defineConfig({
     aposHost: 'http://localhost:3000',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
-    forwardHeaders: [
+    includeResponseHeaders: [
       'content-security-policy', 
       'strict-transport-security', 
       'x-frame-options',
       'referrer-policy',
       'cache-control'
     ],
-    blockedHeaders: [
+    excludeRequestHeaders: [
+      // For single-site setups or hosting on multiple servers, block the host header
       'host'
     ]
   })],
