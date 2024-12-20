@@ -14,15 +14,18 @@ export default defineConfig({
     mode: 'standalone'
   }),
   integrations: [apostrophe({
-    aposHost: 'https://apollo-backend-23180cd0fe88.herokuapp.com',
+    aposHost: 'http://localhost:3000',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
     forwardHeaders: [
-      'content-security-policy',
-      'strict-transport-security',
+      'content-security-policy', 
+      'strict-transport-security', 
       'x-frame-options',
       'referrer-policy',
       'cache-control'
+    ],
+    blockedHeaders: [
+      'host'
     ]
   })],
   vite: {

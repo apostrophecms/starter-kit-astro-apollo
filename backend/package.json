@@ -47,7 +47,7 @@
   "license": "MIT",
   "dependencies": {
     "@apostrophecms/cli": "^3.4.0",
-    "@apostrophecms/vite": "^1.0.0-beta.2",
+    "@apostrophecms/vite": "^1.0.0",
     "apostrophe": "^4.0.0",
     "normalize.css": "^8.0.1"
   },
