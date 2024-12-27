@@ -11,7 +11,7 @@ export default {
   transitionSpeed: {
     type: 'integer',
     label: 'Transition Speed (ms)',
-    def: 300,
+    def: 1000,
     min: 100,
     max: 2000
   },

@@ -1,123 +1,370 @@
 ---
-const { widget } = Astro.props;
-const placeholder = widget?.aposPlaceholder ? 'true' : '';
-const url = widget?.video?.url;
+/**
+ * A responsive slideshow component for ApostropheCMS that displays images with optional text overlays.
+ * @component
+ * @param {Object} props
+ * @param {Object} props.widget - The widget configuration object from ApostropheCMS
+ * @param {number} [props.widget.slideDuration=5000] - Duration each slide is shown in milliseconds
+ * @param {number} [props.widget.transitionSpeed=300] - Speed of transition animation in milliseconds
+ * @param {boolean} [props.widget.autoplay=true] - Whether the slideshow should auto-advance
+ * @param {boolean} [props.widget.showControls=true] - Whether to show navigation dots
+ * @param {Array<Object>} props.widget.slides - Array of slide objects
+ * @param {Array<Object>} [props.widget.slides[].image] - Image attachment for the slide
+ * @param {string} [props.widget.slides[].slideTitle] - Title text for the slide
+ * @param {string} [props.widget.slides[].cardContent] - Body content for the slide
+ * @param {string} [props.widget.slides[].titleColor] - Bulma color class for the title
+ * @param {string} [props.widget.slides[].contentColor] - Bulma color class for the content
+ * @param {string} [props.widget.slides[].textBlockBackground] - Background color for text overlay
+ * @param {number} [props.widget.slides[].textBlockOpacity] - Opacity for text overlay (0-100)
+ */
+ const { widget } = Astro.props;
+
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
+
+const {
+  slideDuration = 5000,
+  transitionSpeed = 300,
+  autoplay = true,
+  showControls = true,
+  slides = []
+} = widget;
+
+const slideshowId = `slideshow-${Math.random().toString(36).substr(2, 9)}`;
+
+/**
+ * Generates the appropriate Bulma color class
+ * @param {string} color - The Bulma color name
+ * @param {('text'|'background')} [type='text'] - The type of color class to generate
+ * @returns {string} The complete Bulma class name or empty string if no color provided
+ */
+const getBulmaColorClass = (color, type = 'text') => {
+  if (!color) return '';
+  return type === 'text' ? `has-text-${color}` : `has-background-${color}`;
+};
+
+/**
+ * Generates a CSS color-mix value for text block background
+ * @param {string} color - The Bulma color variable name
+ * @param {number} opacity - Opacity percentage (0-100)
+ * @returns {string} CSS color-mix value
+ */
+const getTextBlockBackground = (color, opacity) => {
+  return `color-mix(in hsl, var(--bulma-${color}) ${opacity}%, transparent)`;
+};
+
+/**
+ * Gets responsive Bulma title size classes
+ * @param {string} selectedSize - Base Bulma size class (is-1 through is-6)
+ * @returns {string} Space-separated string of responsive size classes
+ */
+const getTitleSize = (selectedSize) => {
+  const sizeMap = {
+    'is-1': 'is-2-tablet is-3-mobile',
+    'is-2': 'is-3-tablet is-4-mobile',
+    'is-3': 'is-4-tablet is-5-mobile',
+    'is-4': 'is-5-tablet is-6-mobile',
+    'is-5': 'is-6-tablet is-6-mobile',
+    'is-6': 'is-6-tablet is-6-mobile'
+  };
+  return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
+};
+
+/**
+ * Gets responsive Bulma content size classes
+ * @param {string} selectedSize - Base Bulma size class (is-size-4 through is-size-7)
+ * @returns {string} Space-separated string of responsive size classes
+ */
+const getContentSize = (selectedSize) => {
+  const sizeMap = {
+    'is-size-4': 'is-size-5-tablet is-size-6-mobile',
+    'is-size-5': 'is-size-6-tablet is-size-6-mobile',
+    'is-size-6': 'is-size-6-tablet is-size-7-mobile',
+    'is-size-7': 'is-size-7-tablet is-size-7-mobile'
+  };
+  return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
+};
 ---
+
+<div
+  class='slideshow-container'
+  data-autoplay={autoplay ? '' : null}
+  data-slide-duration={slideDuration}
+  data-slideshow-id={slideshowId}
+>
+  <div class='slides'>
+    {
+      slides.map((slide, index) => {
+        const slideImage = slide._image?.[0];
+        const imageAttachment = getFirstAttachment(slide._image);
+        // Create image props with fallback
+        const imageProps = imageAttachment
+          ? {
+              src: getAttachmentUrl(imageAttachment, { size: 'full' }),
+              srcset: getAttachmentSrcset(imageAttachment),
+              alt: imageAttachment.attachment?.alt || slide.slideTitle || '',
+              width: getWidth(imageAttachment) || '1920',
+              height: getHeight(imageAttachment) || '1080',
+              style: hasFocalPoint(imageAttachment)
+                ? `object-position: ${getFocalPoint(imageAttachment)};`
+                : 'object-position: center center;'
+            }
+          : {
+              src: `https://picsum.photos/1920/1080?random=${index}`,
+              srcset: '',
+              alt: slide.slideTitle || '',
+              width: '1920',
+              height: '1080',
+              style: 'object-position: center center;'
+            };
+
+        return (
+          <div
+            class='slide'
+            data-slide={index}
+            data-active={index === 0 ? 'true' : 'false'}
+            style={`transition: opacity ${transitionSpeed}ms ease-in-out;`}
+          >
+            <figure class='image is-16by9'>
+              <img
+                {...imageProps}
+                sizes="(max-width: 768px) 100vw, 1140px"
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
+            </figure>
+            <div class="slide-content-wrapper">
+              <div
+                class={`slide-content`}
+                style={`background-color:${getTextBlockBackground(
+                  slide.textBlockBackground || 'black',
+                  slide.textBlockOpacity || 70
+                )}`}
+              >
+                {slide.slideTitle && (
+                  <h3 
+                    class={`title ${getTitleSize(slide.titleSize || 'is-4')} ${getBulmaColorClass(
+                      slide.titleColor,
+                      'text'
+                    )}`}
+                  >
+                    {slide.slideTitle}
+                  </h3>
+                )}
+                {slide.cardContent && (
+                  <div 
+                    class={`content ${getContentSize(slide.contentSize || 'is-size-6')} ${getBulmaColorClass(
+                      slide.contentColor,
+                      'text'
+                    )}`}
+                  >
+                    {slide.cardContent}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+
+  {
+    showControls && (
+      <div class='slideshow-dots'>
+        {slides.map((_, index) => (
+          <button
+            class='dot'
+            data-index={index}
+            data-active={index === 0 ? 'true' : 'false'}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    )
+  }
+</div>
+
 <style>
-  video-widget {
+  .slideshow-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  .slides {
+    position: relative;
+    height: 100%;
     width: 100%;
   }
+
+  .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .slide[data-active='true'] {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .image {
+    height: 100%;
+    margin: 0;
+  }
+
+  .image img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .slide-content-wrapper {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 75%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .slide-content {
+    display: inline-block;
+    padding: 1.5rem 2rem;
+    border-radius: 0.5rem;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .slideshow-dots {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+  }
+
+  .dot[data-active='true'] {
+    background: white;
+  }
 </style>
-<video-widget
-  url={placeholder ? 'https://youtu.be/Q5UX9yexEyM' : url }
->
-</video-widget>
+
 <script>
-  class VideoWidget extends HTMLElement {
-    result: {
-      width: number,
-      height: number,
-      html: string
-    };
-    canvasEl: HTMLElement;
-    
-    constructor() {
-      super();
+  /**
+ * Manages slideshow functionality including transitions and autoplay
+ */
+class Slideshow {
+    constructor(container) {
+      this.container = container;
+      this.slideshowId = container.dataset.slideshowId;
+      this.slides = [...container.querySelectorAll('.slide')];
+      this.dots = [...container.querySelectorAll('.dot')];
+      this.currentIndex = 0;
+      this.autoplayInterval = null;
+      this.init();
     }
 
-    async init() {
-      const videoUrl = this.getAttribute('url');
+    init() {
+      if (this.slides.length === 0) return;
 
-      if (!videoUrl) {
-        return;
-      }
+      this.dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => this.showSlide(index));
+      });
 
-      try {
-        this.result = await this.oembed(videoUrl);
-        this.renderVideo();
-      } catch (error) {
-        console.error('Error initializing video widget:', error);
+      if (this.container.hasAttribute('data-autoplay')) {
+        this.startAutoplay();
       }
     }
 
-    async oembed(url) {
-      const response = await fetch('/api/v1/@apostrophecms/oembed/query?' + new URLSearchParams({
-        url
-      }));
-      if (response.status >= 400) {
-        throw new Error(`oembed error code: ${response.status}`);
+    showSlide(index) {
+      this.slides.forEach((slide) => {
+        slide.setAttribute('data-active', 'false');
+      });
+      this.dots.forEach((dot) => {
+        dot.setAttribute('data-active', 'false');
+      });
+
+      this.slides[index].setAttribute('data-active', 'true');
+      if (this.dots[index]) {
+        this.dots[index].setAttribute('data-active', 'true');
       }
-      return response.json();
+
+      this.currentIndex = index;
+
+      if (this.container.hasAttribute('data-autoplay')) {
+        this.stopAutoplay();
+        this.startAutoplay();
+      }
     }
 
-    renderVideo() {
-      const shaker = document.createElement('div');
-      shaker.innerHTML = this.result.html;
-      const inner = shaker.firstChild;
-      if (!(inner && (inner instanceof HTMLElement))) {
-        throw new Error('First child must be an HTML element');
-      }
-      this.canvasEl = inner;
-      this.innerHTML = '';
-      if (!inner) {
-        return;
-      }
-      inner.removeAttribute('width');
-      inner.removeAttribute('height');
-      this.append(inner);
-      
-      // wait for CSS width to be known
-      setTimeout(() => {
-        if (this.result.width && this.result.height) {
-          inner.style.width = '100%';
-          this.resizeVideo();
-          window.addEventListener('resize', this.resizeHandler.bind(this));
-        }
-      }, 0);
+    startAutoplay() {
+      this.stopAutoplay();
+      const duration = parseInt(this.container.dataset.slideDuration) || 5000;
+
+      this.autoplayInterval = setInterval(() => {
+        const nextIndex = (this.currentIndex + 1) % this.slides.length;
+        this.showSlide(nextIndex);
+      }, duration);
     }
 
-    resizeVideo() {
-      this.canvasEl.style.height = ((this.result.height / this.result.width) * this.canvasEl.offsetWidth) + 'px';
+    stopAutoplay() {
+      if (this.autoplayInterval) {
+        clearInterval(this.autoplayInterval);
+        this.autoplayInterval = null;
+      }
     }
 
-    resizeHandler() {
-      if (document.contains(this)) {
-        this.resizeVideo();
-      } else {
-        window.removeEventListener('resize', this.resizeHandler);
-      }
+    destroy() {
+      this.stopAutoplay();
     }
   }
 
-  // Store video widget instances in a Map
-  const videoWidgets = new Map();
+  const slideshows = new Map();
 
-  function initVideoWidgets() {
-    // Clean up existing instances
-    videoWidgets.clear();
+  function initSlideshows() {
+    slideshows.forEach((slideshow) => slideshow.destroy());
+    slideshows.clear();
 
-    // Initialize new instances with a delay for ApostropheCMS wrapper setup
     setTimeout(() => {
-      document.querySelectorAll('video-widget').forEach((widget, index) => {
-        const instance = widget as VideoWidget;
-        instance.init();
-        videoWidgets.set(`video-${index}`, instance);
+      document.querySelectorAll('.slideshow-container').forEach((container) => {
+        const slideshowId = container.dataset.slideshowId;
+        if (slideshowId) {
+          slideshows.set(slideshowId, new Slideshow(container));
+        }
       });
     }, 500);
   }
 
-  // Define the custom element
-  customElements.define('video-widget', VideoWidget);
+  document.addEventListener('DOMContentLoaded', initSlideshows);
 
-  // Initialize video widgets when the DOM is ready
-  document.addEventListener('DOMContentLoaded', initVideoWidgets);
-
-  // Handle ApostropheCMS refreshes and modal updates
   if (window.apos) {
-    // Reinitialize on general content refresh
-    apos.bus.$on('refreshed', initVideoWidgets);
-
-    // Reinitialize when modal editing is complete
-    apos.bus.$on('modal-resolved', initVideoWidgets);
+    apos.bus.$on('refreshed', initSlideshows);
+    apos.bus.$on('modal-resolved', initSlideshows);
   }
 </script>
