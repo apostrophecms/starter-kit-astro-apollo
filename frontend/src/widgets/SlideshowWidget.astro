@@ -37,7 +37,7 @@ const {
   slides = []
 } = widget;
 
-const slideshowId = `slideshow-${Math.random().toString(36).substr(2, 9)}`;
+const slideshowId = `slideshow-${crypto.randomUUID().slice(0, 8)}`;
 
 /**
  * Generates the appropriate Bulma color class

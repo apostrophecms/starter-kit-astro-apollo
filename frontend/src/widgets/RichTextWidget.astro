@@ -1,4 +1,14 @@
 ---
+/**
+ * Rich Text Widget Component for ApostropheCMS
+ * Renders editable rich text content within an Apostrophe area
+ * 
+ * @component
+ * @param {Object} props
+ * @param {Object} props.widget - ApostropheCMS widget object
+ * @param {string} props.widget.content - HTML content from Apostrophe's rich text editor
+ */
+
 const { widget } = Astro.props;
 const { content } = widget;
 ---

@@ -1,36 +1,67 @@
 ---
+/**
+ * A customizable grid layout widget component for Astro that integrates with ApostropheCMS
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.widget - The widget configuration object from ApostropheCMS
+ * @param {string} props.widget._id - Unique identifier for the widget
+ * @param {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} props.widget.layoutType - The type of layout to render
+ * @param {Object} [props.widget.customGrid] - Custom grid configuration when layoutType is 'custom'
+ * @param {string} [props.widget.maxWidth] - Maximum width constraint for the layout
+ * @param {string} [props.widget.overrideClass] - Additional CSS classes to apply
+ * @param {Object} [props.widget.areaStyles] - Custom styling for areas
+ */
+
 const { widget } = Astro.props;
 const widgetId = widget._id;
-import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 
-// Helper to get content areas based on layout type
+import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import { getLayoutAreas } from '../lib/get-layout-areas.js';
 
-// Get layout configuration
+// Constants for grid defaults
+const GRID_DEFAULTS = {
+  COLUMNS: 12,
+  GAP: '1rem',
+  PADDING: '1rem',
+  MARGIN: 'auto',
+  MOBILE_GAP: '0.5rem',
+  MOBILE_PADDING: '0.5rem'
+};
+
+// Basic preset configurations for different layout types
+const presetConfigs = {
+  asideMainThree: { rows: 3 },
+  mainAsideThree: { rows: 3 },
+  asideTwoMain: { rows: 4 },
+  twoMainAside: { rows: 4 },
+  headerTwoColFooter: { rows: 3 },
+  featuredThreeGrid: { rows: 2 },
+  magazineLayout: { rows: 3, gap: '1.5rem' },
+  contentHub: { rows: 5, gap: '2rem' },
+  galleryMasonry: { rows: 3 },
+  dashboardLayout: { rows: 2, gap: '1.5rem' },
+  productShowcase: { rows: 3, gap: '2rem' }
+};
+
+// Helper function to get layout configuration
 const getLayoutConfig = (widget) => {
-  const presetConfigs = {
-    asideMainThree: { rows: 3 },
-    mainAsideThree: { rows: 3 },
-    asideTwoMain: { rows: 4 },
-    twoMainAside: { rows: 4 },
-    headerTwoColFooter: { rows: 3 },
-    featuredThreeGrid: { rows: 2 },
-    magazineLayout: { rows: 3, gap: '1.5rem' },
-    contentHub: { rows: 5, gap: '2rem' },
-    galleryMasonry: { rows: 3 },
-    dashboardLayout: { rows: 2, gap: '1.5rem' },
-    productShowcase: { rows: 3, gap: '2rem' }
-  };
-
+  // Our base configuration that applies to all layouts
   const defaultConfig = {
-    columns: 12,
-    gap: '1rem',
-    padding: '1rem',
-    margin: 'auto',
-    mobileGap: '0.5rem',
-    mobilePadding: '0.5rem'
+    columns: GRID_DEFAULTS.COLUMNS,
+    gap: GRID_DEFAULTS.GAP,
+    padding: GRID_DEFAULTS.PADDING,
+    margin: GRID_DEFAULTS.MARGIN,
+    mobileGap: GRID_DEFAULTS.MOBILE_GAP,
+    mobilePadding: GRID_DEFAULTS.MOBILE_PADDING
   };
 
+  // If we don't have a layout type, return default config
+  if (!widget?.layoutType) {
+    console.error('Layout type is required for custom layout widget');
+    return defaultConfig;
+  }
+
+  // For custom layouts, merge with custom settings
   if (widget.layoutType === 'custom') {
     return {
       ...defaultConfig,
@@ -42,33 +73,34 @@ const getLayoutConfig = (widget) => {
     };
   }
 
+  // For preset layouts, merge with preset config
   return {
     ...defaultConfig,
     ...(presetConfigs[widget.layoutType] || { rows: 1 })
   };
 };
 
+// Get the areas and configuration
 const areas = getLayoutAreas(widget);
 const config = getLayoutConfig(widget);
 
-const maxWidth = widget.maxWidth ? widget.maxWidth : '';
-
+// Build classes for the layout
 const layoutClasses = [
   'custom-layout-widget',
   `custom-layout-widget-${widgetId}`,
   `layout-type-${widget.layoutType}`,
-  `${widget.overrideClass || ''}`,
-  maxWidth
-]
-  .filter(Boolean)
-  .join(' ');
+  widget.overrideClass,
+  widget.maxWidth
+].filter(Boolean).join(' ');
 ---
+
 <div class="container is-fluid mb-3">
   <div
     id={`custom-layout-widget-${widgetId}`}
     class={layoutClasses}
     data-widget-id={widgetId}
     data-layout-type={widget.layoutType}
+    aria-label={`${widget.layoutType} layout section`}
   >
     {areas.map((area) => (
       <div
@@ -81,8 +113,9 @@ const layoutClasses = [
           '--row-span': area.rowSpan,
           '--tablet-col-span': area.tabletColSpan,
           '--mobile-col-span': area.mobileColSpan,
-          ...(area.minHeight ? { '--min-height': area.minHeight } : {}),
-          ...(area.verticalAlign ? { '--align-self': area.verticalAlign } : {})
+          '--align-self': widget.areaStyles?.verticalAlign || 'stretch',
+          '--justify-self': widget.areaStyles?.horizontalAlign || 'stretch',
+          ...(area.minHeight ? { '--min-height': area.minHeight } : {})
         }}
       >
         <AposArea area={area.content} />
@@ -97,7 +130,9 @@ const layoutClasses = [
     rows: config.rows,
     gap: widget.areaStyles?.gapOverride || config.gap,
     padding: config.padding,
-    margin: config.margin
+    margin: config.margin,
+    tabletBreakpoint: '1023px',
+    mobileBreakpoint: '768px'
   }}
 >
   .custom-layout-widget {
@@ -108,7 +143,6 @@ const layoutClasses = [
     padding: var(--padding);
     margin: var(--margin);
     height: auto;
-    place-items: start stretch;
   }
 
   .custom-layout-area {
@@ -116,9 +150,10 @@ const layoutClasses = [
     grid-row: var(--row-start) / span var(--row-span);
     min-height: var(--min-height, auto);
     align-self: var(--align-self, stretch);
+    justify-self: var(--justify-self, stretch);
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: var(--tabletBreakpoint)) {
     .custom-layout-widget {
       grid-template-columns: repeat(12, 1fr);
       gap: calc(var(--gap) * 0.75);
@@ -130,7 +165,7 @@ const layoutClasses = [
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: var(--mobileBreakpoint)) {
     .custom-layout-widget {
       grid-template-columns: 1fr;
       gap: calc(var(--gap) * 0.5);
@@ -141,36 +176,43 @@ const layoutClasses = [
       grid-row: auto;
     }
   }
+
+  @supports (grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))) {
+    .custom-layout-widget.auto-fit {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    }
+  }
 </style>
+
 <style is:global>
   /* Layout Preview Styles - Used in widget editor UI */
   .layout-preview-container {
-  margin: 0.5rem 0;
-}
+    margin: 0.5rem 0;
+  }
 
-.layout-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.2rem;
-}
+  .layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.2rem;
+  }
 
-.layout-card {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.75rem;
-  background: white;
-}
+  .layout-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem;
+    background: white;
+  }
 
-.layout-title {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-size: 0.9rem;
-}
+  .layout-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+  }
 
-.preview-svg {
-  width: 100%;
-  height: auto;
-  background: white;
-}
+  .preview-svg {
+    width: 100%;
+    height: auto;
+    background: white;
+  }
 </style>

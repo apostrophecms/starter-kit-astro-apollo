@@ -1,4 +1,33 @@
 ---
+/**
+ * A versatile card component that supports various layouts and styles.
+ * @component
+ * @param {Object} widget - The widget configuration object
+ * @param {('basic'|'image'|'image-overlay'|'media')} [widget.cardType='basic'] - The type of card to render
+ * @param {string} [widget.cardTitle] - The card's title
+ * @param {string} [widget.subtitle] - The card's subtitle
+ * @param {string} [widget.titleSize='is-4'] - The size class for the title
+ * @param {string} [widget.titleColor] - Color class for the title
+ * @param {string} [widget.headerAlignment='has-text-left'] - Alignment class for the header
+ * @param {string} [widget.contentAlignment='has-text-left'] - Alignment class for the content
+ * @param {string} [widget.contentColor] - Color class for the content
+ * @param {Object} widget.content - The main content area (AposArea)
+ * @param {string} [widget.backgroundColor] - Background color class for the card
+ * @param {Object} [widget._mainImage] - Main image attachment data
+ * @param {boolean} [widget.useImageRatio=false] - Whether to use image ratio constraints
+ * @param {string} [widget.imageRatio='is-4by3'] - Image ratio class when useImageRatio is true
+ * @param {Object} [widget._avatar] - Avatar image attachment data for media type cards
+ * @param {boolean} [widget.hasFooter] - Whether to show the footer
+ * @param {Object} [widget.footerContent] - Footer content area (AposArea)
+ * @param {string} [widget.minHeight] - Minimum height class for the card
+ * @param {string} [widget.overlayColor='black'] - Color for the overlay
+ * @param {string} [widget.overlayOpacity='50%'] - Opacity for the overlay
+ * @param {boolean} [widget.showOverlay=false] - Whether to show the overlay
+ * @param {boolean} [widget.addFooterBorder=false] - Whether to add a border to the footer
+ * @param {('thin'|'medium'|'thick')} [widget.footerBorderWidth='thin'] - Footer border width
+ * @param {string} [widget.footerBorderColor='primary'] - Footer border color class
+ */
+
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 
@@ -78,7 +107,6 @@ const titleWrapperClasses = ['title-wrapper', 'p-2', headerAlignment]
 
 const contentClasses = [
   'content',
-  ,
   'p-2',
   contentAlignment,
   contentColor ? `has-text-${contentColor}` : ''
@@ -102,7 +130,7 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
             <img
               src={getAttachmentUrl(mainImage, { size: 'full' })}
               srcset={getAttachmentSrcset(mainImage)}
-              sizes='(max-width: 800px) 100vw, 800px'
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px'
               alt={mainImage.alt || mainImage.title || 'Card image'}
               width={getWidth(mainImage) || '800'}
               height={getHeight(mainImage) || '600'}
@@ -217,6 +245,12 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow, 0 4px 8px rgba(0,0,0,0.1));
   }
 
   .is-small {

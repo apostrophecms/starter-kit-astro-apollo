@@ -136,6 +136,17 @@ export default {
                 ],
                 def: 'start'
               },
+              horizontalAlign: {
+                type: 'select',
+                label: 'Horizontal Alignment',
+                choices: [
+                  { label: 'Left', value: 'start' },
+                  { label: 'Center', value: 'center' },
+                  { label: 'Right', value: 'end' },
+                  { label: 'Stretch', value: 'stretch' }
+                ],
+                def: 'stretch'
+              },
               gapOverride: {
                 type: 'string',
                 label: 'Custom Gap',

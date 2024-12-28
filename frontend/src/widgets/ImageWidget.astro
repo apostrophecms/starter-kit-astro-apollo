@@ -1,4 +1,17 @@
 ---
+/**
+ * Image widget component for ApostropheCMS
+ * Renders a responsive image with proper sizing and focal point support.
+ * Content editors only need to:
+ * - Upload an image
+ * - Set alt text
+ * - Optionally set a focal point
+ *
+ * @param {Object} props
+ * @param {Object} props.widget - The widget data from ApostropheCMS
+ * @returns {astro.AstroComponent} - Rendered image component
+ */
+
 import {
   getAttachmentUrl,
   getAttachmentSrcset,
@@ -8,9 +21,14 @@ import {
   getHeight
 } from '../lib/attachments.js';
 
-const { widget, imageOptions = {} } = Astro.props;
+const { widget } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
 const image = widget?._image[0];
+
+// Handle missing image gracefully
+if (!placeholder && !image) {
+  console.warn('Image widget: No image or placeholder provided');
+}
 
 const src = placeholder
   ? '/images/image-widget-placeholder.jpg'
@@ -19,11 +37,10 @@ const srcset = placeholder ? '' : getAttachmentSrcset(image);
 const objectPosition = placeholder ? 'center center' : getFocalPoint(image);
 const alt = image?.alt || '';
 
-const classes = ['img-widget', imageOptions.additionalClasses].filter(Boolean).join(' ');
-
-// Only add width/height if they exist
+// Only add width/height if they exist to prevent layout shift
 const width = image ? getWidth(image) : undefined;
 const height = image ? getHeight(image) : undefined;
+const aspectRatio = width && height ? `${width}/${height}` : undefined;
 ---
 
 <style>
@@ -32,18 +49,21 @@ const height = image ? getHeight(image) : undefined;
     height: auto;
     display: block;
     object-fit: cover;
+    aspect-ratio: var(--aspect-ratio, auto);
   }
 </style>
 
 <img
-  class={classes}
+  class="img-widget"
   src={src}
   alt={alt}
-  loading={imageOptions.loading || 'lazy'}
-  decoding={imageOptions.decoding || 'async'}
-  sizes={imageOptions.sizes}
+  loading="lazy"
+  decoding="async"
   srcset={srcset}
-  style={hasFocalPoint(image) ? `object-position: ${objectPosition};` : undefined}
+  style={`
+    ${hasFocalPoint(image) ? `object-position: ${objectPosition};` : ''}
+    ${aspectRatio ? `--aspect-ratio: ${aspectRatio};` : ''}
+  `.trim()}
   width={width}
   height={height}
 />

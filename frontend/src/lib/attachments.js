@@ -109,30 +109,34 @@ function getFocalPoint(attachmentObject) {
 
   return 'center center';
 }
-
-
 /**
- * Get the width from the passed attachment object
- * @param {object} attachmentObject - Passed attachment object
- * @returns {number|string} The width of the attachment, or an empty string if not available
+ * Get the width from the image object, using crop dimensions if available,
+ * otherwise falling back to original image dimensions
+ * @param {object} imageObject - Image object from ApostropheCMS
+ * @returns {number|undefined} The width of the image
  */
-function getWidth(attachmentObject) {
-  if (attachmentObject?._fields?.width !== undefined && attachmentObject._fields.width !== null) {
-    return attachmentObject._fields.width;
+function getWidth(imageObject) {
+  // Use cropped width from _fields if available
+  if (imageObject?._fields?.width !== undefined && imageObject._fields.width !== null) {
+    return imageObject._fields.width;
   }
-  return '';
+  // Fall back to original image width
+  return imageObject?.attachment?.width;
 }
 
 /**
- * Get the height from the passed attachment object
- * @param {object} attachmentObject - Passed attachment object
- * @returns {number|string} The height of the attachment, or an empty string if not available
+ * Get the height from the image object, using crop dimensions if available,
+ * otherwise falling back to original image dimensions
+ * @param {object} imageObject - Image object from ApostropheCMS
+ * @returns {number|undefined} The height of the image
  */
-function getHeight(attachmentObject) {
-  if (attachmentObject?._fields?.height !== undefined && attachmentObject._fields.height !== null) {
-    return attachmentObject._fields.height;
+function getHeight(imageObject) {
+  // Use cropped height from _fields if available
+  if (imageObject?._fields?.height !== undefined && imageObject._fields.height !== null) {
+    return imageObject._fields.height;
   }
-  return '';
+  // Fall back to original image height
+  return imageObject?.attachment?.height;
 }
 
 /**

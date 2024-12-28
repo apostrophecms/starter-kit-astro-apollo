@@ -1,5 +1,29 @@
 ---
-const { widget } = Astro.props;
+/**
+ * A flexible hero widget component supporting various layouts and background types.
+ * @component
+ * @param {Object} widget - The widget configuration object from ApostropheCMS
+ * @param {string} [widget.background='image'] - Background type: 'image', 'video', or 'color'
+ * @param {string} [widget.backgroundColorType='solid'] - Color background type: 'solid' or 'gradient'
+ * @param {string} [widget.mainColor] - Primary background color (Bulma color name)
+ * @param {string} [widget.secondaryColor] - Secondary color for gradient
+ * @param {string} [widget.gradientAngle='180deg'] - Gradient angle in degrees
+ * @param {string} [widget.layout='full'] - Layout type: 'full' or 'split'
+ * @param {string} [widget.splitSide='left'] - Content position in split layout: 'left' or 'right'
+ * @param {boolean} [widget.enableOverlay=true] - Whether to show overlay on image/video
+ * @param {string} [widget.overlayColor='black'] - Overlay color (Bulma color name)
+ * @param {string} [widget.overlayOpacity='50%'] - Overlay opacity percentage
+ * @param {string} [widget.height='medium'] - Hero height: 'small', 'medium', 'large', or 'full'
+ * @param {string} [widget.contentAlignment='center'] - Content alignment: 'left', 'center', or 'right'
+ * @param {Object} [widget._backgroundImage] - Background image data from ApostropheCMS
+ * @param {string} [widget.imagePosition='center'] - Background image vertical position
+ * @param {Object} [widget.videoBackground] - Main video background data
+ * @param {Object} [widget.videoBackgroundMobile] - Mobile video background data
+ * @param {Object} [widget.mainContent] - Main content configuration
+ * @param {Object} [widget.callToAction] - Call-to-action area configuration
+ */
+
+ const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
   getFirstAttachment,
@@ -10,6 +34,20 @@ import {
   getWidth,
   getHeight
 } from '../lib/attachments.js';
+
+// Constants for better maintainability
+const HEIGHT_CLASSES = {
+  small: 'is-small',
+  medium: 'is-medium',
+  large: 'is-large',
+  full: 'is-fullheight'
+};
+
+const ALIGNMENT_CLASSES = {
+  left: 'has-text-left',
+  center: 'has-text-centered',
+  right: 'has-text-right'
+};
 
 // Destructure all needed properties with defaults
 const {
@@ -54,8 +92,6 @@ const backgroundImageUrl = backgroundImage
       style: `object-position: center ${imagePosition}`
     };
 
-const backgroundImageAlt = backgroundImage?.attachment?.alt || '';
-
 const getVideoSource = (video) => {
   if (!video?._url || !video?.extension) {
     return null;
@@ -69,18 +105,9 @@ const getVideoSource = (video) => {
 const mainVideo = getVideoSource(videoBackground);
 const mobileVideo = getVideoSource(videoBackgroundMobile);
 
-// Helper function to convert color values to Bulma classes
 const getBulmaColorClass = (color, type = 'text') => {
   if (!color) return '';
-
-  switch (type) {
-    case 'text':
-      return `has-text-${color}`;
-    case 'background':
-      return `has-background-${color}`;
-    default:
-      return '';
-  }
+  return type === 'text' ? `has-text-${color}` : `has-background-${color}`;
 };
 
 const getBackgroundStyle = () => {
@@ -94,64 +121,55 @@ const getBackgroundStyle = () => {
 };
 
 const backgroundStyle = getBackgroundStyle();
+const heightClass = HEIGHT_CLASSES[height] || 'is-medium';
+const alignmentClass = ALIGNMENT_CLASSES[contentAlignment] || 'has-text-centered';
 
-// Compute classes based on props
-const heightClass =
-  {
-    small: 'is-small',
-    medium: 'is-medium',
-    large: 'is-large',
-    full: 'is-fullheight'
-  }[height] || 'is-medium';
+const getTextClasses = (size, color) => {
+  return `is-size-${size}-mobile is-size-${size}-tablet is-size-${size}-desktop ${getBulmaColorClass(color, 'text')}`;
+};
 
-// Get content alignment class
-const alignmentClass =
-  {
-    left: 'has-text-left',
-    center: 'has-text-centered',
-    right: 'has-text-right'
-  }[contentAlignment] || 'has-text-centered';
+const pretitleClass = getTextClasses('6', mainContent?.pretitleColor);
+const titleClass = getTextClasses('5', mainContent?.titleColor);
+const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
 
-const pretitleClass = `is-size-6-mobile is-size-6-tablet is-size-6-desktop ${getBulmaColorClass(
-  mainContent?.pretitleColor,
-  'text'
-)}`;
-
-const titleClass = `is-size-5-mobile is-size-1-tablet is-size-1-desktop ${getBulmaColorClass(
-  mainContent?.titleColor,
-  'text'
-)}`;
-
-const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${getBulmaColorClass(
-  mainContent?.subtitleColor,
-  'text'
-)}`;
 ---
 
 {
   layout === 'full' ? (
-    <section class={`hero ${heightClass}`}>
+    <section 
+      class={`hero ${heightClass}`}
+      role="banner" 
+      aria-label={mainContent.title || 'Hero section'}
+    >
       {/* Background layer with conditional rendering */}
-      <div class='hero-background'>
+      <div class='hero-background' aria-hidden="true">
         {background === 'image' && backgroundImageUrl ? (
           <img
-            src={getAttachmentUrl(backgroundImage, { size: 'full' })}
-            srcset={getAttachmentSrcset(backgroundImage)}
+            src={backgroundImageUrl.src}
+            srcset={backgroundImageUrl.srcset}
             sizes='100vw'
-            alt={backgroundImage?.alt || ''}
-            width={getWidth(backgroundImage) || '1920'}
-            height={getHeight(backgroundImage) || '1080'}
-            style={`object-position: ${
-              hasFocalPoint(backgroundImage)
-                ? getFocalPoint(backgroundImage)
-                : `center ${imagePosition}`
-            }`}
+            alt={backgroundImageUrl.alt}
+            width={backgroundImageUrl.width}
+            height={backgroundImageUrl.height}
+            style={backgroundImageUrl.style}
+            loading="eager"
           />
         ) : background === 'video' && (mainVideo || mobileVideo) ? (
-          <video autoplay muted loop playsinline class='background-video'>
+          <video 
+            autoplay 
+            muted 
+            loop 
+            playsinline 
+            class='background-video'
+            aria-hidden="true"
+          >
             {mainVideo && <source src={mainVideo.url} type={mainVideo.type} />}
             {mobileVideo && (
-              <source src={mobileVideo.url} type={mobileVideo.type} />
+              <source 
+                src={mobileVideo.url} 
+                type={mobileVideo.type} 
+                media="(max-width: 768px)"
+              />
             )}
           </video>
         ) : (
@@ -159,9 +177,9 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
         )}
       </div>
 
-      {/* Overlay layer - show for both image and video */}
+      {/* Overlay layer */}
       {enableOverlay && (background === 'image' || background === 'video') && (
-        <div class='hero-overlay' />
+        <div class='hero-overlay' aria-hidden="true" />
       )}
 
       {/* Content */}
@@ -187,7 +205,11 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
       </div>
     </section>
   ) : (
-    <section class='hero-split'>
+    <section 
+      class='hero-split'
+      role="banner"
+      aria-label={mainContent.title || 'Hero section'}
+    >
       <div
         class={`split-content ${alignmentClass}`}
         style={splitSide === 'right' ? 'order: 2' : ''}
@@ -211,7 +233,11 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
           )}
         </div>
       </div>
-      <div class='split-media' style={splitSide === 'right' ? 'order: 1' : ''}>
+      <div 
+        class='split-media' 
+        style={splitSide === 'right' ? 'order: 1' : ''}
+        aria-hidden="true"
+      >
         {background === 'image' ? (
           <>
             <img
@@ -222,12 +248,20 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
               width={backgroundImageUrl.width}
               height={backgroundImageUrl.height}
               style={backgroundImageUrl.style}
+              loading="eager"
             />
             {enableOverlay && <div class='split-overlay' />}
           </>
         ) : background === 'video' ? (
           <>
-            <video autoplay muted loop playsinline class='background-video'>
+            <video 
+              autoplay 
+              muted 
+              loop 
+              playsinline 
+              class='background-video'
+              aria-hidden="true"
+            >
               <source
                 src={videoBackground?._url}
                 type={`video/${videoBackground?.extension}`}
@@ -314,6 +348,18 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
     width: 100%;
   }
 
+  @media (max-width: 768px) {
+    .hero-split {
+      flex-direction: column;
+    }
+    
+    .split-content,
+    .split-media {
+      width: 100%;
+      min-height: 300px;
+    }
+  }
+
   .split-content {
     flex: 1;
     padding: 3rem;
@@ -336,7 +382,9 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
     height: 100%;
     background: var(--colorBackground);
   }
-  .split-media img {
+
+  .split-media img,
+  .split-media video {
     position: absolute;
     top: 0;
     left: 0;
@@ -345,6 +393,7 @@ const subtitleClass = `is-size-5-mobile is-size-3-tablet is-size-3-desktop ${get
     object-fit: cover;
     z-index: 1;
   }
+
   .split-overlay {
     position: absolute;
     top: 0;
