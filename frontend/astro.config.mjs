@@ -7,8 +7,9 @@ import path from 'path';
 export default defineConfig({
   output: "server",
   server: {
-    port: process.env.PORT ? parseInt(process.env.PORT) : 80,
-    host: true // Required for Heroku
+    port: process.env.PORT ? parseInt(process.env.PORT) : 4321,
+    // Required for some hosting, like Heroku
+    // host: true
   },
   adapter: node({
     mode: 'standalone'
@@ -18,14 +19,14 @@ export default defineConfig({
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
     includeResponseHeaders: [
-      'content-security-policy', 
-      'strict-transport-security', 
+      'content-security-policy',
+      'strict-transport-security',
       'x-frame-options',
       'referrer-policy',
       'cache-control'
     ],
     excludeRequestHeaders: [
-      // For single-site setups or hosting on multiple servers, block the host header
+      // For hosting on multiple servers, block the host header
       'host'
     ]
   })],

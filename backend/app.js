@@ -15,7 +15,7 @@ export default apostrophe({
 
     // *********************************
     // Add Vite build - uncomment to enable
-    // Can cause issue with project-level core preview
+    // Can cause issue with project-level core preview assets
     // '@apostrophecms/vite': {},
 
     // `className` options set custom CSS classes for Apostrophe core widgets.

@@ -1,4 +1,15 @@
 ---
+/**
+ * An accessible accordion widget component for ApostropheCMS content
+ * @component
+ * @param {Object} widget - The widget configuration object from ApostropheCMS
+ * @param {string} [widget.itemBackgroundColor='white'] - Background color of accordion items
+ * @param {string} [widget.headerAlignment='left'] - Alignment of headers ('left'|'center'|'right')
+ * @param {boolean} [widget.allowMultipleOpen=false] - Whether multiple accordion items can be open simultaneously
+ * @param {number} [widget.openIndex=-1] - Index of initially open accordion item (1-based, -1 means all closed)
+ * @param {Array<{header: string, headerColor: string, content: Object}>} [widget.items=[]] - Accordion items
+ */
+
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 
@@ -12,26 +23,49 @@ const {
 
 const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
 ---
-<!-- Only add the data attribute if allowMultipleOpen is true -->
-<div class='accordion-widget' data-allow-multiple={allowMultipleOpen}>
+<div
+  class="accordion-widget"
+  data-allow-multiple={allowMultipleOpen}
+  role="presentation"
+>
   {
-    items.map((item, index) => (
-      <details
-        class={`accordion has-background-${itemBackgroundColor}`}
-        open={index === convertedIndex}
-      >
-        <summary class={`accordion-header has-text-${headerAlignment}`}>
-          <p class={`has-text-${item.headerColor} has-text-weight-semibold`}>
-            {item.header}
-          </p>
-        </summary>
-        <div class='accordion-content p-4'>
-          <div class='content'>
-            <AposArea area={item.content} />
+    items.map((item, index) => {
+      const headerId = `accordion-header-${index}`;
+      const panelId = `accordion-panel-${index}`;
+
+      return (
+        <details
+          class={`accordion has-background-${itemBackgroundColor}`}
+          open={index === convertedIndex}
+          data-accordion-item
+        >
+          <summary
+            class={`accordion-header has-text-${headerAlignment}`}
+            id={headerId}
+            aria-controls={panelId}
+            aria-expanded={index === convertedIndex}
+            role="button"
+          >
+            <p class={`has-text-${item.headerColor} has-text-weight-semibold`}>
+              {item.header}
+            </p>
+            <span class="visually-hidden">
+              {index === convertedIndex ? 'Click to close' : 'Click to open'}
+            </span>
+          </summary>
+          <div 
+            class="accordion-content p-4"
+            id={panelId}
+            aria-labelledby={headerId}
+            role="region"
+          >
+            <div class="content">
+              <AposArea area={item.content} />
+            </div>
           </div>
-        </div>
-      </details>
-    ))
+        </details>
+      );
+    })
   }
 </div>
 
@@ -47,13 +81,15 @@ const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    user-select: none;
   }
 
   .accordion-header::after {
     content: '+';
-    margin-left: auto;
-    padding: 0 1rem;
+    padding-left: 1rem;
     transition: transform 0.2s ease;
+    flex-shrink: 0;
   }
 
   details[open] .accordion-header::after {
@@ -64,32 +100,81 @@ const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
     border-top: 1px solid #dbdbdb;
   }
 
-  .accordion-header.has-text-center {
-    justify-content: center;
+  .accordion-header p {
+    width: 100%;
   }
 
-  .accordion-header.has-text-right {
-    justify-content: flex-end;
+  .accordion-header.has-text-center p {
+    text-align: center;
+  }
+
+  .accordion-header.has-text-right p {
+    text-align: right;
+  }
+
+  /* Hide content from screen but keep for screen readers */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
 
 <script>
+/**
+ * Initializes accordion functionality and sets up event listeners
+ * for handling accordion interactions
+ */
 function initializeAccordion() {
   const accordionContainers = document.querySelectorAll('.accordion-widget');
 
   accordionContainers.forEach((accordionContainer) => {
     const allowMultipleOpen = accordionContainer.hasAttribute('data-allow-multiple');
-    const detailsElements = Array.from(accordionContainer.querySelectorAll('details'));
+    const detailsElements = Array.from(
+      accordionContainer.querySelectorAll('[data-accordion-item]')
+    );
 
     detailsElements.forEach((detailsElement) => {
-      detailsElement.addEventListener('toggle', () => {
-        // Only close other panels if allowMultipleOpen is false
-        if (detailsElement.open && !allowMultipleOpen) {
+      const summary = detailsElement.querySelector('summary');
+
+      // Update ARIA states on toggle
+      detailsElement.addEventListener('toggle', (event) => {
+        const isOpen = detailsElement.open;
+        summary.setAttribute('aria-expanded', isOpen);
+
+        // Update screen reader text
+        const srText = summary.querySelector('.visually-hidden');
+        srText.textContent = isOpen ? 'Click to close' : 'Click to open';
+
+        // Close other panels if allowMultipleOpen is false
+        if (isOpen && !allowMultipleOpen) {
           detailsElements
             .filter(details => details !== detailsElement)
             .forEach(details => {
               details.open = false;
+              const otherSummary = details.querySelector('summary');
+              otherSummary.setAttribute('aria-expanded', 'false');
+              otherSummary.querySelector('.visually-hidden').textContent = 'Click to open';
             });
+        }
+      });
+
+      // Add keyboard navigation
+      summary.addEventListener('keydown', (event) => {
+        const key = event.key;
+
+        if (key === 'ArrowUp' || key === 'ArrowDown') {
+          event.preventDefault();
+          const direction = key === 'ArrowUp' ? -1 : 1;
+          const currentIndex = detailsElements.indexOf(detailsElement);
+          const targetIndex = (currentIndex + direction + detailsElements.length) % detailsElements.length;
+          detailsElements[targetIndex].querySelector('summary').focus();
         }
       });
     });
