@@ -2,7 +2,7 @@ import apostrophe from 'apostrophe';
 
 export default apostrophe({
   root: import.meta,
-  shortName: 'apollo-backend',
+  shortName: 'alex-apollo-content',
   modules: {
     // Apostrophe module configuration
     // *******************************
@@ -15,6 +15,7 @@ export default apostrophe({
 
     // *********************************
     // Add Vite build - uncomment to enable
+    // Can cause issue with project-level core preview assets
     // '@apostrophecms/vite': {},
 
     // `className` options set custom CSS classes for Apostrophe core widgets.

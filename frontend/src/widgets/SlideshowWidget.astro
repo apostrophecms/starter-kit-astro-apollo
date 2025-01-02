@@ -1,5 +1,34 @@
 ---
+/**
+ * A responsive slideshow component for ApostropheCMS that displays images with optional text overlays.
+ * @component
+ * @param {Object} props
+ * @param {Object} props.widget - The widget configuration object from ApostropheCMS
+ * @param {number} [props.widget.slideDuration=5000] - Duration each slide is shown in milliseconds
+ * @param {number} [props.widget.transitionSpeed=300] - Speed of transition animation in milliseconds
+ * @param {boolean} [props.widget.autoplay=true] - Whether the slideshow should auto-advance
+ * @param {boolean} [props.widget.showControls=true] - Whether to show navigation dots
+ * @param {Array<Object>} props.widget.slides - Array of slide objects
+ * @param {Array<Object>} [props.widget.slides[].image] - Image attachment for the slide
+ * @param {string} [props.widget.slides[].slideTitle] - Title text for the slide
+ * @param {string} [props.widget.slides[].cardContent] - Body content for the slide
+ * @param {string} [props.widget.slides[].titleColor] - Bulma color class for the title
+ * @param {string} [props.widget.slides[].contentColor] - Bulma color class for the content
+ * @param {string} [props.widget.slides[].textBlockBackground] - Background color for text overlay
+ * @param {number} [props.widget.slides[].textBlockOpacity] - Opacity for text overlay (0-100)
+ */
+
 const { widget } = Astro.props;
+
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
 
 const {
   slideDuration = 5000,
@@ -9,25 +38,34 @@ const {
   slides = []
 } = widget;
 
-const slideshowId = `slideshow-${Math.random().toString(36).substr(2, 9)}`;
+const slideshowId = `slideshow-${crypto.randomUUID().slice(0, 8)}`;
 
+/**
+ * Generates the appropriate Bulma color class
+ * @param {string} color - The Bulma color name
+ * @param {('text'|'background')} [type='text'] - The type of color class to generate
+ * @returns {string} The complete Bulma class name or empty string if no color provided
+ */
 const getBulmaColorClass = (color, type = 'text') => {
   if (!color) return '';
-
-  switch (type) {
-    case 'text':
-      return `has-text-${color}`;
-    case 'background':
-      return `has-background-${color}`;
-    default:
-      return '';
-  }
+  return type === 'text' ? `has-text-${color}` : `has-background-${color}`;
 };
 
+/**
+ * Generates a CSS color-mix value for text block background
+ * @param {string} color - The Bulma color variable name
+ * @param {number} opacity - Opacity percentage (0-100)
+ * @returns {string} CSS color-mix value
+ */
 const getTextBlockBackground = (color, opacity) => {
   return `color-mix(in hsl, var(--bulma-${color}) ${opacity}%, transparent)`;
 };
 
+/**
+ * Gets responsive Bulma title size classes
+ * @param {string} selectedSize - Base Bulma size class (is-1 through is-6)
+ * @returns {string} Space-separated string of responsive size classes
+ */
 const getTitleSize = (selectedSize) => {
   const sizeMap = {
     'is-1': 'is-2-tablet is-3-mobile',
@@ -40,6 +78,11 @@ const getTitleSize = (selectedSize) => {
   return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
 };
 
+/**
+ * Gets responsive Bulma content size classes
+ * @param {string} selectedSize - Base Bulma size class (is-size-4 through is-size-7)
+ * @returns {string} Space-separated string of responsive size classes
+ */
 const getContentSize = (selectedSize) => {
   const sizeMap = {
     'is-size-4': 'is-size-5-tablet is-size-6-mobile',
@@ -49,7 +92,6 @@ const getContentSize = (selectedSize) => {
   };
   return `${selectedSize} ${sizeMap[selectedSize] || ''}`;
 };
-
 ---
 
 <div
@@ -61,6 +103,29 @@ const getContentSize = (selectedSize) => {
   <div class='slides'>
     {
       slides.map((slide, index) => {
+        const slideImage = slide._image?.[0];
+        const imageAttachment = getFirstAttachment(slide._image);
+        // Create image props with fallback
+        const imageProps = imageAttachment
+          ? {
+              src: getAttachmentUrl(imageAttachment, { size: 'full' }),
+              srcset: getAttachmentSrcset(imageAttachment),
+              alt: imageAttachment.attachment?.alt || slide.slideTitle || '',
+              width: getWidth(imageAttachment) || '1920',
+              height: getHeight(imageAttachment) || '1080',
+              style: hasFocalPoint(imageAttachment)
+                ? `object-position: ${getFocalPoint(imageAttachment)};`
+                : 'object-position: center center;'
+            }
+          : {
+              src: `https://picsum.photos/1920/1080?random=${index}`,
+              srcset: '',
+              alt: slide.slideTitle || '',
+              width: '1920',
+              height: '1080',
+              style: 'object-position: center center;'
+            };
+
         return (
           <div
             class='slide'
@@ -69,27 +134,37 @@ const getContentSize = (selectedSize) => {
             style={`transition: opacity ${transitionSpeed}ms ease-in-out;`}
           >
             <figure class='image is-16by9'>
-              {slide._image?.[0] && (
-                <img
-                  src={slide._image[0].attachment._urls['full']}
-                  alt={slide._image[0].attachment.alt || slide.slideTitle}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                />
-              )}
+              <img
+                {...imageProps}
+                sizes="(max-width: 768px) 100vw, 1140px"
+                loading={index === 0 ? 'eager' : 'lazy'}
+              />
             </figure>
             <div class="slide-content-wrapper">
               <div
                 class={`slide-content`}
-                style={`background-color:${getTextBlockBackground(slide.textBlockBackground || 'black', slide.textBlockOpacity || 70)}
-                `}
+                style={`background-color:${getTextBlockBackground(
+                  slide.textBlockBackground || 'black',
+                  slide.textBlockOpacity || 70
+                )}`}
               >
                 {slide.slideTitle && (
-                  <h3 class={`title ${getTitleSize(slide.titleSize || 'is-4')} ${getBulmaColorClass(slide.titleColor, 'text')}`}>
+                  <h3 
+                    class={`title ${getTitleSize(slide.titleSize || 'is-4')} ${getBulmaColorClass(
+                      slide.titleColor,
+                      'text'
+                    )}`}
+                  >
                     {slide.slideTitle}
                   </h3>
                 )}
                 {slide.cardContent && (
-                  <div class={`content ${getContentSize(slide.contentSize || 'is-size-6')} ${getBulmaColorClass(slide.contentColor, 'text')}`}>
+                  <div 
+                    class={`content ${getContentSize(slide.contentSize || 'is-size-6')} ${getBulmaColorClass(
+                      slide.contentColor,
+                      'text'
+                    )}`}
+                  >
                     {slide.cardContent}
                   </div>
                 )}
@@ -202,7 +277,10 @@ const getContentSize = (selectedSize) => {
 </style>
 
 <script>
-  class Slideshow {
+  /**
+ * Manages slideshow functionality including transitions and autoplay
+ */
+class Slideshow {
     constructor(container) {
       this.container = container;
       this.slideshowId = container.dataset.slideshowId;
@@ -225,27 +303,21 @@ const getContentSize = (selectedSize) => {
       }
     }
 
-    showSlide(index, currentIndex = this.currentIndex) {
-      // Reset all slides and dots to inactive state
+    showSlide(index) {
       this.slides.forEach((slide) => {
         slide.setAttribute('data-active', 'false');
-        slide.classList.toggle('active');
       });
       this.dots.forEach((dot) => {
         dot.setAttribute('data-active', 'false');
-        dot.classList.toggle('active');
       });
 
-      // Activate the selected slide and dot
       this.slides[index].setAttribute('data-active', 'true');
       if (this.dots[index]) {
         this.dots[index].setAttribute('data-active', 'true');
       }
-      this.dots[index].style.color = 'green';
 
       this.currentIndex = index;
 
-      // Restart autoplay if enabled
       if (this.container.hasAttribute('data-autoplay')) {
         this.stopAutoplay();
         this.startAutoplay();
@@ -274,19 +346,12 @@ const getContentSize = (selectedSize) => {
     }
   }
 
-  // Store slideshow instances in a Map to track and manage them
   const slideshows = new Map();
 
-  /**
-   * Initialize all slideshows on the page
-   * Uses a timeout to ensure ApostropheCMS has completed its DOM modifications
-   */
   function initSlideshows() {
-    // Clean up existing instances
     slideshows.forEach((slideshow) => slideshow.destroy());
     slideshows.clear();
 
-    // Initialize new instances with a delay for ApostropheCMS wrapper setup
     setTimeout(() => {
       document.querySelectorAll('.slideshow-container').forEach((container) => {
         const slideshowId = container.dataset.slideshowId;
@@ -297,15 +362,10 @@ const getContentSize = (selectedSize) => {
     }, 500);
   }
 
-  // Initialize slideshows when the DOM is ready
   document.addEventListener('DOMContentLoaded', initSlideshows);
 
-  // Handle ApostropheCMS refreshes and modal updates
   if (window.apos) {
-    // Reinitialize on general content refresh
     apos.bus.$on('refreshed', initSlideshows);
-
-    // Reinitialize when modal editing is complete
     apos.bus.$on('modal-resolved', initSlideshows);
   }
-  </script>
+</script>

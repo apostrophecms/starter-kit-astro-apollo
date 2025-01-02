@@ -1,6 +1,45 @@
 ---
+/**
+ * A versatile card component that supports various layouts and styles.
+ * @component
+ * @param {Object} widget - The widget configuration object
+ * @param {('basic'|'image'|'image-overlay'|'media')} [widget.cardType='basic'] - The type of card to render
+ * @param {string} [widget.cardTitle] - The card's title
+ * @param {string} [widget.subtitle] - The card's subtitle
+ * @param {string} [widget.titleSize='is-4'] - The size class for the title
+ * @param {string} [widget.titleColor] - Color class for the title
+ * @param {string} [widget.headerAlignment='has-text-left'] - Alignment class for the header
+ * @param {string} [widget.contentAlignment='has-text-left'] - Alignment class for the content
+ * @param {string} [widget.contentColor] - Color class for the content
+ * @param {Object} widget.content - The main content area (AposArea)
+ * @param {string} [widget.backgroundColor] - Background color class for the card
+ * @param {Object} [widget._mainImage] - Main image attachment data
+ * @param {boolean} [widget.useImageRatio=false] - Whether to use image ratio constraints
+ * @param {string} [widget.imageRatio='is-4by3'] - Image ratio class when useImageRatio is true
+ * @param {Object} [widget._avatar] - Avatar image attachment data for media type cards
+ * @param {boolean} [widget.hasFooter] - Whether to show the footer
+ * @param {Object} [widget.footerContent] - Footer content area (AposArea)
+ * @param {string} [widget.minHeight] - Minimum height class for the card
+ * @param {string} [widget.overlayColor='black'] - Color for the overlay
+ * @param {string} [widget.overlayOpacity='50%'] - Opacity for the overlay
+ * @param {boolean} [widget.showOverlay=false] - Whether to show the overlay
+ * @param {boolean} [widget.addFooterBorder=false] - Whether to add a border to the footer
+ * @param {('thin'|'medium'|'thick')} [widget.footerBorderWidth='thin'] - Footer border width
+ * @param {string} [widget.footerBorderColor='primary'] - Footer border color class
+ */
+
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../lib/attachments.js';
 
 const {
   cardType = 'basic',
@@ -28,8 +67,8 @@ const {
   footerBorderColor = 'primary'
 } = widget;
 
-const hasMainImage = _mainImage[0]?.attachment._urls?.['full'];
-const hasAvatar = _avatar[0]?.attachment._urls?.['one-sixth'];
+const mainImage = getFirstAttachment(_mainImage);
+const avatar = getFirstAttachment(_avatar);
 
 // Dynamic classes for border width and color
 const borderWidthClass = addFooterBorder ? `border-${footerBorderWidth}` : '';
@@ -42,61 +81,136 @@ const cardClasses = [
   minHeight,
   borderWidthClass,
   borderColorClass
-].filter(Boolean).join(' ');
+]
+  .filter(Boolean)
+  .join(' ');
 
 const titleClasses = [
   'title',
   titleSize,
   titleColor ? `has-text-${titleColor}` : ''
-].filter(Boolean).join(' ');
+]
+  .filter(Boolean)
+  .join(' ');
 
 const subtitleClasses = [
-  'subtitle', 
+  'subtitle',
   'is-6',
   titleColor ? `has-text-${titleColor}` : ''
-].filter(Boolean).join(' ');
+]
+  .filter(Boolean)
+  .join(' ');
 
-const titleWrapperClasses = [
-  'title-wrapper',
-  'p-2',
-  headerAlignment
-].filter(Boolean).join(' ');
+const titleWrapperClasses = ['title-wrapper', 'p-2', headerAlignment]
+  .filter(Boolean)
+  .join(' ');
 
 const contentClasses = [
-  'content',,
+  'content',
   'p-2',
   contentAlignment,
   contentColor ? `has-text-${contentColor}` : ''
-].filter(Boolean).join(' ');
+]
+  .filter(Boolean)
+  .join(' ');
 
-const imageContainerClasses = [
-  'card-image',
-  useImageRatio ? imageRatio : ''
-].filter(Boolean).join(' ');
-
+const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
+  .filter(Boolean)
+  .join(' ');
 ---
+
 <div class={cardClasses}>
-  {(cardType === 'image' || cardType === 'image-overlay' || cardType === 'media') && (
-    <div class={imageContainerClasses}>
-      <figure class="image">
-        {hasMainImage ? (
-          <img src={hasMainImage} alt={_mainImage.alt || _mainImage.title || 'Card image'} />
-        ) : (
-          <img src={`https://picsum.photos/800/600`} alt="Placeholder image" />
+  {
+    (cardType === 'image' ||
+      cardType === 'image-overlay' ||
+      cardType === 'media') && (
+      <div class={imageContainerClasses}>
+        <figure class='image'>
+          {mainImage ? (
+            <img
+              src={getAttachmentUrl(mainImage, { size: 'full' })}
+              srcset={getAttachmentSrcset(mainImage)}
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px'
+              alt={mainImage.alt || mainImage.title || 'Card image'}
+              width={getWidth(mainImage) || '800'}
+              height={getHeight(mainImage) || '600'}
+              style={
+                hasFocalPoint(mainImage)
+                  ? `object-position: ${getFocalPoint(mainImage)};`
+                  : 'object-position: center center'
+              }
+            />
+          ) : (
+            <img
+              src={`https://picsum.photos/800/600`}
+              alt='Placeholder image'
+              width='800'
+              height='600'
+            />
+          )}
+        </figure>
+
+        {/* Add overlay if needed */}
+        {(cardType === 'image-overlay' ||
+          (cardType === 'image' && showOverlay)) && <div class='overlay' />}
+
+        {/* Overlay content only for 'image-overlay' card type */}
+        {cardType === 'image-overlay' && (
+          <div class='overlay-content'>
+            {cardTitle && (
+              <div class={titleWrapperClasses}>
+                <p class={titleClasses}>{cardTitle}</p>
+                {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+              </div>
+            )}
+            <div class={contentClasses}>
+              <AposArea area={content} />
+            </div>
+          </div>
         )}
-      </figure>
+      </div>
+    )
+  }
 
-      {/* Add overlay if needed */}
-      {(cardType === 'image-overlay' || (cardType === 'image' && showOverlay)) && (
-        <div
-          class="overlay"
-        ></div>
-      )}
-
-      {/* Overlay content only for 'image-overlay' card type */}
-      {cardType === 'image-overlay' && (
-      <div class="overlay-content">
-        {cardTitle && (
+  {/* Card content for types other than 'image-overlay' */}
+  {
+    cardType !== 'image-overlay' && (
+      <div class='card-content'>
+        {cardType === 'media' && (
+          <div class='media'>
+            <div class='media-left'>
+              <figure class='image is-48x48'>
+                {avatar ? (
+                  <img
+                    src={getAttachmentUrl(avatar, { size: 'one-sixth' })}
+                    alt={avatar.alt || avatar.title || 'Profile image'}
+                    class='is-rounded'
+                    width={getWidth(avatar) || '48'}
+                    height={getHeight(avatar) || '48'}
+                    style={
+                      hasFocalPoint(avatar)
+                        ? `object-position: ${getFocalPoint(avatar)};`
+                        : 'object-position: center center'
+                    }
+                  />
+                ) : (
+                  <img
+                    src='https://picsum.photos/96/96'
+                    alt='Placeholder avatar'
+                    class='is-rounded'
+                    width='48'
+                    height='48'
+                  />
+                )}
+              </figure>
+            </div>
+            <div class={`media-content ${headerAlignment}`}>
+              <p class={titleClasses}>{cardTitle}</p>
+              {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
+            </div>
+          </div>
+        )}
+        {cardType !== 'media' && cardTitle && (
           <div class={titleWrapperClasses}>
             <p class={titleClasses}>{cardTitle}</p>
             {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
@@ -106,149 +220,131 @@ const imageContainerClasses = [
           <AposArea area={content} />
         </div>
       </div>
-    )}
-    </div>
-  )}
+    )
+  }
 
-  {/* Card content for types other than 'image-overlay' */}
-  {cardType !== 'image-overlay' && (
-    <div class="card-content">
-      {cardType === 'media' && (
-        <div class="media">
-          <div class="media-left">
-            <figure class="image is-48x48">
-              {hasAvatar ? (
-                <img src={hasAvatar} alt={_avatar[0].alt || _avatar[0].title || 'Profile image'} class="is-rounded" />
-              ) : (
-                <img src="https://picsum.photos/96/96" alt="Placeholder avatar" class="is-rounded" />
-              )}
-            </figure>
-          </div>
-          <div class={`media-content ${headerAlignment}`}>
-            <p class={titleClasses}>{cardTitle}</p>
-            {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
-          </div>
+  {
+    hasFooter && footerContent && (
+      <footer class='card-footer p-0'>
+        <div class='is-flex-grow-1'>
+          <AposArea area={footerContent} />
         </div>
-      )}
-      {cardType !== 'media' && cardTitle && (
-        <div class={titleWrapperClasses}>
-          <p class={titleClasses}>{cardTitle}</p>
-          {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
-        </div>
-      )}
-      <div class={contentClasses}>
-        <AposArea area={content} />
-      </div>
-    </div>
-  )}
-
-  {hasFooter && footerContent && (
-    <footer class="card-footer p-0">
-      <div class="is-flex-grow-1">
-        <AposArea area={footerContent} />
-      </div>
-    </footer>
-  )}
+      </footer>
+    )
+  }
 </div>
 
-<style define:vars={{
-  overlayBackground: `color-mix(in hsl,var(--bulma-${overlayColor}) ${overlayOpacity}, transparent)`,
-  footerBorderColor: `var(--bulma-${footerBorderColor})`
-}}>
+<style
+  define:vars={{
+    overlayBackground: `color-mix(in hsl,var(--bulma-${overlayColor}) ${overlayOpacity}, transparent)`,
+    footerBorderColor: `var(--bulma-${footerBorderColor})`
+  }}
+>
+  .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
 
-.card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow, 0 4px 8px rgba(0,0,0,0.1));
+  }
 
-.is-small { min-height: 200px; }
-.is-medium { min-height: 300px; }
-.is-large { min-height: 400px; }
+  .is-small {
+    min-height: 200px;
+  }
+  .is-medium {
+    min-height: 300px;
+  }
+  .is-large {
+    min-height: 400px;
+  }
 
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Image handling */
-.card-image {
-  flex-shrink: 0;
-  position: relative; /* Required for overlay positioning */
-}
+  /* Image handling */
+  .card-image {
+    flex-shrink: 0;
+    position: relative; /* Required for overlay positioning */
+  }
 
-.card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-/* Overlay styling */
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--overlayBackground);
-  z-index: 2;
-}
+  /* Overlay styling */
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--overlayBackground);
+    z-index: 2;
+  }
 
-/* Overlay content styling */
-.overlay-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 1rem;
-}
+  /* Overlay content styling */
+  .overlay-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem;
+  }
 
-.overlay-content .title-wrapper,
-.overlay-content .content {
-  width: 100%;
-}
+  .overlay-content .title-wrapper,
+  .overlay-content .content {
+    width: 100%;
+  }
 
-/* Media layout specifics */
-.media-left .image.is-48x48 {
-  height: 48px;
-  width: 48px;
-  overflow: hidden;
-}
+  /* Media layout specifics */
+  .media-left .image.is-48x48 {
+    height: 48px;
+    width: 48px;
+    overflow: hidden;
+  }
 
-.media-left img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
+  .media-left img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
 
-/* Footer positioning and borders */
-.card-footer {
-  margin-top: auto;
-  border-top: none;
-}
+  /* Footer positioning and borders */
+  .card-footer {
+    margin-top: auto;
+    border-top: none;
+  }
 
-/* Footer borders */
-.has-border-color.border-thin .card-footer {
-  border-top: 1px solid var(--footerBorderColor);
-}
+  /* Footer borders */
+  .has-border-color.border-thin .card-footer {
+    border-top: 1px solid var(--footerBorderColor);
+  }
 
-.has-border-color.border-medium .card-footer {
-  border-top: 2px solid var(--footerBorderColor);
-}
+  .has-border-color.border-medium .card-footer {
+    border-top: 2px solid var(--footerBorderColor);
+  }
 
-.has-border-color.border-thick .card-footer {
-  border-top: 3px solid var(--footerBorderColor);
-}
+  .has-border-color.border-thick .card-footer {
+    border-top: 3px solid var(--footerBorderColor);
+  }
 
-/* Clean up editor UI */
-:global(.apos-area-widget) {
-  margin: 0;
-}
+  /* Clean up editor UI */
+  :global(.apos-area-widget) {
+    margin: 0;
+  }
 </style>

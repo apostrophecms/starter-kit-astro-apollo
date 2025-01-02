@@ -1,90 +1,51 @@
 ---
+/**
+ * Video Widget Astro Component
+ *
+ * This component integrates with ApostropheCMS's video widget and renders videos
+ * using a custom web component. It supports multiple video providers through
+ * ApostropheCMS's oEmbed implementation - editors can simply paste any standard
+ * video sharing URL from supported platforms like YouTube or Vimeo.
+ *
+ * @typedef {Object} VideoWidget
+ * @property {boolean} [aposPlaceholder] - Indicates if this is a placeholder instance in the editor
+ * @property {Object} [video] - Video data object
+ * @property {string} [video.url] - The URL of the video to embed
+ *
+ * @param {Object} props - Component properties
+ * @param {VideoWidget} [props.widget] - The widget data from ApostropheCMS
+ */
+
 const { widget } = Astro.props;
+
+// Use placeholder video for the widget editor UI when no video is selected
 const placeholder = widget?.aposPlaceholder ? 'true' : '';
 const url = widget?.video?.url;
+
+// Default placeholder video used in the ApostropheCMS editor
+const PLACEHOLDER_VIDEO_URL = 'https://youtu.be/Q5UX9yexEyM';
 ---
+
 <style>
+  /*
+   * Ensure the video widget takes full width of its container
+   * This allows for responsive sizing based on parent element
+   */
   video-widget {
     width: 100%;
+    display: block; /* Prevents unwanted margins */
   }
 </style>
+
 <video-widget
-  url={placeholder ? 'https://youtu.be/Q5UX9yexEyM' : url }
+  url={placeholder ? PLACEHOLDER_VIDEO_URL : url}
 >
 </video-widget>
-<script>
-  class VideoWidget extends HTMLElement {
-    result: {
-      width: number,
-      height: number,
-      html: string
-    };
-    canvasEl: HTMLElement;
-    constructor() {
-      super();
-      this.init();
-    }
-    async init() {
-      const videoUrl = this.getAttribute('url');
 
-      if (!videoUrl) {
-        return;
-      }
-
-      this.result = await this.oembed(videoUrl);
-
-      this.renderVideo();
-    }
-    async oembed(url) {
-      const response = await fetch('/api/v1/@apostrophecms/oembed/query?' + new URLSearchParams({
-        url
-      }));
-      if (response.status >= 400) {
-        throw new Error(`oembed error code: ${response.status}`);
-      }
-      return response.json();
-    }
-
-    renderVideo() {
-      const shaker = document.createElement('div');
-      shaker.innerHTML = this.result.html;
-      const inner = shaker.firstChild;
-      if (!(inner && (inner instanceof HTMLElement))) {
-        throw new Error('First child must be an HTML element');
-      }
-      this.canvasEl = inner;
-      this.innerHTML = '';
-      if (!inner) {
-        return;
-      }
-      inner.removeAttribute('width');
-      inner.removeAttribute('height');
-      this.append(inner);
-      // wait for CSS width to be known
-      setTimeout(() => {
-        // If oembed results include width and height we can get the
-        // video aspect ratio right
-        if (this.result.width && this.result.height) {
-          inner.style.width = '100%';
-          this.resizeVideo();
-          // If we need to initially size the video, also resize it on window
-          // resize.
-          window.addEventListener('resize', this.resizeHandler.bind(this));
-        } else {
-          // No, so assume the oembed HTML code is responsive.
-        }
-      }, 0);
-    }
-    resizeVideo() {
-      this.canvasEl.style.height = ((this.result.height / this.result.width) * this.canvasEl.offsetWidth) + 'px';
-    }
-    resizeHandler() {
-      if (document.contains(this)) {
-        this.resizeVideo();
-      } else {
-        window.removeEventListener('resize', this.resizeHandler);
-      }
-    }
-  }
-  customElements.define('video-widget', VideoWidget);
-</script>
+<!--
+Usage Notes:
+1. This component expects to receive widget data from ApostropheCMS
+2. The video-widget web component must be loaded before this component renders
+3. Placeholder video is shown in the editor when no video is selected
+4. The component automatically handles responsive sizing
+-->

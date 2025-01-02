@@ -12,6 +12,10 @@
     "release": "npm install && npm run build && npm run migrate",
     "migrate": "NODE_ENV=production node app @apostrophecms/migration:migrate"
   },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
+  },
   "nodemonConfig": {
     "delay": 1000,
     "verbose": true,
@@ -43,8 +47,8 @@
   "license": "MIT",
   "dependencies": {
     "@apostrophecms/cli": "^3.4.0",
-    "@apostrophecms/vite": "^1.0.0-beta.2",
-    "apostrophe": "^4.0.0",
+    "@apostrophecms/vite": "^1.0.0",
+    "apostrophe": "^4.10.0",
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {

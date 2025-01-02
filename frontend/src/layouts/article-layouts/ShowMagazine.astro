@@ -1,7 +1,17 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
+import {
+  getFirstAttachment,
+  getAttachmentUrl,
+  getAttachmentSrcset,
+  hasFocalPoint,
+  getFocalPoint,
+  getWidth,
+  getHeight
+} from '../../lib/attachments.js';
 
 const { article } = Astro.props;
+const heroImage = getFirstAttachment(article._heroImage);
 ---
 
 <article class="magazine-article">
@@ -17,12 +27,18 @@ const { article } = Astro.props;
             <p class="subtitle is-4">{article.excerpt}</p>
           </div>
 
-          {article._heroImage?.[0] && (
+          {heroImage && (
             <figure class="image is-2by1 mb-6">
               <img
-                src={article._heroImage[0].attachment._urls.full}
-                alt={article._heroImage[0].attachment.alt || ''}
+                src={getAttachmentUrl(heroImage, { size: 'full' })}
+                srcset={getAttachmentSrcset(heroImage)}
+                sizes="(min-width: 1200px) 1920px, 100vw"
+                alt={heroImage.alt || ''}
+                width={getWidth(heroImage) || '1920'}
+                height={getHeight(heroImage) || '960'}
                 class="object-fit-cover"
+                style={hasFocalPoint(heroImage) ? `object-position: ${getFocalPoint(heroImage)}` : 'object-position: center center'}
+                loading="eager"
               />
             </figure>
           )}
@@ -30,7 +46,7 @@ const { article } = Astro.props;
           <div class="content is-large">
             <AposArea area={article.mainContent} />
           </div>
-          
+
           {article._tags?.length > 0 && (
             <div class="tags is-centered mt-6">
               {article._tags.map(tag => (

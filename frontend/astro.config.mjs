@@ -6,6 +6,11 @@ import path from 'path';
 // https://astro.build/config
 export default defineConfig({
   output: "server",
+  server: {
+    port: process.env.PORT ? parseInt(process.env.PORT) : 4321,
+    // Required for some hosting, like Heroku
+    // host: true
+  },
   adapter: node({
     mode: 'standalone'
   }),
@@ -13,7 +18,17 @@ export default defineConfig({
     aposHost: 'http://localhost:3000',
     widgetsMapping: './src/widgets',
     templatesMapping: './src/templates',
-    forwardHeaders: ['content-security-policy', 'strict-transport-security', 'x-frame-options', 'referrer-policy', 'cache-control', 'host']
+    includeResponseHeaders: [
+      'content-security-policy',
+      'strict-transport-security',
+      'x-frame-options',
+      'referrer-policy',
+      'cache-control'
+    ],
+    excludeRequestHeaders: [
+      // For hosting on multiple servers, block the host header
+      'host'
+    ]
   })],
   vite: {
     ssr: {

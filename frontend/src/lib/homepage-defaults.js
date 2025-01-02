@@ -27,16 +27,6 @@ export const slideshowDefaults = {
       contentColor: 'success',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            _urls: {
-              full: 'https://picsum.photos/seed/slide1/1600/900'
-            },
-            alt: 'Welcome slide'
-          }
-        }
-      ]
     },
     {
       slideTitle: 'Customizable Design',
@@ -45,16 +35,6 @@ export const slideshowDefaults = {
       contentColor: 'warning',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            _urls: {
-              full: 'https://picsum.photos/seed/slide2/1600/900'
-            },
-            alt: 'Design slide'
-          }
-        }
-      ]
     },
     {
       slideTitle: 'Getting Started',
@@ -63,16 +43,6 @@ export const slideshowDefaults = {
       contentColor: 'white',
       textBlockBackground: 'dark',
       textBlockOpacity: '65',
-      _image: [
-        {
-          attachment: {
-            _urls: {
-              full: 'https://picsum.photos/seed/slide3/1600/900'
-            },
-            alt: 'Getting started slide'
-          }
-        }
-      ]
     }
   ]
 };
