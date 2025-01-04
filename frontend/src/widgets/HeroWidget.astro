@@ -26,10 +26,8 @@
  const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -63,7 +61,7 @@ const {
   overlayOpacity = '50%',
   height = 'medium',
   contentAlignment = 'center',
-  _backgroundImage,
+  _backgroundImage = [],
   imagePosition = 'center',
   videoBackground,
   videoBackgroundMobile,
@@ -71,7 +69,7 @@ const {
   callToAction
 } = widget;
 
-const backgroundImage = getFirstAttachment(_backgroundImage);
+const backgroundImage = _backgroundImage[0];
 const backgroundImageUrl = backgroundImage
   ? {
       src: getAttachmentUrl(backgroundImage, { size: 'full' }),
@@ -79,9 +77,7 @@ const backgroundImageUrl = backgroundImage
       alt: backgroundImage.alt || '',
       width: getWidth(backgroundImage) || '1920',
       height: getHeight(backgroundImage) || '1080',
-      style: hasFocalPoint(backgroundImage)
-        ? `object-position: ${getFocalPoint(backgroundImage)}`
-        : `object-position: center ${imagePosition}`
+      style: `object-position: ${getFocalPoint(backgroundImage)}`
     }
   : {
       src: `https://picsum.photos/1920/1080?random=${Math.random()}`,

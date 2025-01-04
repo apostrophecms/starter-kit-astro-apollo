@@ -34,81 +34,36 @@ function isSized(attachmentObject) {
 }
 
 /**
- * Check if fields object contains a valid crop
- * @param {Object} fields - The fields object to check
- * @returns {boolean} True if fields contains valid crop values
- */
-function isValidCrop(fields) {
-  return fields &&
-    typeof fields.left === 'number' && fields.left !== null &&
-    typeof fields.top === 'number' && fields.top !== null &&
-    typeof fields.width === 'number' && fields.width !== null &&
-    typeof fields.height === 'number' && fields.height !== null;
-}
-
-/**
- * Get crop information from attachment or image
+ * Get focal point coordinates from attachment or image, or return default value if invalid
  * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @returns {Object|null} Crop object or null if no crop exists
+ * @param {string} [defaultValue='center center'] - Default value to return if no valid focal point
+ * @returns {string} String with focal point for styling (e.g., "50% 50%") or default value if invalid
  */
-function getCrop(attachmentObject) {
-  if (!attachmentObject) return null;
+function getFocalPoint(attachmentObject, defaultValue = 'center center') {
+  if (!attachmentObject) return defaultValue;
 
-  // Check _fields if it's a full image object
-  if (attachmentObject._fields && isValidCrop(attachmentObject._fields)) {
-    return {
-      left: attachmentObject._fields.left,
-      top: attachmentObject._fields.top,
-      width: attachmentObject._fields.width,
-      height: attachmentObject._fields.height
-    };
-  }
-
-  return null;
-}
-
-/**
- * Check if attachment or image has a valid focal point
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @returns {boolean} True if the attachment has a valid focal point
- */
-function hasFocalPoint(attachmentObject) {
-  if (!attachmentObject) return false;
-
-  // Check _fields if it's a full image object
-  if (attachmentObject._fields && 
-      typeof attachmentObject._fields.x === 'number' && 
+  // Check _fields if it's from a relationship
+  if (attachmentObject._fields &&
+      typeof attachmentObject._fields.x === 'number' &&
       attachmentObject._fields.x !== null &&
       typeof attachmentObject._fields.y === 'number' &&
       attachmentObject._fields.y !== null) {
-    return true;
-  }
-
-  // Check attachment object
-  const attachment = getAttachment(attachmentObject);
-  if (!attachment) return false;
-
-  if (typeof attachment.x === 'number' && attachment.x !== null && typeof attachment.y === 'number' && attachment.y !== null) {
-    return true;
-  }
-}
-
-/**
- * Get focal point coordinates from attachment or image
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @returns {string} String with focal point for styling (e.g., "50% 50%") or "center center" if invalid
- */
-function getFocalPoint(attachmentObject) {
-  if (
-    attachmentObject?._fields &&
-    typeof attachmentObject._fields.x === 'number' &&
-    typeof attachmentObject._fields.y === 'number'
-  ) {
     return `${attachmentObject._fields.x}% ${attachmentObject._fields.y}%`;
   }
 
-  return 'center center';
+  // Check attachment object directly if it's a direct attachment
+  const attachment = getAttachment(attachmentObject);
+  if (attachment &&
+      typeof attachment.x === 'number' && 
+      attachment.x !== null && 
+      typeof attachment.y === 'number' && 
+      attachment.y !== null) {
+    return `${attachment.x}% ${attachment.y}%`;
+  }
+
+  return defaultValue;
 }
+
 /**
  * Get the width from the image object, using crop dimensions if available,
  * otherwise falling back to original image dimensions
@@ -143,46 +98,20 @@ function getHeight(imageObject) {
  * Get URL for an attachment with optional size
  * @param {Object} attachmentObject - Either a full image object or direct attachment
  * @param {Object} [options={}] - Options object
- * @param {string} [options.size] - Size variant ('one-sixth', 'one-third', 'one-half', 'two-thirds', 'full', 'max')
- * @param {Object} [options.crop] - Crop configuration object
- * @returns {string} The constructed URL for the attachment
+ * @param {string} [options.size] - Size variant ('one-sixth', 'one-third', 'one-half', 'two-thirds', 'full', 'max', 'original')
+ * @returns {string} The URL for the attachment
  */
 export function getAttachmentUrl(attachmentObject, options = {}) {
-  const attachment = getAttachment(attachmentObject);
+  const attachment = attachmentObject?.attachment || attachmentObject;
 
-  if (!attachment) {
-    console.warn('Template warning: Impossible to retrieve the attachment url since it is missing, a default icon has been set. Please fix this ASAP!');
+  if (!attachment?._urls) {
+    console.warn('Template warning: Missing attachment or _urls, using fallback icon');
     return MISSING_ATTACHMENT_URL;
   }
 
-  // Start building the URL
-  let path = `/uploads/attachments/${attachment._id}-${attachment.name}`;
-
-  // Handle crop if present
-  const crop = options.crop !== false && (options.crop || getCrop(attachmentObject));
-  if (crop?.width) {
-    path += `.${crop.left}.${crop.top}.${crop.width}.${crop.height}`;
-  }
-
-  // Handle size unless original is requested
-  if (isSized(attachmentObject) && options.size !== 'original') {
-    const effectiveSize = options.size || 'full';
-    path += `.${effectiveSize}`;
-  }
-
-  // Add extension
-  path += `.${attachment.extension}`;
-
-  return path;
-}
-
-/**
- * Get the first attachment from an array of attachments
- * @param {Array} attachments - Array of attachments
- * @returns {Object|null} First attachment maintaining field information
- */
-export function getFirstAttachment(attachments) {
-  return attachments?.[0] || null;
+  // Return the requested size URL or original if size not found
+  const size = options.size || 'full';
+  return attachment._urls[size] || attachment._urls.original;
 }
 
 /**
@@ -218,10 +147,7 @@ export function getAttachmentSrcset(attachmentObject, options = {}) {
 
 // Export the helper functions for use in components
 export {
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
-  getHeight,
-  getCrop,
-  isSized
+  getHeight
 };

@@ -1,10 +1,8 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -81,35 +79,26 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
               )}
             </div>
             <div class='column'>
-              {article?._heroImage?.[0] && (
-                <figure class='image is-3by2'>
-                  <img
-                    class='has-shadow object-fit-cover'
-                    loading='lazy'
-                    decoding='async'
-                    width={
-                      getWidth(getFirstAttachment(article._heroImage)) || '570'
-                    }
-                    height={
-                      getHeight(getFirstAttachment(article._heroImage)) || '380'
-                    }
-                    sizes='(max-width: 768px) 100vw, 50vw'
-                    src={getAttachmentUrl(
-                      getFirstAttachment(article._heroImage),
-                      { size: 'full' }
-                    )}
-                    srcset={getAttachmentSrcset(
-                      getFirstAttachment(article._heroImage)
-                    )}
-                    alt={article._heroImage[0].attachment._alt || ''}
-                    style={
-                      hasFocalPoint(article._heroImage[0])
-                        ? `object-position: ${getFocalPoint(article._heroImage[0])}`
-                        : 'object-position: center center'
-                    }
-                  />
-                </figure>
-              )}
+              {article?._heroImage?.[0] &&
+                (() => {
+                  const heroImage = article._heroImage[0];
+                  return (
+                    <figure class='image is-3by2'>
+                      <img
+                        class='has-shadow object-fit-cover'
+                        loading='lazy'
+                        decoding='async'
+                        width={getWidth(heroImage) || '570'}
+                        height={getHeight(heroImage) || '380'}
+                        sizes='(max-width: 768px) 100vw, 50vw'
+                        src={getAttachmentUrl(heroImage, { size: 'full' })}
+                        srcset={getAttachmentSrcset(heroImage)}
+                        alt={heroImage.attachment._alt || ''}
+                        style={`object-position: ${getFocalPoint(heroImage)}`}
+                      />
+                    </figure>
+                  );
+                })()}
             </div>
           </div>
         </article>

@@ -21,10 +21,8 @@
 const { widget } = Astro.props;
 
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -103,19 +101,16 @@ const getContentSize = (selectedSize) => {
   <div class='slides'>
     {
       slides.map((slide, index) => {
-        const slideImage = slide._image?.[0];
-        const imageAttachment = getFirstAttachment(slide._image);
+        const slideImage = slide?._image[0];
         // Create image props with fallback
-        const imageProps = imageAttachment
+        const imageProps = slideImage
           ? {
-              src: getAttachmentUrl(imageAttachment, { size: 'full' }),
-              srcset: getAttachmentSrcset(imageAttachment),
-              alt: imageAttachment.attachment?.alt || slide.slideTitle || '',
-              width: getWidth(imageAttachment) || '1920',
-              height: getHeight(imageAttachment) || '1080',
-              style: hasFocalPoint(imageAttachment)
-                ? `object-position: ${getFocalPoint(imageAttachment)};`
-                : 'object-position: center center;'
+              src: getAttachmentUrl(slideImage, { size: 'full' }),
+              srcset: getAttachmentSrcset(slideImage),
+              alt: slideImage.attachment?.alt || slide.slideTitle || '',
+              width: getWidth(slideImage) || '1920',
+              height: getHeight(slideImage) || '1080',
+              style: `object-position: ${getFocalPoint(slideImage)}`
             }
           : {
               src: `https://picsum.photos/1920/1080?random=${index}`,

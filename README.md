@@ -79,34 +79,30 @@ Piece-type pages in ApostropheCMS only projects are used to either display multi
 ## Overview
 These helper functions are designed to work with images in your Astro frontend that come from ApostropheCMS through relationships or attachment fields. If you're using the image widget within an area, you should use the `AposArea` helper instead - these utilities are specifically for handling images that are part of your content model.
 
+**Important:** These helpers expect a single attachment object, not an array. When working with relationships or array fields, make sure to pass a single image object (e.g., `page.relationship._image[0]`) rather than the full array.
+
 ## Common Use Cases
 
 ### Working with Image Relationships
 When you have a relationship field to `@apostrophecms/image` in your content type, you'll typically need to:
 1. Get the image URL (potentially at different sizes for responsive images)
-2. Get the image dimensions including any cropping that should be applied
-3. Set up proper alt text
-4. Handle focal points if configured
+2. Handle focal points if configured
+3. Get the image dimensions including any cropping that should be applied
+4. Set up proper alt text
 
 Here's a typical example:
 ```js
 ---
-// PATH assumes you are importing from a subfolder of the `src` folder
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
 } from '../lib/attachments.js';
 
-// relationshipField._image comes from your schema
-const image = relationshipField._image;
-
-// If you have an array of images, you might need getFirstAttachment
-const image = getFirstAttachment(relationshipField._images);
+// Get first image from relationship
+const image = relationshipField._image[0];
 ---
 
 <img
@@ -116,11 +112,12 @@ const image = getFirstAttachment(relationshipField._images);
   alt={image.alt || image.title || 'Image description'}
   width={getWidth(image)}
   height={getHeight(image)}
+  style={`object-position: ${getFocalPoint(image)};`}
 />
 ```
 
 ### Working with Direct Attachments
-For attachment fields (like logo fields), the pattern is similar, but you don't need to use `getFirstAttachment` since the field already contains the direct attachment:
+For attachment fields (like logo fields), the pattern is similar:
 
 ```js
 <img 
@@ -165,7 +162,7 @@ const srcset = getAttachmentSrcset(image, {
 });
 ```
 
-Important: These helpers don't generate the image sizes - they just reference sizes that already exist. To use custom sizes, you must configure the [`@apostrophecms/attachment` module](https://docs.apostrophecms.org/reference/modules/attachment.html#configuration) to create those sizes when images are uploaded. You can do this in your backend configuration:
+> Important: These helpers don't generate the image sizes - they just reference sizes that already exist. To use custom sizes, you must configure the [`@apostrophecms/attachment` module](https://docs.apostrophecms.org/reference/modules/attachment.html#configuration) to create those sizes when images are uploaded. You can do this in your backend configuration:
 
 ```javascript
 // modules/@apostrophecms/attachment/index.js
@@ -185,27 +182,33 @@ module.exports = {
 
 See the [attachment module documentation](https://docs.apostrophecms.org/reference/modules/attachment.html#configuration) for complete configuration options.
 
-### Focal Points
-If you've set focal points in the ApostropheCMS admin UI, you can use them:
+## Working with Focal Points
+When using focal points set in the ApostropheCMS admin UI, you'll need to:
+1. Use `object-position` with the focal point value
+2. Set appropriate Bulma image classes (like `is-fullwidth`)
 
 ```js
-<img
-  src={getAttachmentUrl(image)}
-  style={
-    hasFocalPoint(image)
-      ? `object-position: ${getFocalPoint(image)};`
-      : 'object-position: center center'
-  }
-/>
+<figure class="image">
+  <img
+    src={getAttachmentUrl(image)}
+    style={`object-position: ${getFocalPoint(image)}; object-fit: cover;`}
+    class="is-fullwidth"
+    width={getWidth(image)}
+    height={getHeight(image)}
+    alt="Image with focal point"
+  />
+</figure>
 ```
 
+The `getFocalPoint()` function returns coordinates in the format "X% Y%" (e.g., "50% 50%" for center). If no focal point is set, it returns the default value (default is "center center").
+
 ## Core Functions Reference
-There are JSDocs blocks for the core function that can be used for a more detailed explanation, but as a quick summary:
-- `getAttachmentUrl(attachment, options?)`: Get URL for an image with optional size (defaults to 'full')
-- `getAttachmentSrcset(attachment, options?)`: Generate responsive srcset string
-- `getWidth(attachment)`: Get image width
-- `getHeight(attachment)`: Get image height
-- `getFirstAttachment(attachments)`: Get first image from an array
+Key functions available (see JSDoc comments in source for detailed documentation):
+- `getAttachmentUrl(attachmentObject, options?)`: Get URL for an image with optional size (defaults to 'full')
+- `getAttachmentSrcset(attachmentObject, options?)`: Generate responsive srcset string
+- `getWidth(imageObject)`: Get image width, respecting crops
+- `getHeight(imageObject)`: Get image height, respecting crops
+- `getFocalPoint(attachmentObject, defaultValue?)`: Get focal point coordinates for styling
 
 # Deploying to production
 

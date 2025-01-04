@@ -1,10 +1,8 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -18,8 +16,8 @@ const {
   heroImageClass = 'is-3by2'
 } = Astro.props;
 
-const heroImageObject = getFirstAttachment(pieces[0]?._heroImage);
-const heroSrcset = heroImageObject ? getAttachmentSrcset(heroImageObject) : '';
+const heroImage = pieces[0]?._heroImage[0];
+const heroSrcset = heroImage ? getAttachmentSrcset(heroImage) : '';
 
 // Get the current category from URL params
 const currentCategory = Astro.url.searchParams.get('category') || '';
@@ -28,19 +26,17 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   <div class='columns is-vcentered mb-6'>
     <div class='column is-two-thirds'>
       <a href={pieces[0]._url} class='image hero-image'>
-        {heroImageObject && (
+        {heroImage && (
           <figure class={`image ${heroImageClass}`}>
             <img
-              src={getAttachmentUrl(heroImageObject, { size: 'full' })}
+              src={getAttachmentUrl(heroImage, { size: 'full' })}
               srcset={heroSrcset}
               sizes="(min-width: 1200px) 2400px, (min-width: 800px) 1200px, 800px"
-              alt={heroImageObject.alt || ''}
+              alt={heroImage.alt || ''}
               class="has-ratio"
-              style={`object-fit: cover; ${
-                hasFocalPoint(heroImageObject) ? `object-position: ${getFocalPoint(heroImageObject)};` : ''
-              }`}
-              width={getWidth(heroImageObject)}
-              height={getHeight(heroImageObject)}
+              style={`object-fit: cover; object-position: ${getFocalPoint(heroImage)};`}
+              width={getWidth(heroImage)}
+              height={getHeight(heroImage)}
             />
           </figure>
         )}
@@ -88,7 +84,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   </div>
   <div class='columns is-multiline'>
     {pieces.slice(1).map((article) => {
-      const cardImage = getFirstAttachment(article._heroImage);
+      const cardImage = article?._heroImage[0];
       return (
       <div class={`column is-${12/gridColumns}`}>
         <div class='card h-100'>
@@ -100,7 +96,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
                     src={getAttachmentUrl(cardImage, { size: 'full' })}
                     alt={article.title}
                     class='has-ratio'
-                    style={`object-fit: cover; ${hasFocalPoint(cardImage.attachment) ? `object-position: ${getFocalPoint(cardImage.attachment)};` : ''}`}
+                    style={`object-fit: cover; object-position: ${getFocalPoint(cardImage)};`}
                     width={getWidth(cardImage)}
                     height={getHeight(cardImage)}
                     loading="lazy"

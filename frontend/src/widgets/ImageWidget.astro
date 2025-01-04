@@ -15,7 +15,6 @@
 import {
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -24,6 +23,7 @@ import {
 const { widget } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
 const image = widget?._image[0];
+console.log('Image widget:', widget?._image );
 
 // Handle missing image gracefully
 if (!placeholder && !image) {
@@ -61,7 +61,7 @@ const aspectRatio = width && height ? `${width}/${height}` : undefined;
   decoding="async"
   srcset={srcset}
   style={`
-    ${hasFocalPoint(image) ? `object-position: ${objectPosition};` : ''}
+    object-position: ${objectPosition};
     ${aspectRatio ? `--aspect-ratio: ${aspectRatio};` : ''}
   `.trim()}
   width={width}

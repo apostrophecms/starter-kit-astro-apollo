@@ -1,10 +1,8 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -23,7 +21,7 @@ const authors = article._author;
 const authorCount = Array.isArray(authors) ? authors.length : 1;
 const primaryAuthor = Array.isArray(authors) ? authors[0] : authors;
 
-const heroImage = getFirstAttachment(article._heroImage);
+const heroImage = article?._heroImage[0];
 ---
 <article class="full-width-article">
   {heroImage && (
@@ -37,7 +35,7 @@ const heroImage = getFirstAttachment(article._heroImage);
           width={getWidth(heroImage) || '1920'}
           height={getHeight(heroImage) || '1080'}
           class="object-fit-cover"
-          style={hasFocalPoint(heroImage) ? `object-position: ${getFocalPoint(heroImage)}` : 'object-position: center center'}
+          style={`object-position: ${getFocalPoint(heroImage)}`}
           loading="eager"
         />
       </figure>

@@ -1,17 +1,15 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
 } from '../../lib/attachments.js';
 
 const { article } = Astro.props;
-const heroImage = getFirstAttachment(article._heroImage);
+const heroImage = article?._heroImage[0];
 ---
 
 {
@@ -24,11 +22,7 @@ const heroImage = getFirstAttachment(article._heroImage);
           sizes='(min-width: 1200px) 1200px, 100vw'
           alt={heroImage.alt || ''}
           class='object-fit-cover'
-          style={
-            hasFocalPoint(heroImage)
-              ? `object-position: ${getFocalPoint(heroImage)};`
-              : 'object-position: center center'
-          }
+          style={`object-position: ${getFocalPoint(heroImage)}`}
           width={getWidth(heroImage) || '1200'}
           height={getHeight(heroImage) || '800'}
           loading='eager'
@@ -57,7 +51,7 @@ const heroImage = getFirstAttachment(article._heroImage);
             <h4 class='title is-5 mb-4'>More Articles</h4>
             <div class='columns is-multiline'>
               {article._related?.map((related) => {
-                const relatedHero = getFirstAttachment(related._heroImage);
+                const relatedHero = related?._heroImage[0];
                 return (
                   <div class='column is-6'>
                     <a href={related._url} class='has-text-dark'>
@@ -73,11 +67,7 @@ const heroImage = getFirstAttachment(article._heroImage);
                                 sizes='(min-width: 1200px) 600px, 50vw'
                                 alt={related.title}
                                 class='object-fit-cover'
-                                style={
-                                  hasFocalPoint(relatedHero)
-                                    ? `object-position: ${getFocalPoint(relatedHero)};`
-                                    : 'object-position: center center'
-                                }
+                                style={`object-position: ${getFocalPoint(relatedHero)}`}
                                 width={getWidth(relatedHero) || '600'}
                                 height={getHeight(relatedHero) || '338'}
                                 loading='lazy'

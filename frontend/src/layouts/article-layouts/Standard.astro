@@ -1,10 +1,8 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -32,7 +30,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   <div class='content'>
     {
       pieces.map((article) => {
-        const heroImage = getFirstAttachment(article._heroImage);
+        const heroImage = article?._heroImage[0];
         return (
           <article class='mb-6 pb-6 border-bottom'>
             <div class='columns is-vcentered'>
@@ -86,11 +84,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
                       src={getAttachmentUrl(heroImage, { size: 'full' })}
                       srcset={getAttachmentSrcset(heroImage)}
                       alt={heroImage.alt || ''}
-                      style={
-                        hasFocalPoint(heroImage)
-                          ? `object-position: ${getFocalPoint(heroImage)}`
-                          : 'object-position: center center'
-                      }
+                      style={`object-position: ${getFocalPoint(heroImage)}`}
                     />
                   </figure>
                 </div>

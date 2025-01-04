@@ -32,10 +32,8 @@ const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 
 import {
-  getFirstAttachment,
   getAttachmentUrl,
   getAttachmentSrcset,
-  hasFocalPoint,
   getFocalPoint,
   getWidth,
   getHeight
@@ -52,10 +50,10 @@ const {
   contentColor = '',
   content,
   backgroundColor = '',
-  _mainImage,
+  _mainImage = [],
   useImageRatio = false,
   imageRatio = 'is-4by3',
-  _avatar,
+  _avatar = [],
   hasFooter,
   footerContent,
   minHeight = '',
@@ -67,8 +65,8 @@ const {
   footerBorderColor = 'primary'
 } = widget;
 
-const mainImage = getFirstAttachment(_mainImage);
-const avatar = getFirstAttachment(_avatar);
+const mainImage = _mainImage[0];
+const avatar = _avatar[0];
 
 // Dynamic classes for border width and color
 const borderWidthClass = addFooterBorder ? `border-${footerBorderWidth}` : '';
@@ -134,11 +132,7 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
               alt={mainImage.alt || mainImage.title || 'Card image'}
               width={getWidth(mainImage) || '800'}
               height={getHeight(mainImage) || '600'}
-              style={
-                hasFocalPoint(mainImage)
-                  ? `object-position: ${getFocalPoint(mainImage)};`
-                  : 'object-position: center center'
-              }
+              style={`object-position: ${getFocalPoint(mainImage)}`}
             />
           ) : (
             <img
@@ -187,11 +181,7 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
                     class='is-rounded'
                     width={getWidth(avatar) || '48'}
                     height={getHeight(avatar) || '48'}
-                    style={
-                      hasFocalPoint(avatar)
-                        ? `object-position: ${getFocalPoint(avatar)};`
-                        : 'object-position: center center'
-                    }
+                    style={`object-position: ${getFocalPoint(avatar)}`}
                   />
                 ) : (
                   <img
