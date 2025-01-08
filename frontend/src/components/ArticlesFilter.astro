@@ -37,7 +37,7 @@ function buildUrl(currentUrl, category) {
 }
 ---
 
-<div class={`box mb-5 ${darkThemeBool ? 'enable-dark-theme' : ''}`}>
+<div class={`mb-5 ${darkThemeBool ? 'enable-dark-theme' : ''}`}>
   <h3 class="title is-4 mb-4">Filter by Category</h3>
   <div class="tabs is-boxed">
     <ul>
@@ -54,14 +54,14 @@ function buildUrl(currentUrl, category) {
 
 <style>
   .tabs.is-boxed li.is-active a {
-    background-color: var(--primary-color, #485fc7);
-    border-color: var(--primary-color, #485fc7);
-    color: #fff;
+    background-color: var(--bulma-primary);
+    border-color: var(--bulma-primary);
+    color: #000;
   }
 
   .tabs.is-boxed li.is-active a .tag {
     background-color: #fff;
-    color: var(--primary-color, #485fc7);
+    color: var(--bulma-primary);
   }
 
   /* Dark theme styles only apply when enable-dark-theme class is present */
@@ -76,7 +76,7 @@ function buildUrl(currentUrl, category) {
     }
 
     & .tabs.is-boxed li.is-active a {
-      background-color: var(--primary-color, #485fc7);
+      background-color: var(--bulma-primary);
       color: #fff;
     }
 
