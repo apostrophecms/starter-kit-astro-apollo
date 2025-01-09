@@ -71,3 +71,13 @@ body {
 .has-background-transparent {
   background-color: transparent;
 }
+
+body [data-apos-area] [data-apos-area] {
+  margin: 0 0 1.5rem 0;
+}
+
+.rich-text-widget {
+  *:not(:last-child) {
+    margin-bottom: 0.75rem
+  }
+}
