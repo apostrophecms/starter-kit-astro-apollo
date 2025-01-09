@@ -32,13 +32,13 @@ import '../styles/main.scss';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
-
 <AposLayout title={aposData.page?.title} {aposData} {bodyClass}>
   <Fragment slot='standardHead'>
     <meta name='description' content={aposData.page?.seoDescription} />
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <meta charset='UTF-8' />
     <script src="/scripts/VideoWidget.ts" type="module"></script>
+    <script src="/scripts/dynamic-navbar-padding.js" defer></script>
     <link
       rel='stylesheet'
       href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'
