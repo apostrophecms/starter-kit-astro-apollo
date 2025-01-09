@@ -14,6 +14,10 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone'
   }),
+  server: {
+    // Required for some hosting, like Heroku
+    host: true
+  },
   integrations: [apostrophe({
     aposHost: 'http://localhost:3000',
     widgetsMapping: './src/widgets',
@@ -27,7 +31,7 @@ export default defineConfig({
     ],
     excludeRequestHeaders: [
       // For hosting on multiple servers, block the host header
-      'host'
+      //'host'
     ]
   })],
   vite: {

@@ -14,9 +14,6 @@
  * Direct usage (if needed):
  * <video-widget url="https://youtube.com/..."></video-widget>
  * <video-widget url="https://vimeo.com/..."></video-widget>
- *
- * The component works with any video provider supported by ApostropheCMS's oEmbed
- * implementation - just pass the standard sharing URL from the video platform.
  */
 class VideoWidget extends HTMLElement {
   constructor() {
@@ -26,7 +23,6 @@ class VideoWidget extends HTMLElement {
 
   /**
    * Initializes the video widget by fetching oEmbed data and rendering the video
-   * @returns {Promise<void>}
    */
   async init() {
     const videoUrl = this.getAttribute('url');
@@ -49,7 +45,6 @@ class VideoWidget extends HTMLElement {
    * Fetches oEmbed data for the given URL using ApostropheCMS's oEmbed endpoint
    * @param {string} url - The video URL to fetch oEmbed data for
    * @returns {Promise<Object>} The oEmbed response data
-   * @throws {Error} If the oEmbed request fails
    */
   async oembed(url) {
     const response = await fetch('/api/v1/@apostrophecms/oembed/query?' + new URLSearchParams({
@@ -71,7 +66,7 @@ class VideoWidget extends HTMLElement {
     shaker.innerHTML = this.result.html;
     const inner = shaker.firstChild;
     
-    if (!(inner && (inner instanceof HTMLElement))) {
+    if (!inner || !(inner instanceof HTMLElement)) {
       throw new Error('oEmbed response must contain a valid HTML element');
     }
 
