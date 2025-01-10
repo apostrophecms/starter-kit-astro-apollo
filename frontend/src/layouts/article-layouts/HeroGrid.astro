@@ -106,7 +106,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
             )}
           </a>
           <div class='card-content'>
-            <a href={article._url} class='has-text-dark'>
+            <a href={article._url} class='has-text-dark card-title'>
               <h3 class='title is-4'>{article.title}</h3>
             </a>
             <p class='subtitle is-6'>
@@ -116,7 +116,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
             <p class='content'>{article.excerpt}</p>
           </div>
           <footer class='card-footer mt-auto'>
-            <a href={article._url} class='card-footer-item button has-background-primary has-text-black is-info is-medium'>
+            <a href={article._url} class='button has-background-primary has-text-black is-info'>
               Read More
             </a>
           </footer>
@@ -131,6 +131,26 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
 html.theme-dark .title,
 html.theme-dark .subtitle {
   color: #fff !important;
+}
+
+.card {
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: unset;
+}
+
+.card-footer {
+  border: none;
+  padding: 0 1em 1em;
+}
+
+.card-image:last-child img {
+  border-radius: unset;
+}
+
+.card-title {
+  display: inline-block;
+  margin-bottom: 0.75em;
 }
 
 </style>
