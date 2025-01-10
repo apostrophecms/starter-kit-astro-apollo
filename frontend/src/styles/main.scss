@@ -135,3 +135,24 @@ body [data-apos-area] [data-apos-area] {
     margin-bottom: 0.75rem
   }
 }
+
+.rich-text-widget,
+.ProseMirror {
+  ul { 
+    list-style-type: disc; 
+  }
+  ol { 
+    list-style-type: decimal; 
+  }
+  ul, ol {
+    margin-bottom: 1em;
+  }
+  ul ul, ol ul { 
+    list-style-type: circle;
+    margin-left: 1em;
+  }
+  ol ol, ul ol {
+    list-style-type: lower-latin;
+    margin-left: 1em;
+  }
+}
