@@ -133,7 +133,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
 {
   layout === 'full' ? (
     <section 
-      class={`hero ${heightClass}`}
+      class={`hero mb-5 ${heightClass}`}
       role="banner" 
       aria-label={mainContent.title || 'Hero section'}
     >
@@ -186,7 +186,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
               {mainContent.pretitle}
             </p>
           )}
-          <h1 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
+          <h1 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent?.titleColor, 'text')}`}>{mainContent.title}</h1>
           {mainContent?.subtitle && (
             <p class={`subtitle mb-5 ${subtitleClass}`}>
               {mainContent.subtitle}
@@ -202,7 +202,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
     </section>
   ) : (
     <section 
-      class='hero-split'
+      class='hero-split mb-5'
       role="banner"
       aria-label={mainContent.title || 'Hero section'}
     >
@@ -216,7 +216,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
               {mainContent.pretitle}
             </p>
           )}
-          <h1 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
+          <h1 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent?.titleColor, 'text')}`}>{mainContent.title}</h1>
           {mainContent?.subtitle && (
             <p class={`subtitle mb-5 ${subtitleClass}`}>
               {mainContent.subtitle}
@@ -322,6 +322,8 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
   .hero-body {
     position: relative;
     z-index: 3;
+    display: flex;
+    align-items: center;
   }
 
   /* Height variations */

@@ -67,30 +67,31 @@ const heroImage = article?._heroImage[0];
                 </div>
               )}
               <div class="author-content">
-                <p class="title is-4">{primaryAuthor.title}</p>
-                <p class="subtitle is-6">
-                  {new Date(article.publishDate).toLocaleDateString()}
+                <p class="title is-4 mb-2">{primaryAuthor.title}</p>
+                <p>
+                  <a href="mailto:{primaryAuthor.email}">{primaryAuthor.email}</a>
                 </p>
-                <p>{primaryAuthor.email}</p>
-                <div class="buttons">
-                  {primaryAuthor.socialLinks.map((link) => (
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="button is-light"
-                      aria-label={`Visit my ${link.platform} profile`}
-                    >
-                      <span class="icon">
-                        <i class={iconMap[link.platform]}></i>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-                <div class="author-bio">
-                  <AposArea area={article._author[0].biography} />
-                </div>
               </div>
+            </div>
+            {primaryAuthor.socialLinks.length > 0 && (
+              <div class="buttons">
+                {primaryAuthor.socialLinks.map((link) => (
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="button is-light"
+                    aria-label={`Visit my ${link.platform} profile`}
+                  >
+                    <span class="icon">
+                      <i class={iconMap[link.platform]}></i>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+            <div class="author-bio">
+              <AposArea area={article._author[0].biography} />
             </div>
             <!-- Additional Authors if they exist -->
             {authorCount > 1 && (

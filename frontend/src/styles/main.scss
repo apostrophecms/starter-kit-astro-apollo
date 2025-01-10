@@ -1,10 +1,64 @@
 @charset "utf-8";
+/// BULMA CUSTOMIZATION
+// To customize Bulma's theme, override variables before importing Bulma.
+// Common variables are shown below - uncomment and modify as needed.
+// For all available variables, see:
+// https://bulma.io/documentation/customize/variables/
+
+//@use 'bulma/sass/utilities/initial-variables' as * with (
+  // Colors
+  // $turquoise: hsl(171, 100%, 41%),   // Primary color
+  // $cyan: hsl(204, 86%, 53%),         // Info color
+  // $green: hsl(141, 71%, 48%),        // Success color
+  // $yellow: hsl(48, 100%, 67%),       // Warning color
+  // $red: hsl(348, 100%, 61%),         // Danger color
+
+  // Typography
+  // $family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif,
+  // $family-monospace: monospace,
+  // $size-1: 3rem,
+  // $size-2: 2.5rem,
+  // $size-3: 2rem,
+  // $size-4: 1.5rem,
+  // $size-5: 1.25rem,
+  // $size-6: 1rem
+//);
+
 @use 'bulma/bulma.scss';
 
+// HEADING STYLES
+// These extend Bulma's title classes to regular h1-h6 tags
+// You can customize individual heading styles here if needed
+h1 {
+  @extend .title;
+  @extend .is-1;
+}
+h2 {
+  @extend .title;
+  @extend .is-2;
+}
+h3 {
+  @extend .title;
+  @extend .is-3;
+}
+h4 {
+  @extend .title;
+  @extend .is-4;
+}
+h5 {
+  @extend .title;
+  @extend .is-5;
+}
+h6 {
+  @extend .title;
+  @extend .is-6;
+}
 
 :root {
   // Your custom CSS variables
+  --bulma-body-font-size: 1.2em;
 }
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -70,4 +124,14 @@ body {
 // helper for has-backround-transparent
 .has-background-transparent {
   background-color: transparent;
+}
+
+body [data-apos-area] [data-apos-area] {
+  margin: 0 0 1.5rem 0;
+}
+
+.rich-text-widget {
+  *:not(:last-child) {
+    margin-bottom: 0.75rem
+  }
 }

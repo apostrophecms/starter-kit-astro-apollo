@@ -4,6 +4,7 @@ export default {
   linkText: {
     label: 'Link/Button Text',
     type: 'string',
+    def: 'Click Here',
     required: true
   },
   linkType: {
@@ -72,6 +73,7 @@ export default {
   linkStyle: {
     label: 'Link Style',
     type: 'select',
+    def: 'button',
     choices: [
       {
         label: 'Button',
@@ -81,12 +83,12 @@ export default {
         label: 'Text Link',
         value: 'text-link'
       }
-    ],
-    def: 'text-link'
+    ]
   },
   buttonStyle: {
     type: 'select',
     label: 'Button Style',
+    def: '',
     choices: [
       { label: 'Solid', value: '' },
       { label: 'Outlined', value: 'outlined' },
@@ -100,6 +102,7 @@ export default {
   buttonSize: {
     label: 'Button Size',
     type: 'select',
+    def: 'large',
     choices: [
       {
         label: 'Small',
@@ -120,7 +123,7 @@ export default {
       {
         label: 'Large',
         value: 'large'
-      },
+      }
     ],
     if: {
       linkStyle: 'button'
@@ -154,6 +157,7 @@ export default {
   iconPosition: {
     label: 'Icon Position',
     type: 'select',
+    def: 'left',
     choices: [
       {
         label: 'Left',
@@ -194,6 +198,7 @@ export default {
   buttonColor: {
     label: 'Button Color',
     type: 'select',
+    def: 'primary',
     choices: colorOptionsHelper.getColorOptions(),
     if: {
       linkStyle: 'button'
