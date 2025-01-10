@@ -106,20 +106,32 @@
     }
   }
 
-  function checkAstroConnection() {
-    fetch('http://localhost:4321')
-      .then(() => {
+function checkAstroConnection() {
+  fetch('http://localhost:4321')
+    .then(() => {
+      // Server responded successfully
+      updateUI(true);
+      if (checkInterval) {
+        clearInterval(checkInterval);
+        console.log('Astro frontend detected. Stopping periodic checks.');
+      }
+    })
+    .catch((error) => {
+      console.log('Astro frontend check error:', error.message);
+      if (error.message.includes('CORS')) {
+        // CORS error means server exists but blocked the request - that's fine!
         updateUI(true);
         if (checkInterval) {
           clearInterval(checkInterval);
-          console.log('Astro frontend detected. Stopping periodic checks.');
+          console.log('Astro frontend detected (CORS block). Stopping periodic checks.');
         }
-      })
-      .catch((error) => {
+      } else {
+        // Other errors mean no server
         updateUI(false);
         console.log('Astro frontend not detected:', error);
-      });
-  }
+      }
+    });
+}
 
   // Check for Astro connection immediately
   checkAstroConnection();
