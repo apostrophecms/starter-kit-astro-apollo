@@ -16,7 +16,7 @@ export default defineConfig({
   }),
   server: {
     // Required for some hosting, like Heroku
-    host: true
+    // host: true
   },
   integrations: [apostrophe({
     aposHost: 'http://localhost:3000',
