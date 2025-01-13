@@ -18,6 +18,7 @@
  * @param {number} [props.widget.slides[].textBlockOpacity] - Opacity for text overlay (0-100)
  */
 
+ import { slideshowDefaults } from '../lib/homepage-defaults.js';
 const { widget } = Astro.props;
 
 import {
@@ -36,6 +37,7 @@ const {
   slides = []
 } = widget;
 
+const activeSlides = slides?.length ? slides : slideshowDefaults.slides;
 const slideshowId = `slideshow-${crypto.randomUUID().slice(0, 8)}`;
 
 /**
@@ -100,8 +102,8 @@ const getContentSize = (selectedSize) => {
 >
   <div class='slides'>
     {
-      slides.map((slide, index) => {
-        const slideImage = slide?._image[0];
+      activeSlides.map((slide, index) => {
+        const slideImage = slide?._image?.[0];
         // Create image props with fallback
         const imageProps = slideImage
           ? {
@@ -174,7 +176,7 @@ const getContentSize = (selectedSize) => {
   {
     showControls && (
       <div class='slideshow-dots'>
-        {slides.map((_, index) => (
+        {activeSlides.map((_, index) => (
           <button
             class='dot'
             data-index={index}
