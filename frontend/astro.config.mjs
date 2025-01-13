@@ -31,7 +31,7 @@ export default defineConfig({
     ],
     excludeRequestHeaders: [
       // For hosting on multiple servers, block the host header
-      //'host'
+      'host'
     ]
   })],
   vite: {
