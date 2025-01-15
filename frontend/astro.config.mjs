@@ -31,6 +31,13 @@ export default defineConfig({
     ]
   })],
   vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          quietDeps: true
+        }
+      }
+    },
     ssr: {
       // Do not externalize the @apostrophecms/apostrophe-astro plugin, we need
       // to be able to use virtual: URLs there
