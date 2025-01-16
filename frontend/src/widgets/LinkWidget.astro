@@ -37,9 +37,9 @@ if (!widget?.linkType || !widget?.linkText) {
 const path = (() => {
   switch (widget.linkType) {
     case 'page':
-      return widget._linkPage?._url;
+      return widget._linkPage?.[0]?._url;
     case 'file':
-      return widget._linkFile?._url;
+      return widget._linkFile?.[0]?._url;
     default:
       return widget.linkUrl;
   }
