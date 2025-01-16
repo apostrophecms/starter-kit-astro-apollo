@@ -153,7 +153,7 @@ const layoutClasses = [
     justify-self: var(--justify-self, stretch);
   }
 
-  @media (max-width: var(--tabletBreakpoint)) {
+  @media (max-width: 1023px) {
     .custom-layout-widget {
       grid-template-columns: repeat(12, 1fr);
       gap: calc(var(--gap) * 0.75);
@@ -165,7 +165,7 @@ const layoutClasses = [
     }
   }
 
-  @media (max-width: var(--mobileBreakpoint)) {
+  @media (max-width: 768px) {
     .custom-layout-widget {
       grid-template-columns: 1fr;
       gap: calc(var(--gap) * 0.5);
