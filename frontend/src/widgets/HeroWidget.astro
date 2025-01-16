@@ -216,7 +216,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
               {mainContent.pretitle}
             </p>
           )}
-          <h2 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
+          <h2 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent.titleColor, 'text')}`}>{mainContent.title}</h1>
           {mainContent?.subtitle && (
             <p class={`subtitle mb-5 ${subtitleClass}`}>
               {mainContent.subtitle}
