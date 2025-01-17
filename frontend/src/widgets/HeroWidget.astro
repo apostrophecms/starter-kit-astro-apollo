@@ -113,7 +113,7 @@ const getBackgroundStyle = () => {
     return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
   }
 
-  return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${mainColor}))`;
+  return mainColor;
 };
 
 const backgroundStyle = getBackgroundStyle();

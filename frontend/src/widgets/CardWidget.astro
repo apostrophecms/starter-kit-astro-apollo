@@ -225,18 +225,42 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
   }
 </div>
 
-<style
+<style lang="scss"
   define:vars={{
     overlayBackground: `color-mix(in hsl,var(--bulma-${overlayColor}) ${overlayOpacity}, transparent)`,
     footerBorderColor: `var(--bulma-${footerBorderColor})`
   }}
 >
+
+/* .card-footer {
+  border: none;
+  padding: 0 1em 1em;
+} */
+
+.card-image:first-child img {
+  border-radius: unset;
+}
+
+.card-title {
+  display: inline-block;
+  margin-bottom: 0.75em;
+}
+
+
+
   .card {
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: none;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: unset;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    :deep(.apos-rich-text-editor__editor) {
+      margin-left: 0;
+    }
   }
 
   .card:hover {
