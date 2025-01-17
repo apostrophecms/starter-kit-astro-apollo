@@ -4,7 +4,7 @@ export default {
   extend: '@apostrophecms/piece-page-type',
   options: {
     label: 'Article Page',
-    perPage: 5,
+    perPage: 7,
     piecesFilters: [
       {
         name: 'category'
