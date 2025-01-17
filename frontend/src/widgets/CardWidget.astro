@@ -231,23 +231,6 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
     footerBorderColor: `var(--bulma-${footerBorderColor})`
   }}
 >
-
-/* .card-footer {
-  border: none;
-  padding: 0 1em 1em;
-} */
-
-.card-image:first-child img {
-  border-radius: unset;
-}
-
-.card-title {
-  display: inline-block;
-  margin-bottom: 0.75em;
-}
-
-
-
   .card {
     height: 100%;
     display: flex;
@@ -257,10 +240,6 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
     border: 1px solid rgba(0,0,0,.125);
     border-radius: unset;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    :deep(.apos-rich-text-editor__editor) {
-      margin-left: 0;
-    }
   }
 
   .card:hover {
@@ -277,7 +256,6 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
   .is-large {
     min-height: 400px;
   }
-
   .card-content {
     flex: 1;
     display: flex;
@@ -294,6 +272,7 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: unset;
   }
 
   /* Overlay styling */
