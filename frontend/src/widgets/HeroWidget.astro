@@ -110,10 +110,11 @@ const getBackgroundStyle = () => {
   if (background !== 'color') return '';
 
   if (backgroundColorType === 'gradient' && secondaryColor) {
-    return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
+    const angle = gradientAngle ?? '180deg';  // Handle null case here
+    return `linear-gradient(${angle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
   }
 
-  return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${mainColor}))`;
+  return `linear-gradient(${gradientAngle ?? '180deg'}, var(--bulma-${mainColor}), var(--bulma-${mainColor}))`;
 };
 
 const backgroundStyle = getBackgroundStyle();
