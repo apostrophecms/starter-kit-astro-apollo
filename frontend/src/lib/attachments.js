@@ -159,9 +159,20 @@ export function getAttachmentUrl(imageObject, options = {}) {
     return MISSING_ATTACHMENT_URL;
   }
 
+  // Get the requested size or default to 'full'
+  const size = options.size || 'full';
+
+  // Check if we're in the just-edited state (has uncropped URLs)
+  if (attachment._urls?.uncropped) {
+    // During the just-edited state, the main _urls already contain the crop parameters
+    return attachment._urls[size] || attachment._urls.original;
+  }
+
+  // Get crop parameters from the image object's _fields
+  const crop = getCrop(imageObject);
+
   // If we have _urls and no crop, use the pre-generated URL
-  if (attachment._urls && !getCrop(imageObject)) {
-    const size = options.size || 'full';
+  if (attachment._urls && !crop) {
     return attachment._urls[size] || attachment._urls.original;
   }
 
@@ -170,16 +181,7 @@ export function getAttachmentUrl(imageObject, options = {}) {
   if (attachment._urls?.original) {
     // Remove the extension from the original URL to get the base path
     baseUrl = attachment._urls.original.replace(`.${attachment.extension}`, '');
-  } else {
-    // Fallback for local development
-    baseUrl = `uploads/attachments/${attachment._id}-${attachment.name}`;
   }
-
-  // Get crop parameters from the image object's _fields
-  const crop = getCrop(imageObject);
-
-  // Get the requested size or default to 'full'
-  const size = options.size || 'full';
 
   // Build the complete URL with crop parameters and size
   return buildAttachmentUrl(baseUrl, crop, size, attachment.extension);
