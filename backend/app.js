@@ -24,6 +24,10 @@ export default apostrophe({
     '@apostrophecms/video-widget': {},
     '@apostrophecms/asset': {},
 
+    // Custom extensions
+    // Make sure to set the `APOS_BASE_URL` environment variable to the base URL of your Apostrophe site
+    '@apostrophecms/seo': {},
+
     // pieces
     article: {},
     author: {},
