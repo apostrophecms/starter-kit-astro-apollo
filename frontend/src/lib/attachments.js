@@ -95,23 +95,96 @@ function getHeight(imageObject) {
 }
 
 /**
+ * Get the crop parameters from the image object's _fields
+ * @param {Object} imageObject - The full image object from ApostropheCMS
+ * @returns {Object|null} The crop parameters or null if no crop exists
+ */
+function getCrop(imageObject) {
+  // Check for crop parameters in _fields
+  if (imageObject?._fields &&
+      typeof imageObject._fields.left === 'number' &&
+      typeof imageObject._fields.top === 'number' &&
+      typeof imageObject._fields.width === 'number' &&
+      typeof imageObject._fields.height === 'number') {
+    return {
+      left: imageObject._fields.left,
+      top: imageObject._fields.top,
+      width: imageObject._fields.width,
+      height: imageObject._fields.height
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Build the URL for an attachment with crop parameters and size
+ * @param {string} baseUrl - The base URL for the attachment
+ * @param {Object} crop - The crop parameters object
+ * @param {string} [size] - The size variant name
+ * @param {string} extension - The file extension
+ * @returns {string} The complete URL with crop parameters
+ */
+function buildAttachmentUrl(baseUrl, crop, size, extension) {
+  let url = baseUrl;
+
+  // Add crop parameters if they exist
+  if (crop) {
+    url += `.${crop.left}.${crop.top}.${crop.width}.${crop.height}`;
+  }
+
+  // Add size if specified
+  if (size && size !== 'original') {
+    url += `.${size}`;
+  }
+
+  // Add extension
+  url += `.${extension}`;
+
+  return url;
+}
+
+/**
  * Get URL for an attachment with optional size
- * @param {Object} attachmentObject - Either a full image object or direct attachment
+ * @param {Object} imageObject - The full image object from ApostropheCMS
  * @param {Object} [options={}] - Options object
  * @param {string} [options.size] - Size variant ('one-sixth', 'one-third', 'one-half', 'two-thirds', 'full', 'max', 'original')
  * @returns {string} The URL for the attachment
  */
-export function getAttachmentUrl(attachmentObject, options = {}) {
-  const attachment = attachmentObject?.attachment || attachmentObject;
+export function getAttachmentUrl(imageObject, options = {}) {
+  const attachment = getAttachment(imageObject);
 
-  if (!attachment?._urls) {
-    console.warn('Template warning: Missing attachment or _urls, using fallback icon');
+  if (!attachment) {
+    console.warn('Template warning: Missing attachment, using fallback icon');
     return MISSING_ATTACHMENT_URL;
   }
 
-  // Return the requested size URL or original if size not found
+  // Get the requested size or default to 'full'
   const size = options.size || 'full';
-  return attachment._urls[size] || attachment._urls.original;
+
+  // Check if we're in the just-edited state (has uncropped URLs)
+  if (attachment._urls?.uncropped) {
+    // During the just-edited state, the main _urls already contain the crop parameters
+    return attachment._urls[size] || attachment._urls.original;
+  }
+
+  // Get crop parameters from the image object's _fields
+  const crop = getCrop(imageObject);
+
+  // If we have _urls and no crop, use the pre-generated URL
+  if (attachment._urls && !crop) {
+    return attachment._urls[size] || attachment._urls.original;
+  }
+
+  // Derive the base URL path from _urls if available
+  let baseUrl;
+  if (attachment._urls?.original) {
+    // Remove the extension from the original URL to get the base path
+    baseUrl = attachment._urls.original.replace(`.${attachment.extension}`, '');
+  }
+
+  // Build the complete URL with crop parameters and size
+  return buildAttachmentUrl(baseUrl, crop, size, attachment.extension);
 }
 
 /**
