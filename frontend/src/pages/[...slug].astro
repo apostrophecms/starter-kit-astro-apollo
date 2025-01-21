@@ -45,7 +45,6 @@ import Footer from '../components/Footer.astro';
     />
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded fired');
         const updateThemeAndNavbar = () => {
           const themeMarker = document.getElementById('theme-marker');
           if (themeMarker) {
@@ -75,9 +74,10 @@ import Footer from '../components/Footer.astro';
           }
         };
 
+        // Fire script for all users
         updateThemeAndNavbar();
 
-        // Set up apos listener if it exists or becomes available
+        // Set up apos refreshed listener if it exists or becomes available
         if (window.apos) {
           apos.bus.$on('refreshed', updateThemeAndNavbar);
         } else {
