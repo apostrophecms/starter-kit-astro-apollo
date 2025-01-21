@@ -18,7 +18,7 @@
     font-size: 22px;
     margin-top: 20px;
   }
-  .info-box, .instructions, .status-box {
+  .info-box, .instructions, .status-box, .warning-box {
     background-color: #f0f0f0;
     border-left: 5px solid #3498db;
     padding: 15px;
@@ -37,6 +37,10 @@
     background-color: #e9f7ef;
     border-left-color: #27ae60;
   }
+  .warning-box {
+    background-color: #fdedec;
+    border-left-color: #e74c3c;
+  }
   code {
     background-color: #f8f8f8;
     padding: 2px 5px;
@@ -46,10 +50,10 @@
   .hidden {
     display: none;
   }
-  :is(.status-box, .info-box) > *:first-child {
+  :is(.status-box, .info-box, .warning-box) > *:first-child {
     margin-top: 0;
   }
-  :is(.status-box, .info-box) > *:last-child {
+  :is(.status-box, .info-box, .warning-box) > *:last-child {
     margin-bottom: 0;
   }
 </style>
@@ -60,7 +64,13 @@
   <div class="info-box">
     <p>You are currently viewing the ApostropheCMS backend, used to manage the content for your project. It supplies the Admin UI and in-context editing functionality. The frontend rendering of the website is handled by Astro and is delivered from a separate repository.</p>
   </div>
-  
+
+    <div class="warning-box">
+    <h2>Important Note About Frontend Server</h2>
+    <p>This status checker only works when the Astro frontend is running in development mode (<code>npm run dev</code>). It will not detect servers running in preview mode (<code>npm run preview</code>) or production mode (<code>npm run serve</code>).</p>
+    <p>For local development and content editing, please ensure you're using <code>npm run dev</code> to start the Astro frontend.</p>
+  </div>
+
   <div id="status-box" class="status-box">
     <h2>Astro Frontend Status</h2>
     <p id="status-message">Checking Astro frontend status...</p>
