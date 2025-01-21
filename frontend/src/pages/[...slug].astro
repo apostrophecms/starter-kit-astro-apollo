@@ -74,17 +74,25 @@ import Footer from '../components/Footer.astro';
           }
         };
 
-        // Initialize immediately if apos is available
+        // Fire script for all users
+        updateThemeAndNavbar();
+
+        // Set up apos refreshed listener if it exists or becomes available
         if (window.apos) {
-          updateThemeAndNavbar();
           apos.bus.$on('refreshed', updateThemeAndNavbar);
         } else {
-          // Poll for apos availability
+          // Poll for apos for logged-in users
+          // But timeout after a reasonable period
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds maximum
           const waitForApos = setInterval(() => {
+            attempts++;
             if (window.apos) {
               clearInterval(waitForApos);
-              updateThemeAndNavbar();
               apos.bus.$on('refreshed', updateThemeAndNavbar);
+            } else if (attempts >= maxAttempts) {
+              clearInterval(waitForApos);
+              console.debug('No apos found after 5 seconds, assuming logged-out user');
             }
           }, 100);
         }
@@ -96,6 +104,6 @@ import Footer from '../components/Footer.astro';
   <AposTemplate {aposData} slot='main' />
   <Footer {aposData} slot='afterMain' />
   <Fragment slot='endBody'>
-    
+
   </Fragment>
 </AposLayout>
