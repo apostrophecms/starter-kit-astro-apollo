@@ -210,6 +210,20 @@ Key functions available (see JSDoc comments in source for detailed documentation
 - `getHeight(imageObject)`: Get image height, respecting crops
 - `getFocalPoint(attachmentObject, defaultValue?)`: Get focal point coordinates for styling
 
+# Package scripts
+
+## Root `package.json` scripts
+
+The root of the project has several useful scripts located in the `package.json` file. Running `npm run install` in the root directory will trigger the `postinstall` script. This will install the dependencies for both the ApostropheCMS and Astro projects. Similarly, `npm run update` will update dependencies for both the `frontend` and `backend` folders. The rest of the scripts in this file are primarily used for project deployment to Apostrophe hosting.
+
+## Frontend folder scripts
+
+The main scripts for the Astro project located in the frontend folder are `dev`, `preview`, and `build`. These first two of these scripts will allow you to start the Astro server in either development or preview mode. The `build` script should be run prior to starting the server in preview mode. The remainder of the scripts are for deployment and may need to be altered to fit your hosting solution.
+
+## Backend folder scripts
+
+Typically, you will only use the `dev` script in the backend folder outside of deployment. You can consult the [ApostropheCMS hosting](https://docs.apostrophecms.org/guide/hosting.html) recipes to see how these other scripts should be used.
+
 # Deploying to production
 
 ## Using Apostrophe hosting
