@@ -11,7 +11,7 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 
 ### Prerequisites
 - Node.js v20 or later
-- MongoDB v6.0 or later running on a local server or access to Atlas. See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for set-up details.
+- MongoDB v6.0 or later running on a local server or access to Atlas. See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for set up details.
 
 ### Getting Started
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
@@ -266,7 +266,7 @@ If your changes are not reflected:
 
 ## Using Apostrophe hosting
 
-Apostrophe can provide easy hosting for any ApostropheCMS-Astro monorepo with little or no extra configuration. This can be setup for deployment from Github or other code repository.
+Apostrophe can provide easy hosting for any ApostropheCMS-Astro monorepo with little or no extra configuration. This can be set up for deployment from Github or other code repository.
 
 Apostrophe hosting will automatically handle:
 - Database provisioning and management
