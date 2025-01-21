@@ -23,7 +23,7 @@ To simplify dependency management, this repository includes several root-level s
 - Next, open a terminal instance at the root of each folder (`frontend` and `backend`). Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
 - The `astro.config.mjs` file is already set to the normal default values, but if you are running the backend server on a different port, you will also have to set the `APOS_HOST` environment variable.
 - Then, you can start the projects using the accompanying scripts. For example, in a local development environment you can start each with `npm run dev`.
-  > Note: Astro is much less stringent about project set-up when running in development mode. It is recommended that you run the `npm run build` followed by the `npm run preview` commands in the `frontend` folder containing the Astro portion of your project to test that it behaves as expected before deployment. We do not recommend starting project using the root `npm run serve-frontend` script during development, this script is used for Apostrophe hosting.
+  > Note: Astro is much less stringent about project set-up when running in development mode. It is recommended that you run the `npm run build` followed by the `npm run preview` commands in the `frontend` folder containing the Astro portion of your project to test that it behaves as expected before deployment. We do not recommend starting the project using the root `npm run serve-frontend` script during development, this script is used for Apostrophe hosting.
 
 ### Similarities to a stand-alone ApostropheCMS project
 If you have worked with an ApostropheCMS project previously, the backend repo should look as expected. There are a number of custom modules, providing new pages, pieces, and widgets, located in the `modules` folder. The project also configures several Apostrophe core modules through code located in the `modules/@apostrophecms` folder. For a full understanding of Apostrophe you should consult the [documentation](https://docs.apostrophecms.org/), but we will touch on a few highlights later in this document.
@@ -275,7 +275,7 @@ Apostrophe hosting will automatically handle:
 - Automatic backups
 - Security updates
 
-In the future, we will be providing a path to create your own account and create a new hosted project. In the meantime, you can [contact us](https://apostrophecms.com/contact-us) to get your project set-up.
+In the future, we will be providing a path to create your own account and create a new hosted project. In the meantime, you can [contact us](https://apostrophecms.com/contact-us) to get your hosting set-up.
 
 ## Using 3rd-party hosting
 
