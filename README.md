@@ -275,8 +275,7 @@ Apostrophe hosting will automatically handle:
 - Automatic backups
 - Security updates
 
-
-In the future, we will be providing a path to create your own account and create a new hosted project. In the meantime, you can contact [Apostrophe Sales](https://apostrophecms.com/contact-us) to get your project set-up.
+In the future, we will be providing a path to create your own account and create a new hosted project. In the meantime, you can [contact us](https://apostrophecms.com/contact-us) to get your project set-up.
 
 ## Using 3rd-party hosting
 
