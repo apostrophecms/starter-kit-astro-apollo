@@ -110,10 +110,11 @@ const getBackgroundStyle = () => {
   if (background !== 'color') return '';
 
   if (backgroundColorType === 'gradient' && secondaryColor) {
-    return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
+    const angle = gradientAngle ?? '180deg';  // Handle null case here
+    return `linear-gradient(${angle}, var(--bulma-${mainColor}), var(--bulma-${secondaryColor}))`;
   }
 
-  return `linear-gradient(${gradientAngle}, var(--bulma-${mainColor}), var(--bulma-${mainColor}))`;
+  return `var(--bulma-${mainColor})`;
 };
 
 const backgroundStyle = getBackgroundStyle();
@@ -125,7 +126,7 @@ const getTextClasses = (size, color) => {
 };
 
 const pretitleClass = getTextClasses('6', mainContent?.pretitleColor);
-const titleClass = getTextClasses('5', mainContent?.titleColor);
+const titleClass = getTextClasses('2', mainContent?.titleColor);
 const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
 
 ---
@@ -133,7 +134,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
 {
   layout === 'full' ? (
     <section 
-      class={`hero mb-5 ${heightClass}`}
+      class={`hero mb-6 ${heightClass}`}
       role="banner" 
       aria-label={mainContent.title || 'Hero section'}
     >
@@ -186,7 +187,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
               {mainContent.pretitle}
             </p>
           )}
-          <h1 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent?.titleColor, 'text')}`}>{mainContent.title}</h1>
+          <h2 class={`title mb-4 ${titleClass}`}>{mainContent.title}</h1>
           {mainContent?.subtitle && (
             <p class={`subtitle mb-5 ${subtitleClass}`}>
               {mainContent.subtitle}
@@ -202,7 +203,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
     </section>
   ) : (
     <section 
-      class='hero-split mb-5'
+      class='hero-split mb-6'
       role="banner"
       aria-label={mainContent.title || 'Hero section'}
     >
@@ -216,7 +217,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
               {mainContent.pretitle}
             </p>
           )}
-          <h1 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent?.titleColor, 'text')}`}>{mainContent.title}</h1>
+          <h2 class={`title mb-4 is-size-2-mobile is-size-2-tablet is-size-1-desktop ${getBulmaColorClass(mainContent.titleColor, 'text')}`}>{mainContent.title}</h1>
           {mainContent?.subtitle && (
             <p class={`subtitle mb-5 ${subtitleClass}`}>
               {mainContent.subtitle}

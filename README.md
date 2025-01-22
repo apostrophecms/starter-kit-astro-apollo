@@ -212,6 +212,7 @@ Key functions available (see JSDoc comments in source for detailed documentation
 - `getFocalPoint(attachmentObject, defaultValue?)`: Get focal point coordinates for styling
 
 
+
 ## Theming
 
 Customizing the theme in this project is straightforward and leverages Bulma's powerful theming capabilities. You can override Bulma's default variables to match your brand or design requirements by editing the `frontend/src/styles/main.scss` file. This is done **before importing Bulma** so that your customizations are applied throughout the project.
@@ -261,6 +262,21 @@ If your changes are not reflected:
 
 * Ensure your variables are correctly uncommented and modified.
 * Check for any caching issues by clearing your browser cache or restarting the build process.
+=======
+# Package scripts
+
+## Root `package.json` scripts
+
+The root of the project has several useful scripts located in the `package.json` file. Running `npm run install` in the root directory will trigger the `postinstall` script. This will install the dependencies for both the ApostropheCMS and Astro projects. Similarly, `npm run update` will update dependencies for both the `frontend` and `backend` folders. The rest of the scripts in this file are primarily used for project deployment to Apostrophe hosting.
+
+## Frontend folder scripts
+
+The main scripts for the Astro project located in the frontend folder are `dev`, `preview`, and `build`. These first two of these scripts will allow you to start the Astro server in either development or preview mode. The `build` script should be run prior to starting the server in preview mode. The remainder of the scripts are for deployment and may need to be altered to fit your hosting solution.
+
+## Backend folder scripts
+
+Typically, you will only use the `dev` script in the backend folder outside of deployment. You can consult the [ApostropheCMS hosting](https://docs.apostrophecms.org/guide/hosting.html) recipes to see how these other scripts should be used.
+
 
 # Deploying to production
 

@@ -160,35 +160,6 @@ export default {
           label: 'Responsive Settings',
           fields: {
             add: {
-              tabletBreakpoint: {
-                type: 'select',
-                label: 'Tablet Layout Starts At',
-                choices: [
-                  { label: '1024px', value: '1024' },
-                  { label: '960px', value: '960' },
-                  { label: '868px', value: '868' }
-                ],
-                def: '1024'
-              },
-              mobileBreakpoint: {
-                type: 'select',
-                label: 'Mobile Layout Starts At',
-                choices: [
-                  { label: '768px', value: '768' },
-                  { label: '640px', value: '640' },
-                  { label: '480px', value: '480' }
-                ],
-                def: '768'
-              },
-              tabletLayout: {
-                type: 'select',
-                label: 'Tablet Layout Behavior',
-                choices: [
-                  { label: 'Maintain Grid (Reduced Columns)', value: 'grid' },
-                  { label: 'Stack All Items', value: 'stack' }
-                ],
-                def: 'grid'
-              },
               spacing: {
                 type: 'object',
                 label: 'Responsive Spacing',
@@ -196,12 +167,12 @@ export default {
                   add: {
                     tabletGap: {
                       type: 'string',
-                      label: 'Grid Gap (Tablet)',
+                      label: 'Grid Gap (Tablet) e.g., "10px" or "1rem"',
                       def: '0.75rem'
                     },
                     mobileGap: {
                       type: 'string',
-                      label: 'Grid Gap (Mobile)',
+                      label: 'Grid Gap (Mobile) e.g., "10px" or "1rem"',
                       def: '0.5rem'
                     }
                   }
