@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Our team uses this script to update the starter content. You may
+# safely remove this script from your own project
+
+if [ -z "$APOS_MONGODB_URI" ]; then
+  APOS_MONGODB_URI="mongodb://localhost:27017/apollo"
+fi
+
+mongodb-snapshot-write --to=/tmp/starter-database.snapshot --from=$APOS_MONGODB_URI \
+  --exclude=aposUsersSafe,aposLocks,aposBearerTokens,aposCache,aposNotifications,sessions \
+  --filter-aposDocs='{"type":{"$ne":"@apostrophecms/user"}}' &&
+scp /tmp/starter-database.snapshot static@static.apostrophecms.com:/opt/static/static/apollo/starter-database.snapshot &&
+tar -cf /tmp/starter-uploads.tar -C ./public/uploads . &&
+scp /tmp/starter-uploads.tar static@static.apostrophecms.com:/opt/static/static/apollo/starter-uploads.tar &&
+echo "Starter content updated."
