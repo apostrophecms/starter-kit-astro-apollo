@@ -10,7 +10,7 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 ## Using this project
 
 ### Prerequisites
-- Node.js v20 or later
+- Node.js v18 or later
 - MongoDB v6.0 or later running on a local server or access to Atlas. See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for set up details.
 
 ### Getting Started
