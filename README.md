@@ -18,11 +18,21 @@ The codebases located in the `backend` and `frontend` folders should be treated 
 
 To simplify dependency management, this repository includes several root-level scripts for convenience. The `postinstall` script automatically installs dependencies for both the `frontend` and `backend` folders when you run `npm install` at the root. Additionally, you can use the update script to run `npm update` in both codebases, and the `build` script to build both projects.
 
-#### For local Development
-- To start, execute `npm install` from a terminal in the root of this repo
+#### For Local Development
+- To start, execute `npm install` from a terminal in the root of this repo.
+- Next, run `npm run load-starter-content` to fetch a starter database and a little bit of starter media to go with it. You will also be prompted to set an admin password.
 - Next, open a terminal instance at the root of each folder (`frontend` and `backend`). Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
 - The `astro.config.mjs` file is already set to the normal default values, but if you are running the backend server on a different port, you will also have to set the `APOS_HOST` environment variable.
 - Then, you can start the projects using the accompanying scripts. For example, in a local development environment you can start each with `npm run dev`.
+
+#### If you don't want to use the starter content
+If you prefer to start with an empty database, you can just add an admin user instead.
+
+In your `backend` terminal window:
+
+```bash
+node app @apostrophecms/user:add admin admin
+```
 
 ### Similarities to a stand-alone ApostropheCMS project
 If you have worked with an ApostropheCMS project previously, the backend repo should look as expected. There are a number of custom modules, providing new pages, pieces, and widgets, located in the `modules` folder. The project also configures several Apostrophe core modules through code located in the `modules/@apostrophecms` folder. For a full understanding of Apostrophe you should consult the [documentation](https://docs.apostrophecms.org/), but we will touch on a few highlights later in this document.

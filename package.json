@@ -12,7 +12,8 @@
     "build-backend": "echo '\\n💡 running npm run build in backend/' && cd backend && npm run build",
     "migrate": "cd backend && npm run migrate",
     "serve-frontend": "cd frontend && npm run serve",
-    "serve-backend": "cd backend && npm run serve"
+    "serve-backend": "cd backend && npm run serve",
+    "load-starter-content": "cd backend && npm run load-starter-content"
   },
   "repository": {
     "type": "git",
