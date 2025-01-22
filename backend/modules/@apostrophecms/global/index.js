@@ -4,23 +4,6 @@ import textSizeHelper from '../../../lib/helpers/typography-options.js';
 export default {
   fields: {
     add: {
-      themeGroup: {
-        type: 'object',
-        label: 'Color Settings',
-        fields: {
-          add: {
-            theme: {
-              type: 'select',
-              label: 'Theme',
-              choices: [
-                { label: 'Light', value: 'light' },
-                { label: 'Dark', value: 'dark' }
-              ],
-              def: 'light'
-            }
-          }
-        }
-      },
       brandingGroup: {
         type: 'object',
         label: 'Brand Settings',
@@ -398,7 +381,7 @@ export default {
     group: {
       branding: {
         label: 'Branding',
-        fields: ['brandingGroup', 'themeGroup']
+        fields: ['brandingGroup']
       },
       header: {
         label: 'Header',

@@ -14,7 +14,6 @@ if (aposData.notFound) {
 // Extract header information
 const headerPosition = aposData.global?.headerGroup.headerPosition || 'static';
 
-const theme = aposData.global?.themeGroup.theme || 'light';
 
 // Initialize an array to hold body classes
 const bodyClasses = [];
@@ -43,23 +42,12 @@ import Footer from '../components/Footer.astro';
       rel='stylesheet'
       href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'
     />
+
     <script is:inline>
       document.addEventListener('DOMContentLoaded', () => {
         const updateThemeAndNavbar = () => {
           const themeMarker = document.getElementById('theme-marker');
           if (themeMarker) {
-            const selectedTheme =
-              themeMarker.getAttribute('data-selected-theme') || 'light';
-            const newThemeClass = `theme-${selectedTheme}`;
-
-            // Update theme classes
-            const html = document.documentElement;
-            const existingHtmlClasses = html.className.split(' ');
-            const filteredHtmlClasses = existingHtmlClasses.filter(
-              (className) => !className.startsWith('theme-')
-            );
-            html.className = [...filteredHtmlClasses, newThemeClass].join(' ');
-
             // Update navbar classes
             const isFixedNav =
               themeMarker.getAttribute('data-fixed-nav') === 'true';
