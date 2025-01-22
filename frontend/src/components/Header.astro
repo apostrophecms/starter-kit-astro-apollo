@@ -8,8 +8,7 @@ const {
   getDropdownClasses,
   renderBranding,
   getHeaderClasses,
-  getHeaderTransparency,
-  theme
+  getHeaderTransparency
 } = useSiteConfig(aposData.global);
 
 function formatNavItem(page) {
@@ -106,7 +105,6 @@ const shouldShowItems = navItems.length > 0;
   </div>
   <div
     id='theme-marker'
-    data-selected-theme={theme.theme}
     data-fixed-nav={addFixedHeaderClass()}
     style='display: none;'
   >
