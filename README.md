@@ -10,8 +10,9 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 ## Using this project
 
 ### Prerequisites
-- Node.js v20 or later
-- MongoDB v6.0 or later running on a local server or access to Atlas. See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for set-up details.
+- Node.js v18 or later
+- MongoDB v6.0 or later (local server or Atlas). See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for setup.
+- Windows users: We recommend using Windows Subsystem for Linux 2 (WSL2) for the best development experience. This ensures consistent behavior with our image processing tools and file system operations. [Learn more about setting up WSL2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
 ### Getting Started
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
@@ -21,7 +22,12 @@ To simplify dependency management, this repository includes several root-level s
 #### For Local Development
 - To start, execute `npm install` from a terminal in the root of this repo.
 - Next, run `npm run load-starter-content` to fetch a starter database and a little bit of starter media to go with it. You will also be prompted to set an admin password.
-- Next, open a terminal instance at the root of each folder (`frontend` and `backend`). Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
+- Open terminals:
+ - Mac/Linux users: Open one terminal in `frontend` folder and one in `backend` folder
+ - Windows users:
+   - Open a WSL terminal for the `backend` folder
+   - Open a Windows terminal for `frontend` folder (optional - can also use WSL)
+- Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
 - The `astro.config.mjs` file is already set to the normal default values, but if you are running the backend server on a different port, you will also have to set the `APOS_HOST` environment variable.
 - Then, you can start the projects using the accompanying scripts. For example, in a local development environment you can start each with `npm run dev`.
 
