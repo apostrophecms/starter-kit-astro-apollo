@@ -131,8 +131,7 @@ const layoutClasses = [
   padding: config.padding,
   margin: config.margin
 }}>
-  @import "bulma/sass/utilities/initial-variables";
-  @import "bulma/sass/utilities/mixins";
+  @use "bulma/sass/utilities/mixins" as *;
 
   .custom-layout-widget {
     display: grid;

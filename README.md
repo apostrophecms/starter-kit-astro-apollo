@@ -14,6 +14,7 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 - MongoDB v6.0 or later (local server or Atlas). See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for setup.
 - Windows users: We require using Windows Subsystem for Linux 2 (WSL2) for Apostrophe development. This ensures consistent behavior with our image processing tools and file system operations. [Learn more about setting up WSL2](https://learn.microsoft.com/en-us/windows/wsl/install).
 
+
 ### Getting Started
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
 
@@ -30,6 +31,7 @@ To simplify dependency management, this repository includes several root-level s
 - Each project needs to be provided with an `APOS_EXTERNAL_FRONT_KEY` environment variable set to the same string value in order to authenticate communication. For example, in each terminal execute `export APOS_EXTERNAL_FRONT_KEY=my-secret-key`.
 - The `astro.config.mjs` file is already set to the normal default values, but if you are running the backend server on a different port, you will also have to set the `APOS_HOST` environment variable.
 - Then, you can start the projects using the accompanying scripts. For example, in a local development environment you can start each with `npm run dev`.
+  > Note: Astro is much less stringent about project setup when running in development mode. It is recommended that you run the `npm run build` followed by the `npm run preview` commands in the `frontend` folder containing the Astro portion of your project to test that it behaves as expected before deployment. We do not recommend starting the project using the root `npm run serve-frontend` script during development, this script is used for Apostrophe hosting.
 
 #### If you don't want to use the starter content
 If you prefer to start with an empty database, you can just add an admin user instead.
@@ -226,6 +228,58 @@ Key functions available (see JSDoc comments in source for detailed documentation
 - `getHeight(imageObject)`: Get image height, respecting crops
 - `getFocalPoint(attachmentObject, defaultValue?)`: Get focal point coordinates for styling
 
+
+
+## Theming
+
+Customizing the theme in this project is straightforward and leverages Bulma's powerful theming capabilities. You can override Bulma's default variables to match your brand or design requirements by editing the `frontend/src/styles/main.scss` file. This is done **before importing Bulma** so that your customizations are applied throughout the project.
+
+### Steps to Customize
+
+1. Navigate to the `frontend/src/styles/main.scss` file.
+2. Locate the section for overriding Bulma variables.
+3. Uncomment and modify the variables you wish to customize. You can define colors, typography, spacing, and more.
+4. Save your changes, and the updated theme will automatically apply when you rebuild the project.
+
+### Example: Overriding Common Variables
+
+Here’s an example of how to customize some of Bulma's common variables. These variables are commented out by default. Uncomment and modify them as needed:
+
+```scss
+@use 'bulma/sass/utilities/initial-variables' as * with (
+  // Colors
+  $turquoise: hsl(171, 100%, 41%),   // Primary color
+  $cyan: hsl(204, 86%, 53%),         // Info color
+  $green: hsl(141, 71%, 48%),        // Success color
+  $yellow: hsl(48, 100%, 67%),       // Warning color
+  $red: hsl(348, 100%, 61%),         // Danger color
+
+  // Typography
+  $family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif,
+  $family-monospace: monospace,
+  $size-1: 3rem,
+  $size-2: 2.5rem,
+  $size-3: 2rem,
+  $size-4: 1.5rem,
+  $size-5: 1.25rem,
+  $size-6: 1rem
+);
+```
+
+### Full List of Variables
+For a comprehensive list of all customizable variables, refer to the [Bulma documentation](https://bulma.io/documentation/customize/list-of-sass-variables/) on variables. This resource provides details on all available options for customization, including advanced options for responsive breakpoints, spacing, and more.
+
+### Notes
+* **Order matters**: Ensure your variable overrides are declared before importing Bulma to avoid conflicts.
+* **SASS compatibility**: This setup uses the modern SASS syntax with @use and @forward. If you are unfamiliar with these concepts, refer to the SASS documentation for more information.
+* **Theme consistency**: To maintain a cohesive design, consider defining your core color palette and typography styles at the beginning of your project.
+
+### Troubleshooting
+If your changes are not reflected:
+
+* Ensure your variables are correctly uncommented and modified.
+* Check for any caching issues by clearing your browser cache or restarting the build process.
+=======
 # Package scripts
 
 ## Root `package.json` scripts
@@ -240,19 +294,12 @@ The main scripts for the Astro project located in the frontend folder are `dev`,
 
 Typically, you will only use the `dev` script in the backend folder outside of deployment. You can consult the [ApostropheCMS hosting](https://docs.apostrophecms.org/guide/hosting.html) recipes to see how these other scripts should be used.
 
+
 # Deploying to production
 
 ## Using Apostrophe hosting
 
-Apostrophe can provide easy hosting for any ApostropheCMS-Astro monorepo with little or no extra configuration. This can be setup for deployment from Github or other code repository.
-
-1. Sign up for an Apostrophe Cloud account at [app.apostrophecms.com](app.apostrophecms.com)
-2. Connect your repository using Github integration or another supported version control system
-3. Configure your deployment settings in the Apostrophe Cloud dashboard:
-   - Set your environment variables
-   - Configure your domain settings
-   - Set up your SSL certificates
-4. Deploy your project using the provided deployment commands or automatic deployment triggers
+Apostrophe can provide easy hosting for any ApostropheCMS-Astro monorepo with little or no extra configuration. This can be set up for deployment from Github or other code repository.
 
 Apostrophe hosting will automatically handle:
 - Database provisioning and management
@@ -260,6 +307,8 @@ Apostrophe hosting will automatically handle:
 - SSL certificate management
 - Automatic backups
 - Security updates
+
+In the future, we will be providing a path to create your own account and create a new hosted project. In the meantime, you can [contact us](https://apostrophecms.com/contact-us) to get your hosting set up.
 
 ## Using 3rd-party hosting
 
@@ -271,7 +320,6 @@ Your ApostropheCMS backend requires:
 - Node.js environment (v20 or later recommended)
 - MongoDB database
 - Asset storage solution (cloud storage like AWS S3)
-- Environment variables properly 
 
 There are several examples of common deployment strategies in our [documentation](https://docs.apostrophecms.org/guide/hosting.html)
 
