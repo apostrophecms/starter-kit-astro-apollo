@@ -15,8 +15,8 @@
     "update-starter-content": "./scripts/update-starter-content"
   },
   "engines": {
-    "node": "22.x",
-    "npm": "10.x"
+    "node": "^18.17.1 || ^20.3.0 || >=22.0.0",
+    "npm": ">=9.0.0"
   },
   "nodemonConfig": {
     "delay": 1000,
