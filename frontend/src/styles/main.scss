@@ -1,17 +1,23 @@
 @charset "utf-8";
-/// BULMA CUSTOMIZATION
-// To customize Bulma's theme, override variables before importing Bulma.
-// Common variables are shown below - uncomment and modify as needed.
-// For all available variables, see:
-// https://bulma.io/documentation/customize/variables/
 
-//@use 'bulma/sass/utilities/initial-variables' as * with (
+/// BULMA CUSTOMIZATION
+// There are three ways to use/customize Bulma:
+
+// METHOD 1: Use standard Bulma, but add back dark mode without customization
+//@use 'bulma/sass';
+
+// METHOD 2: Customize using bulma-no-dark-mode
+// To customize, replace the line "@use 'bulma/versions/bulma-no-dark-mode';" located below
+// with the following, uncommenting and modifying variables as needed:
+
+//@use 'bulma/versions/bulma-no-dark-mode' with (
   // Colors
   // $turquoise: hsl(171, 100%, 41%),   // Primary color
   // $cyan: hsl(204, 86%, 53%),         // Info color
   // $green: hsl(141, 71%, 48%),        // Success color
   // $yellow: hsl(48, 100%, 67%),       // Warning color
   // $red: hsl(348, 100%, 61%),         // Danger color
+  // $blue: hsl(217, 71%, 53%),         // Link color
 
   // Typography
   // $family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif,
@@ -24,7 +30,14 @@
   // $size-6: 1rem
 //);
 
-@use 'bulma/bulma.scss';
+// METHOD 3: Customize standard Bulma with dark mode
+// To enable dark mode with customization, use:
+//@use 'bulma/sass' with ( ... );  // Use the same variable format as above
+
+// For all available variables, see:
+// https://bulma.io/documentation/customize/variables/
+
+@use 'bulma/versions/bulma-no-dark-mode';
 
 // HEADING STYLES
 // These extend Bulma's title classes to regular h1-h6 tags
@@ -138,16 +151,16 @@ body [data-apos-area] [data-apos-area] {
 
 .rich-text-widget,
 .ProseMirror {
-  ul { 
-    list-style-type: disc; 
+  ul {
+    list-style-type: disc;
   }
-  ol { 
-    list-style-type: decimal; 
+  ol {
+    list-style-type: decimal;
   }
   ul, ol {
     margin-bottom: 1em;
   }
-  ul ul, ol ul { 
+  ul ul, ol ul {
     list-style-type: circle;
     margin-left: 1em;
   }
