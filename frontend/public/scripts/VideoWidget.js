@@ -73,6 +73,12 @@ class VideoWidget extends HTMLElement {
     this.canvasEl = inner;
     this.innerHTML = '';
 
+    // Add title attribute to iframe
+    if (inner instanceof HTMLIFrameElement) {
+      const title = this.getAttribute('title') || 'Video content';
+      inner.setAttribute('title', title);
+    }
+
     // Remove fixed dimensions to allow responsive sizing
     inner.removeAttribute('width');
     inner.removeAttribute('height');

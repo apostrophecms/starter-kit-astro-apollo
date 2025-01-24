@@ -129,7 +129,7 @@ const imageContainerClasses = ['card-image', useImageRatio ? imageRatio : '']
             <img
               src={getAttachmentUrl(mainImage, { size: 'full' })}
               srcset={getAttachmentSrcset(mainImage)}
-              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px'
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
               alt={mainImage.alt || mainImage.title || 'Card image'}
               width={getWidth(mainImage) || '800'}
               height={getHeight(mainImage) || '600'}

@@ -240,7 +240,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
             <img
               src={backgroundImageUrl.src}
               srcset={backgroundImageUrl.srcset}
-              sizes={layout === 'full' ? '100vw' : '50vw'}
+              sizes='(min-width: 768px) 50vw, 100vw'
               alt={backgroundImageUrl.alt}
               width={backgroundImageUrl.width}
               height={backgroundImageUrl.height}

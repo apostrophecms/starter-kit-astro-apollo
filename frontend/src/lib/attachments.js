@@ -160,7 +160,7 @@ export function getAttachmentUrl(imageObject, options = {}) {
   }
 
   // Get the requested size or default to 'full'
-  const size = options.size || 'full';
+  const size = options.size || 'two-thirds';
 
   // Check if we're in the just-edited state (has uncropped URLs)
   if (attachment._urls?.uncropped) {
