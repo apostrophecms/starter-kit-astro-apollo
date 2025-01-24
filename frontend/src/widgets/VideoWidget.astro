@@ -11,6 +11,7 @@
  * @property {boolean} [aposPlaceholder] - Indicates if this is a placeholder instance in the editor
  * @property {Object} [video] - Video data object
  * @property {string} [video.url] - The URL of the video to embed
+ * @property {string} [video.title] - The title of the video
  *
  * @param {Object} props - Component properties
  * @param {VideoWidget} [props.widget] - The widget data from ApostropheCMS
@@ -21,6 +22,7 @@ const { widget } = Astro.props;
 // Use placeholder video for the widget editor UI when no video is selected
 const placeholder = widget?.aposPlaceholder ? 'true' : '';
 const url = widget?.video?.url;
+const videoTitle = widget?.video?.title;
 
 // Default placeholder video used in the ApostropheCMS editor
 const PLACEHOLDER_VIDEO_URL = 'https://youtu.be/Q5UX9yexEyM';
@@ -40,6 +42,7 @@ const PLACEHOLDER_VIDEO_URL = 'https://youtu.be/Q5UX9yexEyM';
 
 <video-widget
   url={placeholder ? PLACEHOLDER_VIDEO_URL : url}
+  title={videoTitle}
 >
 </video-widget>
 
