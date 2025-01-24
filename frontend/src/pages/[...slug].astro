@@ -12,7 +12,7 @@ if (aposData.notFound) {
   Astro.response.status = 404;
 }
 // Extract header information
-const headerPosition = aposData.global?.headerGroup.headerPosition || 'static';
+const headerPosition = aposData.global?.headerGroup?.headerPosition || 'static';
 
 
 // Initialize an array to hold body classes
@@ -91,7 +91,4 @@ import Footer from '../components/Footer.astro';
   <Header slot='beforeMain' {aposData} />
   <AposTemplate {aposData} slot='main' />
   <Footer {aposData} slot='afterMain' />
-  <Fragment slot='endBody'>
-
-  </Fragment>
 </AposLayout>

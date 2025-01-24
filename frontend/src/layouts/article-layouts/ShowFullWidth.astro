@@ -21,7 +21,7 @@ const authors = article._author;
 const authorCount = Array.isArray(authors) ? authors.length : 1;
 const primaryAuthor = Array.isArray(authors) ? authors[0] : authors;
 
-const heroImage = article?._heroImage[0];
+const heroImage = article?._heroImage?.[0];
 ---
 <article class="full-width-article">
   {heroImage && (
@@ -145,12 +145,6 @@ const heroImage = article?._heroImage[0];
   --background-primary: #fff;
 }
 
-html.theme-dark {
-  --text-primary: #fff;
-  --text-secondary: #eaeaea;
-  --background-primary: #121212;
-}
-
 .full-width-article .title {
   color: var(--text-primary);
 }
@@ -166,10 +160,6 @@ html.theme-dark {
 .author-bio,
 .additional-author-content p {
   color: var(--text-primary);
-}
-
-html.theme-dark .box {
-  background: var(--background-primary);
 }
 
   /* Fix image fitting */

@@ -1,5 +1,4 @@
 export function useSiteConfig(globalData) {
-  const themeGroup = globalData?.themeGroup || {};
   const brandingGroup = globalData?.brandingGroup || {};
   const headerGroup = globalData?.headerGroup || {};
 
@@ -91,7 +90,7 @@ export function useSiteConfig(globalData) {
     if (displayType === 'logo' || displayType === 'both') {
       if (brandingGroup.siteLogo?._urls?.max) {
         elements.push(
-          `<img 
+          `<img
             src="${brandingGroup.siteLogo._urls.max}" 
             alt="${brandingGroup.siteTitle}"
             style="max-height: ${brandingGroup.logoMaxHeight || 40}px"
@@ -118,11 +117,6 @@ export function useSiteConfig(globalData) {
     getHeaderTransparency,
     getNavItemClasses,
     getDropdownClasses,
-    renderBranding,
-    theme: {
-      layout: themeGroup.layout || 'classic',
-      theme: themeGroup.theme || 'default',
-      mode: themeGroup.mode || 'light'
-    }
+    renderBranding
   };
 }

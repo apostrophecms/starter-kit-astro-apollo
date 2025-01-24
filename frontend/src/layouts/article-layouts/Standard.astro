@@ -30,7 +30,7 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   <div class='content'>
     {
       pieces.map((article) => {
-        const heroImage = article?._heroImage[0];
+        const heroImage = article?._heroImage?.[0];
         return (
           <article class='mb-6 pb-6 border-bottom'>
             <div class='columns is-vcentered'>
@@ -97,13 +97,6 @@ const currentCategory = Astro.url.searchParams.get('category') || '';
   </div>
 </div>
 <style>
-  html.theme-dark .title {
-    color: #fff !important;
-  }
-  html.theme-dark .subtitle,
-  html.theme-dark p {
-    color: #dbdbdb !important;
-  }
   /* Add these styles to fix image fitting */
   .image img {
     object-fit: cover;

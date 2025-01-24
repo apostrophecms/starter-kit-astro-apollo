@@ -78,7 +78,7 @@ const hasIcon = Boolean(widget.icon);
 const alignmentClass = ALIGNMENT_MAP[widget.buttonAlignment || 'left'];
 
 // Prepare aria-label if link opens in new tab
-const ariaLabel = linkTarget === '_blank' 
+const ariaLabel = linkTarget === '_blank'
   ? `${widget.linkText} (opens in new tab)`
   : undefined;
 ---

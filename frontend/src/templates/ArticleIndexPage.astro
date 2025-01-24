@@ -99,15 +99,15 @@ for (let i = 1; i <= totalPages; i++) {
       </div>
     )}
 
-{totalPages > 1 && (
-  <Pagination 
-  currentPage={currentPage}
-  totalPages={totalPages}
-  url={Astro.url}
-  class="my-8"
-  />
-)}
-</div>
+  {totalPages > 1 && (
+    <Pagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    url={Astro.url}
+    class="my-8"
+    />
+  )}
+  </div>
 </section>
 <style>
 .sticky-top {
