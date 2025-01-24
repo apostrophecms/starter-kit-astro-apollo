@@ -18,7 +18,7 @@
  * @param {number} [props.widget.slides[].textBlockOpacity] - Opacity for text overlay (0-100)
  */
 
- import { slideshowDefaults } from '../lib/homepage-defaults.js';
+import { slideshowDefaults } from '../lib/homepage-defaults.js';
 const { widget } = Astro.props;
 
 import {
@@ -145,7 +145,7 @@ const getContentSize = (selectedSize) => {
                 )}`}
               >
                 {slide.slideTitle && (
-                  <h3 
+                  <h3
                     class={`title ${getTitleSize(slide.titleSize || 'is-4')} ${getBulmaColorClass(
                       slide.titleColor,
                       'text'
@@ -155,7 +155,7 @@ const getContentSize = (selectedSize) => {
                   </h3>
                 )}
                 {slide.cardContent && (
-                  <div 
+                  <div
                     class={`content ${getContentSize(slide.contentSize || 'is-size-6')} ${getBulmaColorClass(
                       slide.contentColor,
                       'text'

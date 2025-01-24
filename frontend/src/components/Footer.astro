@@ -63,21 +63,21 @@ const { renderBranding } = useSiteConfig(aposData.global);
         {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
           const iconName = platformIcons[platform as keyof typeof platformIcons];
           if (!iconName) return null;
-          
+
           return (
             <a 
               href={url}
               class={`${linkClasses} social-icon icon-${footer.socialIconStyle || 'rounded'} ${
-                footer.socialIconSize === 'sm' ? 'is-size-5' : 
-                footer.socialIconSize === 'lg' ? 'is-size-3' : 
+                footer.socialIconSize === 'sm' ? 'is-size-5' :
+                footer.socialIconSize === 'lg' ? 'is-size-3' :
                 'is-size-4'
               }`}
               {...getLinkAttributes(url)}
               aria-label={ariaLabel || `Visit our ${platform} page`}
             >
               <span class={`icon ${
-                footer.socialIconSize === 'sm' ? 'is-small' : 
-                footer.socialIconSize === 'lg' ? 'is-large' : 
+                footer.socialIconSize === 'sm' ? 'is-small' :
+                footer.socialIconSize === 'lg' ? 'is-large' :
                 'is-medium'
               }`}>
                 <i class={`fab fa-${iconName}`} aria-hidden="true"></i>
@@ -125,8 +125,8 @@ const { renderBranding } = useSiteConfig(aposData.global);
                 <ul class="footer-list">
                   {section.links.map((link) => (
                     <li>
-                      <a 
-                        href={link.linkUrl} 
+                      <a
+                        href={link.linkUrl}
                         class={linkClasses}
                         {...getLinkAttributes(link.linkUrl, link.openInNewTab)}
                       >
@@ -148,9 +148,9 @@ const { renderBranding } = useSiteConfig(aposData.global);
         {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
           const iconName = platformIcons[platform as keyof typeof platformIcons];
           if (!iconName) return null;
-          
+
           return (
-            <a 
+            <a
               href={url}
               class={`${linkClasses} social-icon icon-${footer.socialIconStyle || 'rounded'} ${
                 footer.socialIconSize === 'sm' ? 'is-size-5' : 

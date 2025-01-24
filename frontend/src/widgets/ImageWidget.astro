@@ -22,7 +22,7 @@ import {
 
 const { widget } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
-const image = widget?._image[0];
+const image = widget?._image?.[0];
 
 // Handle missing image gracefully
 if (!placeholder && !image) {

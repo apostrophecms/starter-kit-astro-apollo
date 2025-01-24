@@ -4,6 +4,7 @@ export default {
     refreshOnRestart: true,
     breakpointPreviewMode: {
       enabled: false
-    }
+    },
+    hmr: false
   }
 };

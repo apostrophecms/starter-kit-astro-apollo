@@ -9,7 +9,7 @@ import {
 } from '../../lib/attachments.js';
 
 const { article } = Astro.props;
-const heroImage = article?._heroImage[0];
+const heroImage = article?._heroImage?.[0];
 ---
 
 <article class="magazine-article">
@@ -61,24 +61,20 @@ const heroImage = article?._heroImage[0];
   .magazine-article {
   --text-primary: #363636;
   --text-secondary: #4a4a4a;
-}
+  }
 
-html.theme-dark .magazine-article {
-  --text-primary: #fff;
-  --text-secondary: #eaeaea;
-}
 
-.magazine-article .title,
-.magazine-article .subtitle {
-  color: var(--text-primary);
-}
+  .magazine-article .title,
+  .magazine-article .subtitle {
+    color: var(--text-primary);
+  }
   /* Fix image fitting */
   .image img {
     object-fit: cover;
     width: 100%;
     height: 100%;
   }
-  
+
   .is-rounded {
     border-radius: 50%;
   }

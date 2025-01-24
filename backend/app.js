@@ -14,9 +14,7 @@ export default apostrophe({
     // have a minimal configuration here to turn them on: `moduleName: {}`
 
     // *********************************
-    // Add Vite build - uncomment to enable
-    // Can cause issue with project-level core preview assets
-    // '@apostrophecms/vite': {},
+    '@apostrophecms/vite': {},
 
     // `className` options set custom CSS classes for Apostrophe core widgets.
     '@apostrophecms/rich-text-widget': {},

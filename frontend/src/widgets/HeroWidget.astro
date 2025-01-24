@@ -23,7 +23,7 @@
  * @param {Object} [widget.callToAction] - Call-to-action area configuration
  */
 
- const { widget } = Astro.props;
+const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 import {
   getAttachmentUrl,
@@ -133,9 +133,9 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
 
 {
   layout === 'full' ? (
-    <section 
+    <section
       class={`hero mb-6 ${heightClass}`}
-      role="banner" 
+      role="banner"
       aria-label={mainContent.title || 'Hero section'}
     >
       {/* Background layer with conditional rendering */}
@@ -152,19 +152,19 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
             loading="eager"
           />
         ) : background === 'video' && (mainVideo || mobileVideo) ? (
-          <video 
-            autoplay 
-            muted 
-            loop 
-            playsinline 
+          <video
+            autoplay
+            muted
+            loop
+            playsinline
             class='background-video'
             aria-hidden="true"
           >
             {mainVideo && <source src={mainVideo.url} type={mainVideo.type} />}
             {mobileVideo && (
-              <source 
-                src={mobileVideo.url} 
-                type={mobileVideo.type} 
+              <source
+                src={mobileVideo.url}
+                type={mobileVideo.type}
                 media="(max-width: 768px)"
               />
             )}
@@ -202,7 +202,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
       </div>
     </section>
   ) : (
-    <section 
+    <section
       class='hero-split mb-6'
       role="banner"
       aria-label={mainContent.title || 'Hero section'}
@@ -230,8 +230,8 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
           )}
         </div>
       </div>
-      <div 
-        class='split-media' 
+      <div
+        class='split-media'
         style={splitSide === 'right' ? 'order: 1' : ''}
         aria-hidden="true"
       >
@@ -251,11 +251,11 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
           </>
         ) : background === 'video' ? (
           <>
-            <video 
-              autoplay 
-              muted 
-              loop 
-              playsinline 
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
               class='background-video'
               aria-hidden="true"
             >
@@ -351,7 +351,7 @@ const subtitleClass = getTextClasses('5', mainContent?.subtitleColor);
     .hero-split {
       flex-direction: column;
     }
-    
+
     .split-content,
     .split-media {
       width: 100%;
