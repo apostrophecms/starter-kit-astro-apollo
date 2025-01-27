@@ -48,10 +48,9 @@
   "author": "Apostrophe Technologies, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@apostrophecms/cli": "^3.4.0",
     "@apostrophecms/seo": "^1.3.0",
     "@apostrophecms/vite": "^1.0.0",
-    "apostrophe": "github:apostrophecms/apostrophe",
+    "apostrophe": "^4.12.0",
     "@apostrophecms/mongodb-snapshot": "^1.1.0",
     "normalize.css": "^8.0.1"
   },
