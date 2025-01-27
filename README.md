@@ -363,3 +363,6 @@ There are a number of tutorials in the [Astro documentation](https://docs.astro.
 6. Save your configuration and deploy the site.
 
 The build settings can also be supplied through a `netlify.toml` file at the root of your project.
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
