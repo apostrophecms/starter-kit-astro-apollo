@@ -1,5 +1,3 @@
-import { text } from "@fortawesome/fontawesome-svg-core";
-
 export const heroDefaults = {
   layout: 'split',
   splitSide: 'right',
