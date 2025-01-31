@@ -54,8 +54,7 @@ const buttonClasses = isButton
       'button',
       widget.buttonColor && `is-${widget.buttonColor}`,
       getButtonStyle(widget.buttonStyle),
-      widget.buttonSize && `is-${widget.buttonSize}`,
-      widget.buttonDisabled && 'is-disabled'
+      widget.buttonSize && `is-${widget.buttonSize}`
     ].filter(Boolean).join(' ')
   : '';
 
@@ -69,6 +68,7 @@ const attributes = {
   ...(linkTarget === '_blank' && { rel: 'noopener noreferrer' }),
   ...(isButton && { role: 'button' }),
   ...(widget.buttonDisabled ? {
+    'disabled': true,
     'aria-disabled': 'true',
     tabindex: '-1'
   } : {})
