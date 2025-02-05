@@ -20,7 +20,7 @@ import {
   getHeight
 } from '../lib/attachments.js';
 
-const { widget } = Astro.props;
+const { widget, imageOptions } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
 const image = widget?._image?.[0];
 
@@ -53,7 +53,7 @@ const aspectRatio = width && height ? `${width}/${height}` : undefined;
 </style>
 
 <img
-  class="img-widget mb-6"
+class={`img-widget mb-6 ${imageOptions?.additionalClasses || ''}`}
   src={src}
   alt={alt}
   loading="lazy"
