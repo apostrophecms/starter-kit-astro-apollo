@@ -1,15 +1,21 @@
 ---
 /**
- * A customizable grid layout widget component for Astro that integrates with ApostropheCMS
+ * @typedef {Object} GridWidget
+ * @property {string} _id - Unique identifier for the widget
+ * @property {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|
+ *            'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|
+ *            'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} layoutType - The type of layout to render
+ * @property {Object} [customGrid] - Custom grid configuration when layoutType is 'custom'
+ * @property {string} [maxWidth] - Maximum width constraint for the layout
+ * @property {string} [overrideClass] - Additional CSS classes to apply
+ * @property {Object} [areaStyles] - Custom styling for areas
+ *
  * @component
- * @param {Object} props - Component props
- * @param {Object} props.widget - The widget configuration object from ApostropheCMS
- * @param {string} props.widget._id - Unique identifier for the widget
- * @param {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} props.widget.layoutType - The type of layout to render
- * @param {Object} [props.widget.customGrid] - Custom grid configuration when layoutType is 'custom'
- * @param {string} [props.widget.maxWidth] - Maximum width constraint for the layout
- * @param {string} [props.widget.overrideClass] - Additional CSS classes to apply
- * @param {Object} [props.widget.areaStyles] - Custom styling for areas
+ * @description A customizable grid layout widget component for Astro that integrates with ApostropheCMS.
+ * Provides multiple pre-built layouts and supports custom grid configurations for flexible content arrangement.
+ *
+ * @param {GridWidget} props
+ * @returns {astro.AstroComponent} Rendered grid layout component
  */
 
 const { widget } = Astro.props;

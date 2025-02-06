@@ -1,27 +1,25 @@
 ---
 /**
- * A flexible row-based layout widget for ApostropheCMS content areas.
- * Supports multiple column configurations, spacing options, and alignment settings.
- *
- * @component
- * @param {Object} widget - The widget configuration object from ApostropheCMS
- * @param {string} [widget.columnLayout='two-equal'] - Column layout configuration:
- *   - 'single' - Full width single column
- *   - 'two-equal' - Two equal width columns
- *   - 'three-equal' - Three equal width columns
- *   - 'four-equal' - Four equal width columns
- *   - 'one-third-two-thirds' - 33% | 66% split
- *   - 'two-thirds-one-third' - 66% | 33% split
- *   - 'quarter-half-quarter' - 25% | 50% | 25% split
- * @param {string} [widget.spacing='normal'] - Space between columns ('none', 'tight', 'normal', 'wide')
- * @param {string} [widget.verticalAlignment='top'] - Vertical alignment ('top', 'center', 'bottom')
- * @param {string} [widget.horizontalAlignment='left'] - Horizontal alignment ('left', 'center', 'right', 'space-between')
- * @param {string} [widget.maxWidth] - Optional maximum width constraint ('768', '960', '1152', '1344')
- * @param {Object} widget.columnOneContent - Content for first column
- * @param {Object} [widget.columnTwoContent] - Content for second column (layout dependent)
- * @param {Object} [widget.columnThreeContent] - Content for third column (layout dependent)
- * @param {Object} [widget.columnFourContent] - Content for fourth column (layout dependent)
- */
+* @typedef {Object} RowWidget
+* @property {('single'|'two-equal'|'three-equal'|'four-equal'|'one-third-two-thirds'|
+*            'two-thirds-one-third'|'quarter-half-quarter')} [columnLayout='two-equal'] - Column layout configuration
+* @property {('none'|'tight'|'normal'|'wide')} [spacing='normal'] - Space between columns
+* @property {('top'|'center'|'bottom')} [verticalAlignment='top'] - Vertical alignment
+* @property {('left'|'center'|'right'|'space-between')} [horizontalAlignment='left'] - Horizontal alignment
+* @property {('768'|'960'|'1152'|'1344')} [maxWidth] - Optional maximum width constraint
+* @property {Object} columnOneContent - Content for first column
+* @property {Object} [columnTwoContent] - Content for second column (layout dependent)
+* @property {Object} [columnThreeContent] - Content for third column (layout dependent)
+* @property {Object} [columnFourContent] - Content for fourth column (layout dependent)
+*
+* @component
+* @description A flexible row-based layout widget for ApostropheCMS content areas.
+* Supports multiple column configurations including equal-width and proportional splits,
+* with customizable spacing, alignment, and width constraints.
+*
+* @param {RowWidget} props
+* @returns {astro.AstroComponent} Rendered row layout component
+*/
 
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';

@@ -1,3 +1,16 @@
+/**
+ * Custom hook for site configuration and styling
+ * @param {Object} globalData - Global site configuration data
+ * @param {Object} [globalData.brandingGroup] - Branding configuration
+ * @param {Object} [globalData.headerGroup] - Header configuration
+ * @returns {{
+*   getHeaderClasses: () => string,
+*   getHeaderTransparency: () => number,
+*   getNavItemClasses: (isActive?: boolean) => string,
+*   getDropdownClasses: () => string,
+*   renderBranding: (isMobile?: boolean) => string
+* }} Configuration utility functions
+*/
 export function useSiteConfig(globalData) {
   const brandingGroup = globalData?.brandingGroup || {};
   const headerGroup = globalData?.headerGroup || {};

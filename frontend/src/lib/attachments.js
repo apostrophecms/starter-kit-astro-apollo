@@ -1,10 +1,25 @@
+/**
+* @namespace ImageUtils
+* @description Utilities for handling ApostropheCMS image attachments and their properties.
+* Includes functions for URL generation, attachment processing, and image dimension calculations.
+*/
+
+/**
+* Default fallback URL for missing image attachments
+* @constant {string}
+* @memberof ImageUtils
+*/
+
 const MISSING_ATTACHMENT_URL = '/images/missing-icon.svg';
 
 /**
- * Get the actual attachment object from either a full image object or direct attachment
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @returns {Object|null} The attachment object
- */
+* Extracts attachment object from ApostropheCMS image data structure
+* @memberof ImageUtils
+* @param {Object} attachmentObject - Either a full image object or direct attachment
+* @returns {Object|null} The attachment object or null if invalid
+* @description Handles both full image objects with _fields and direct attachments,
+* normalizing the data structure for other utility functions
+*/
 function getAttachment(attachmentObject) {
   if (!attachmentObject) return null;
 
@@ -18,10 +33,13 @@ function getAttachment(attachmentObject) {
 }
 
 /**
- * Check if attachment has multiple size variants
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @returns {boolean} True if the attachment has multiple sizes
- */
+* Checks if an attachment has multiple size variants available
+* @memberof ImageUtils
+* @param {Object} attachmentObject - Either a full image object or direct attachment
+* @returns {boolean} True if the attachment has multiple size variants
+* @description Verifies if the attachment includes multiple pre-generated size variants
+* through the _urls property
+*/
 function isSized(attachmentObject) {
   const attachment = getAttachment(attachmentObject);
   if (!attachment) return false;
@@ -34,11 +52,14 @@ function isSized(attachmentObject) {
 }
 
 /**
- * Get focal point coordinates from attachment or image, or return default value if invalid
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @param {string} [defaultValue='center center'] - Default value to return if no valid focal point
- * @returns {string} String with focal point for styling (e.g., "50% 50%") or default value if invalid
- */
+* Retrieves image focal point coordinates
+* @memberof ImageUtils
+* @param {Object} attachmentObject - Either a full image object or direct attachment
+* @param {string} [defaultValue='center center'] - Default focal point value
+* @returns {string} CSS-compatible focal point string (e.g., "50% 50%")
+* @description Extracts focal point data from either _fields or direct attachment,
+* handling both relationship-based and direct attachment cases
+*/
 function getFocalPoint(attachmentObject, defaultValue = 'center center') {
   if (!attachmentObject) return defaultValue;
 
@@ -65,11 +86,12 @@ function getFocalPoint(attachmentObject, defaultValue = 'center center') {
 }
 
 /**
- * Get the width from the image object, using crop dimensions if available,
- * otherwise falling back to original image dimensions
- * @param {object} imageObject - Image object from ApostropheCMS
- * @returns {number|undefined} The width of the image
- */
+* Gets image width, prioritizing crop dimensions
+* @memberof ImageUtils
+* @param {Object} imageObject - Image object from ApostropheCMS
+* @returns {number|undefined} Image width in pixels
+* @description Returns cropped width if available, falls back to original width
+*/
 function getWidth(imageObject) {
   // Use cropped width from _fields if available
   if (imageObject?._fields?.width !== undefined && imageObject._fields.width !== null) {
@@ -80,11 +102,12 @@ function getWidth(imageObject) {
 }
 
 /**
- * Get the height from the image object, using crop dimensions if available,
- * otherwise falling back to original image dimensions
- * @param {object} imageObject - Image object from ApostropheCMS
- * @returns {number|undefined} The height of the image
- */
+* Gets image height, prioritizing crop dimensions
+* @memberof ImageUtils
+* @param {Object} imageObject - Image object from ApostropheCMS
+* @returns {number|undefined} Image height in pixels
+* @description Returns cropped height if available, falls back to original height
+*/
 function getHeight(imageObject) {
   // Use cropped height from _fields if available
   if (imageObject?._fields?.height !== undefined && imageObject._fields.height !== null) {
@@ -95,10 +118,12 @@ function getHeight(imageObject) {
 }
 
 /**
- * Get the crop parameters from the image object's _fields
- * @param {Object} imageObject - The full image object from ApostropheCMS
- * @returns {Object|null} The crop parameters or null if no crop exists
- */
+* Extracts crop parameters from image object
+* @memberof ImageUtils
+* @param {Object} imageObject - The full image object from ApostropheCMS
+* @returns {Object|null} Crop parameters object or null if no crop exists
+* @description Returns object with left, top, width, and height if crop is defined
+*/
 function getCrop(imageObject) {
   // Check for crop parameters in _fields
   if (imageObject?._fields &&
@@ -118,13 +143,15 @@ function getCrop(imageObject) {
 }
 
 /**
- * Build the URL for an attachment with crop parameters and size
- * @param {string} baseUrl - The base URL for the attachment
- * @param {Object} crop - The crop parameters object
- * @param {string} [size] - The size variant name
- * @param {string} extension - The file extension
- * @returns {string} The complete URL with crop parameters
- */
+* Constructs attachment URL with crop parameters and size
+* @memberof ImageUtils
+* @param {string} baseUrl - Base URL for the attachment
+* @param {Object} crop - Crop parameters object
+* @param {string} [size] - Size variant name
+* @param {string} extension - File extension
+* @returns {string} Complete URL with crop parameters
+* @description Builds complete image URL following ApostropheCMS URL structure
+*/
 function buildAttachmentUrl(baseUrl, crop, size, extension) {
   let url = baseUrl;
 
@@ -145,12 +172,15 @@ function buildAttachmentUrl(baseUrl, crop, size, extension) {
 }
 
 /**
- * Get URL for an attachment with optional size
- * @param {Object} imageObject - The full image object from ApostropheCMS
- * @param {Object} [options={}] - Options object
- * @param {string} [options.size] - Size variant ('one-sixth', 'one-third', 'one-half', 'two-thirds', 'full', 'max', 'original')
- * @returns {string} The URL for the attachment
- */
+* Generates complete URL for an image attachment
+* @memberof ImageUtils
+* @param {Object} imageObject - The full image object from ApostropheCMS
+* @param {Object} [options={}] - Configuration options
+* @param {string} [options.size] - Size variant name
+* @returns {string} Complete image URL
+* @description Handles various image states including just-edited, cropped, and
+* pre-generated URLs
+*/
 export function getAttachmentUrl(imageObject, options = {}) {
   const attachment = getAttachment(imageObject);
 
@@ -188,15 +218,15 @@ export function getAttachmentUrl(imageObject, options = {}) {
 }
 
 /**
- * Generate a srcset for an image attachment
- * @param {Object} attachmentObject - Either a full image object or direct attachment
- * @param {Object} [options] - Options for generating the srcset
- * @param {Array} [options.sizes] - Array of custom size objects to override the default sizes
- * @param {string} options.sizes[].name - The name of the size (e.g., 'small', 'medium')
- * @param {number} options.sizes[].width - The width of the image for this size
- * @param {number} [options.sizes[].height] - The height of the image for this size (optional)
- * @returns {string} The srcset string
- */
+* Generates srcset string for responsive images
+* @memberof ImageUtils
+* @param {Object} attachmentObject - Either a full image object or direct attachment
+* @param {Object} [options] - Configuration options
+* @param {Array} [options.sizes] - Custom size definitions
+* @returns {string} Complete srcset string
+* @description Creates srcset string with all available size variants for
+* responsive image loading
+*/
 export function getAttachmentSrcset(attachmentObject, options = {}) {
   if (!attachmentObject || !isSized(attachmentObject)) {
     return '';

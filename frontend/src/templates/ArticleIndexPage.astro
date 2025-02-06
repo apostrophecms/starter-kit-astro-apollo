@@ -1,4 +1,32 @@
 ---
+/**
+* Index Template for ApostropheCMS Piece Types
+*
+* @file
+* @description
+* Displays collections of pieces (e.g. articles, events) with support for:
+* - Multiple layout options (heroGrid, listAside, standard)
+* - Filtering via tags
+* - Pagination
+* - Optional masthead and content areas
+*
+* @requires @apostrophecms/apostrophe-astro/lib/aposSetQueryParameter
+* @requires @apostrophecms/apostrophe-astro/components/AposArea
+*
+* @typedef {Object} AposProps
+* @property {Object} page - Page configuration
+* @property {string} page.title - Page title
+* @property {('heroGrid'|'listAside'|'standard')} page.indexLayout - Layout type
+* @property {Object} [page.masthead] - Optional masthead area
+* @property {Object} [page.beforeContent] - Optional content before main area
+* @property {Object} [page.afterContent] - Optional content after main area
+* @property {Object} [page.sidebarContent] - Sidebar content for listAside layout
+* @property {Array} pieces - Collection of content pieces to display
+* @property {Array} [piecesFilters] - Available filters
+* @property {number} currentPage - Current pagination page
+* @property {number} totalPages - Total number of pages
+*/
+
 import setParameter from '@apostrophecms/apostrophe-astro/lib/aposSetQueryParameter.js';
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 

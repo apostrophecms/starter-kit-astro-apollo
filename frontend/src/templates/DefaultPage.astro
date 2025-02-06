@@ -1,4 +1,22 @@
 ---
+/**
+ * Default Page Template for ApostropheCMS content
+ *
+ * @file
+ * @description
+ * Renders a standard content page with a single main content area.
+ * This template serves as the default layout for basic CMS pages
+ * that don't require special layout handling.
+ *
+ * @requires @apostrophecms/apostrophe-astro/components/AposArea
+ *
+ * @typedef {Object} AposProps
+ * @property {Object} page - Page data from ApostropheCMS
+ * @property {Object} page.main - Main content area data
+ * @property {Object} user - Current user data
+ * @property {Object} query - URL query parameters
+ */
+
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
 const { page, user, query } = Astro.props.aposData;
 const { main } = page;

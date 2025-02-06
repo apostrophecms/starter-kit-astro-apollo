@@ -1,28 +1,37 @@
 /**
- * VideoWidget - A custom web component for embedding videos with responsive sizing
- *
- * This component handles video embedding through ApostropheCMS's oEmbed endpoint,
- * which supports multiple video providers (YouTube, Vimeo, etc). While typically
- * used with URLs from ApostropheCMS's video widget schema, it can accept any
- * standard video sharing URL. The component handles all provider-specific details
- * through the oEmbed standard and maintains responsive sizing.
- *
- * Typical usage (with ApostropheCMS):
- * The URL typically comes from the video widget schema data:
- * <video-widget url={widget.video.url}></video-widget>
- *
- * Direct usage (if needed):
- * <video-widget url="https://youtube.com/..."></video-widget>
- * <video-widget url="https://vimeo.com/..."></video-widget>
- */
+* VideoWidget - A custom web component for embedding responsive videos
+*
+* @customElement video-widget
+* @extends HTMLElement
+* @description
+* Handles video embedding through ApostropheCMS's oEmbed endpoint.
+* Supports multiple video providers (YouTube, Vimeo, etc) and maintains
+* responsive sizing. The component automatically handles provider-specific
+* details through the oEmbed standard.
+*
+* @example
+* // With ApostropheCMS video widget data:
+* <video-widget url={widget.video.url}></video-widget>
+*
+* // Direct usage:
+* <video-widget url="https://youtube.com/..."></video-widget>
+* <video-widget url="https://vimeo.com/..." title="My Video"></video-widget>
+*
+* @property {string} url - The video URL to embed (required)
+* @property {string} [title] - Optional title for the video iframe
+*/
 class VideoWidget extends HTMLElement {
   constructor() {
     super();
     this.init();
   }
 
-  /**
-   * Initializes the video widget by fetching oEmbed data and rendering the video
+    /**
+   * Initializes the video widget by fetching oEmbed data and rendering
+   * @async
+   * @private
+   * @throws {Error} When video initialization fails
+   * @returns {Promise<void>}
    */
   async init() {
     const videoUrl = this.getAttribute('url');
@@ -42,8 +51,11 @@ class VideoWidget extends HTMLElement {
   }
 
   /**
-   * Fetches oEmbed data for the given URL using ApostropheCMS's oEmbed endpoint
+   * Fetches oEmbed data for the provided video URL
+   * @async
+   * @private
    * @param {string} url - The video URL to fetch oEmbed data for
+   * @throws {Error} When oEmbed request fails
    * @returns {Promise<Object>} The oEmbed response data
    */
   async oembed(url) {
@@ -57,15 +69,16 @@ class VideoWidget extends HTMLElement {
   }
 
   /**
-   * Renders the video iframe with proper responsive sizing
-   * Uses oEmbed HTML and maintains aspect ratio if dimensions are provided
+   * Renders the video iframe with responsive sizing
+   * @private
+   * @throws {Error} When oEmbed response doesn't contain valid HTML
    */
   renderVideo() {
     // Create temporary container to parse oEmbed HTML
     const shaker = document.createElement('div');
     shaker.innerHTML = this.result.html;
     const inner = shaker.firstChild;
-    
+
     if (!inner || !(inner instanceof HTMLElement)) {
       throw new Error('oEmbed response must contain a valid HTML element');
     }
@@ -96,8 +109,10 @@ class VideoWidget extends HTMLElement {
     }, 0);
   }
 
+
   /**
-   * Updates video height to maintain aspect ratio based on current width
+   * Updates video dimensions to maintain aspect ratio
+   * @private
    */
   resizeVideo() {
     const aspectRatio = this.result.height / this.result.width;
@@ -105,7 +120,8 @@ class VideoWidget extends HTMLElement {
   }
 
   /**
-   * Handles window resize events and cleans up when component is removed
+   * Handles window resize events with cleanup
+   * @private
    */
   resizeHandler() {
     if (document.contains(this)) {

@@ -1,22 +1,29 @@
 ---
 /**
- * A responsive slideshow component for ApostropheCMS that displays images with optional text overlays.
- * @component
- * @param {Object} props
- * @param {Object} props.widget - The widget configuration object from ApostropheCMS
- * @param {number} [props.widget.slideDuration=5000] - Duration each slide is shown in milliseconds
- * @param {number} [props.widget.transitionSpeed=300] - Speed of transition animation in milliseconds
- * @param {boolean} [props.widget.autoplay=true] - Whether the slideshow should auto-advance
- * @param {boolean} [props.widget.showControls=true] - Whether to show navigation dots
- * @param {Array<Object>} props.widget.slides - Array of slide objects
- * @param {Array<Object>} [props.widget.slides[].image] - Image attachment for the slide
- * @param {string} [props.widget.slides[].slideTitle] - Title text for the slide
- * @param {string} [props.widget.slides[].cardContent] - Body content for the slide
- * @param {string} [props.widget.slides[].titleColor] - Bulma color class for the title
- * @param {string} [props.widget.slides[].contentColor] - Bulma color class for the content
- * @param {string} [props.widget.slides[].textBlockBackground] - Background color for text overlay
- * @param {number} [props.widget.slides[].textBlockOpacity] - Opacity for text overlay (0-100)
- */
+* @typedef {Object} Slide
+* @property {Object} [image] - Image attachment for the slide
+* @property {string} [slideTitle] - Title text for the slide
+* @property {string} [cardContent] - Body content for the slide
+* @property {string} [titleColor] - Bulma color class for the title
+* @property {string} [contentColor] - Bulma color class for the content
+* @property {string} [textBlockBackground] - Background color for text overlay
+* @property {number} [textBlockOpacity] - Opacity for text overlay (0-100)
+*
+* @typedef {Object} SlideshowWidget
+* @property {number} [slideDuration=5000] - Duration each slide is shown in milliseconds
+* @property {number} [transitionSpeed=300] - Speed of transition animation in milliseconds
+* @property {boolean} [autoplay=true] - Whether the slideshow should auto-advance
+* @property {boolean} [showControls=true] - Whether to show navigation dots
+* @property {Array<Slide>} slides - Array of slide objects
+*
+* @component
+* @description A responsive slideshow component for ApostropheCMS that displays images
+* with optional text overlays. Features configurable timing, transitions, and navigation
+* controls. Each slide can include custom text styling and overlay settings.
+*
+* @param {SlideshowWidget} props
+* @returns {astro.AstroComponent} Rendered slideshow component
+*/
 
 import { slideshowDefaults } from '../lib/homepage-defaults.js';
 const { widget } = Astro.props;

@@ -1,3 +1,28 @@
+/**
+ * @typedef {Object} LayoutArea
+ * @property {string} name - Area name
+ * @property {any} content - Area content
+ * @property {number} colStart - Starting column
+ * @property {number} colSpan - Column span
+ * @property {number} rowStart - Starting row
+ * @property {number} rowSpan - Row span
+ * @property {number} tabletColSpan - Tablet column span
+ * @property {number} mobileColSpan - Mobile column span
+ */
+
+/**
+ * @typedef {{[key: string]: any} & {
+*   layoutType: 'asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom',
+*   customGrid?: {contentAreas: Array<any>}
+* }} Widget
+*/
+
+/**
+* Returns layout area configurations based on widget layout type
+* @param {Widget} widget - Widget configuration
+* @returns {LayoutArea[]} Layout area configurations
+*/
+
 export const getLayoutAreas = (widget) => {
   switch (widget.layoutType) {
     case 'asideMainThree':

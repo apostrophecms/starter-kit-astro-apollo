@@ -1,15 +1,18 @@
 ---
 /**
- * Image widget component for ApostropheCMS
- * Renders a responsive image with proper sizing and focal point support.
- * Content editors only need to:
- * - Upload an image
- * - Set alt text
- * - Optionally set a focal point
+ * @typedef {Object} ImageWidget
+ * @property {Object} widget - The widget data from ApostropheCMS
+ * @property {Object} [imageOptions] - Optional image configuration
+ * @property {string} [imageOptions.additionalClasses] - Additional CSS classes
  *
- * @param {Object} props
- * @param {Object} props.widget - The widget data from ApostropheCMS
- * @returns {astro.AstroComponent} - Rendered image component
+ * @component
+ * @description Image widget component for ApostropheCMS. Upon image upload, the system generates
+ * multiple responsive sizes automatically. Each instance of the widget can reference any image
+ * from the media library with its own unique cropping and focal point settings, without
+ * modifying the original. Editors can customize alt text, cropping, and focal point per instance.
+ *
+ * @param {ImageWidget} props
+ * @returns {astro.AstroComponent} Rendered image component
  */
 
 import {

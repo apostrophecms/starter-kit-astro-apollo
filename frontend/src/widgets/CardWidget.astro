@@ -1,31 +1,37 @@
 ---
 /**
- * A versatile card component that supports various layouts and styles.
+ * @typedef {Object} CardWidget
+ * @property {('basic'|'image'|'image-overlay'|'media')} [cardType='basic'] - The type of card to render
+ * @property {string} [cardTitle] - The card's title
+ * @property {string} [subtitle] - The card's subtitle
+ * @property {string} [titleSize='is-4'] - The size class for the title
+ * @property {string} [titleColor] - Color class for the title
+ * @property {string} [headerAlignment='has-text-left'] - Alignment class for the header
+ * @property {string} [contentAlignment='has-text-left'] - Alignment class for the content
+ * @property {string} [contentColor] - Color class for the content
+ * @property {Object} content - The main content area (AposArea)
+ * @property {string} [backgroundColor] - Background color class for the card
+ * @property {Object} [_mainImage] - Main image attachment data
+ * @property {boolean} [useImageRatio=false] - Whether to use image ratio constraints
+ * @property {string} [imageRatio='is-4by3'] - Image ratio class when useImageRatio is true
+ * @property {Object} [_avatar] - Avatar image attachment data for media type cards
+ * @property {boolean} [hasFooter] - Whether to show the footer
+ * @property {Object} [footerContent] - Footer content area (AposArea)
+ * @property {string} [minHeight] - Minimum height class for the card
+ * @property {string} [overlayColor='black'] - Color for the overlay
+ * @property {string} [overlayOpacity='50%'] - Opacity for the overlay
+ * @property {boolean} [showOverlay=false] - Whether to show the overlay
+ * @property {boolean} [addFooterBorder=false] - Whether to add a border to the footer
+ * @property {('thin'|'medium'|'thick')} [footerBorderWidth='thin'] - Footer border width
+ * @property {string} [footerBorderColor='primary'] - Footer border color class
+ *
  * @component
- * @param {Object} widget - The widget configuration object
- * @param {('basic'|'image'|'image-overlay'|'media')} [widget.cardType='basic'] - The type of card to render
- * @param {string} [widget.cardTitle] - The card's title
- * @param {string} [widget.subtitle] - The card's subtitle
- * @param {string} [widget.titleSize='is-4'] - The size class for the title
- * @param {string} [widget.titleColor] - Color class for the title
- * @param {string} [widget.headerAlignment='has-text-left'] - Alignment class for the header
- * @param {string} [widget.contentAlignment='has-text-left'] - Alignment class for the content
- * @param {string} [widget.contentColor] - Color class for the content
- * @param {Object} widget.content - The main content area (AposArea)
- * @param {string} [widget.backgroundColor] - Background color class for the card
- * @param {Object} [widget._mainImage] - Main image attachment data
- * @param {boolean} [widget.useImageRatio=false] - Whether to use image ratio constraints
- * @param {string} [widget.imageRatio='is-4by3'] - Image ratio class when useImageRatio is true
- * @param {Object} [widget._avatar] - Avatar image attachment data for media type cards
- * @param {boolean} [widget.hasFooter] - Whether to show the footer
- * @param {Object} [widget.footerContent] - Footer content area (AposArea)
- * @param {string} [widget.minHeight] - Minimum height class for the card
- * @param {string} [widget.overlayColor='black'] - Color for the overlay
- * @param {string} [widget.overlayOpacity='50%'] - Opacity for the overlay
- * @param {boolean} [widget.showOverlay=false] - Whether to show the overlay
- * @param {boolean} [widget.addFooterBorder=false] - Whether to add a border to the footer
- * @param {('thin'|'medium'|'thick')} [widget.footerBorderWidth='thin'] - Footer border width
- * @param {string} [widget.footerBorderColor='primary'] - Footer border color class
+ * @description A versatile card component that supports various layouts and styles.
+ * Can be configured as a basic card, image card, image with overlay, or media card.
+ * Supports customizable typography, layouts, colors, and footer options.
+ *
+ * @param {CardWidget} props
+ * @returns {astro.AstroComponent} Rendered card component
  */
 
 const { widget } = Astro.props;

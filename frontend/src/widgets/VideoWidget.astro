@@ -1,21 +1,19 @@
 ---
 /**
- * Video Widget Astro Component
- *
- * This component integrates with ApostropheCMS's video widget and renders videos
- * using a custom web component. It supports multiple video providers through
- * ApostropheCMS's oEmbed implementation - editors can simply paste any standard
- * video sharing URL from supported platforms like YouTube or Vimeo.
- *
- * @typedef {Object} VideoWidget
- * @property {boolean} [aposPlaceholder] - Indicates if this is a placeholder instance in the editor
- * @property {Object} [video] - Video data object
- * @property {string} [video.url] - The URL of the video to embed
- * @property {string} [video.title] - The title of the video
- *
- * @param {Object} props - Component properties
- * @param {VideoWidget} [props.widget] - The widget data from ApostropheCMS
- */
+* @typedef {Object} VideoWidget
+* @property {boolean} [aposPlaceholder] - Indicates if this is a placeholder instance in the editor
+* @property {Object} [video] - Video data object
+* @property {string} [video.url] - The URL of the video to embed
+* @property {string} [video.title] - The title of the video
+* 
+* @component
+* @description Video Widget component that integrates with ApostropheCMS's video widget and renders videos
+* using a custom web component. Supports multiple video providers through ApostropheCMS's oEmbed implementation.
+* Content editors can simply paste any standard video sharing URL from supported platforms like YouTube or Vimeo.
+* 
+* @param {VideoWidget} props
+* @returns {astro.AstroComponent} Rendered video component
+*/
 
 const { widget } = Astro.props;
 

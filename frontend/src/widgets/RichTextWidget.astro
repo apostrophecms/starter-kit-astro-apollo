@@ -1,12 +1,15 @@
 ---
 /**
- * Rich Text Widget Component for ApostropheCMS
- * Renders editable rich text content within an Apostrophe area
- * 
+ * @typedef {Object} RichTextWidget
+ * @property {string} content - HTML content from Apostrophe's rich text editor
+ *
  * @component
- * @param {Object} props
- * @param {Object} props.widget - ApostropheCMS widget object
- * @param {string} props.widget.content - HTML content from Apostrophe's rich text editor
+ * @description Rich Text Widget Component for ApostropheCMS. Renders editable rich text content
+ * within an Apostrophe area, supporting formatted text, inline styles, and basic HTML elements
+ * through Apostrophe's built-in rich text editor.
+ *
+ * @param {RichTextWidget} props
+ * @returns {astro.AstroComponent} Rendered rich text component
  */
 
 const { widget } = Astro.props;

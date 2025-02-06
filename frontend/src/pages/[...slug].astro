@@ -1,4 +1,36 @@
 ---
+/**
+ * Dynamic route handler for all CMS pages in an Astro-ApostropheCMS integration
+ *
+ * @file
+ * @description
+ * This is the main routing file that handles all dynamic routes in the Astro frontend.
+ * It fetches page data from ApostropheCMS, handles redirects and 404s, manages header
+ * positioning, and provides the base layout structure for all CMS pages.
+ *
+ * @requires @apostrophecms/apostrophe-astro/lib/aposPageFetch
+ * @requires @apostrophecms/apostrophe-astro/components/layouts/AposLayout
+ * @requires @apostrophecms/apostrophe-astro/components/AposTemplate
+ *
+ * @typedef {Object} AposData
+ * @property {boolean} [redirect] - Indicates if the request should be redirected
+ * @property {string} [url] - Redirect URL if redirect is true
+ * @property {number} [status] - HTTP status code for redirect
+ * @property {boolean} [notFound] - Indicates if page was not found (404)
+ * @property {Object} [global] - Global CMS data
+ * @property {Object} [global.headerGroup] - Header configuration
+ * @property {('static'|'fixed'|'fixed-fade')} [global.headerGroup.headerPosition] - Header position setting
+ * @property {Object} [page] - Current page data
+ * @property {string} [page.title] - Page title
+ * @property {string} [page.seoDescription] - Page meta description
+ *
+ * @notes
+ * - Handles dynamic navbar positioning based on CMS settings
+ * - Includes client-side script for theme/navbar updates
+ * - Manages script reloading for dynamic widget updates
+ * - Integrates with Apostrophe's event system for live updates
+ */
+
 import aposPageFetch from '@apostrophecms/apostrophe-astro/lib/aposPageFetch.js';
 import AposLayout from '@apostrophecms/apostrophe-astro/components/layouts/AposLayout.astro';
 import AposTemplate from '@apostrophecms/apostrophe-astro/components/AposTemplate.astro';
@@ -13,7 +45,6 @@ if (aposData.notFound) {
 }
 // Extract header information
 const headerPosition = aposData.global?.headerGroup?.headerPosition || 'static';
-
 
 // Initialize an array to hold body classes
 const bodyClasses = [];
@@ -31,13 +62,14 @@ import '../styles/main.scss';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
+
 <AposLayout title={aposData.page?.title} {aposData} {bodyClass}>
   <Fragment slot='standardHead'>
     <meta name='description' content={aposData.page?.seoDescription} />
     <meta name='viewport' content='width=device-width, initial-scale=1' />
     <meta charset='UTF-8' />
-    <script src="/scripts/VideoWidget.js" type="module"></script>
-    <script src="/scripts/dynamic-navbar-padding.js" defer></script>
+    <script src='/scripts/VideoWidget.js' type='module'></script>
+    <script src='/scripts/dynamic-navbar-padding.js' defer></script>
     <link
       rel='stylesheet'
       href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'
@@ -67,7 +99,80 @@ import Footer from '../components/Footer.astro';
 
         // Set up apos refreshed listener if it exists or becomes available
         if (window.apos) {
+          console.log('Apostrophe found, setting up event listener');
+          const originalEmit = window.apos.bus.$emit;
+          window.apos.bus.$emit = function (eventName, ...args) {
+            // console.log(`[Apostrophe Event]: ${eventName}`, args);
+            originalEmit.apply(this, arguments);
+          };
           apos.bus.$on('refreshed', updateThemeAndNavbar);
+          let reloadScheduled = false;
+
+          // Listen for area-updated, then wait for the next busy event before reloading
+          window.apos.bus.$on('area-updated', (payload) => {
+            console.log(
+              'Apostrophe area updated, waiting for next busy event...',
+              payload
+            );
+
+            if (!reloadScheduled) {
+              reloadScheduled = true;
+
+              window.apos.bus.$on('busy', () => {
+                const needsReload = document.querySelector('.needs-js-reload');
+                console.log('needsReload', needsReload);
+
+                if (needsReload) {
+                  const widgetContainer =
+                    needsReload.closest('[data-apos-widget]');
+                  if (widgetContainer) {
+                    const scripts = Array.from(
+                      widgetContainer.querySelectorAll('script')
+                    );
+                    const nextScript = widgetContainer.nextElementSibling;
+                    if (nextScript && nextScript.tagName === 'SCRIPT') {
+                      scripts.push(nextScript);
+                    }
+
+                    scripts.forEach((script) => {
+                      console.log('Original script:', script);
+                      const newScript = document.createElement('script');
+                      if (script.type === 'module') {
+                        newScript.type = 'module';
+                      }
+                      if (script.src) {
+                        newScript.src = script.src;
+                        newScript.onerror = (error) => {
+                          console.error('Script failed to load:', error);
+                        };
+                        newScript.onload = () => {
+                          console.log(
+                            'Script loaded successfully:',
+                            newScript.src
+                          );
+                          // Try to trigger a custom event that the module might be listening for
+                          window.dispatchEvent(new CustomEvent('astro:reload'));
+                        };
+                      }
+                      Array.from(script.attributes).forEach((attr) => {
+                        if (attr.name !== 'src' && attr.name !== 'type') {
+                          newScript.setAttribute(attr.name, attr.value);
+                        }
+                      });
+
+                      // Remove the old script first
+                      script.remove();
+                      // Then append the new one
+                      widgetContainer.appendChild(newScript);
+                      console.log('New script appended:', newScript);
+                      window.dispatchEvent(new Event('astro:load'));
+                    });
+                  }
+                  console.warn('Reloaded scripts for widget');
+                }
+              });
+            }
+          });
         } else {
           // Poll for apos for logged-in users
           // But timeout after a reasonable period
@@ -77,10 +182,18 @@ import Footer from '../components/Footer.astro';
             attempts++;
             if (window.apos) {
               clearInterval(waitForApos);
+              console.log('Apostrophe found, setting up event listener');
+              const originalEmit = window.apos.bus.$emit;
+              window.apos.bus.$emit = function (eventName, ...args) {
+                console.log(`[Apostrophe Event]: ${eventName}`, args);
+                originalEmit.apply(this, arguments);
+              };
               apos.bus.$on('refreshed', updateThemeAndNavbar);
             } else if (attempts >= maxAttempts) {
               clearInterval(waitForApos);
-              console.debug('No apos found after 5 seconds, assuming logged-out user');
+              console.debug(
+                'No apos found after 5 seconds, assuming logged-out user'
+              );
             }
           }, 100);
         }

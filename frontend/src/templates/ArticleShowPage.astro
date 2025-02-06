@@ -1,4 +1,22 @@
 ---
+/**
+* Show Template for Individual ApostropheCMS Pieces
+*
+* @file
+* @description
+* Renders individual content pieces (e.g. articles) with configurable layouts:
+* fullWidth, magazine, or minimal. Defaults to fullWidth if layout not specified.
+*
+* @typedef {Object} AposProps
+* @property {Object} page - Page configuration
+* @property {('fullWidth'|'magazine'|'minimal')} page.showLayout - Layout selection
+* @property {Object} piece - The content piece to display
+*
+* @requires ../layouts/article-layouts/ShowFullWidth
+* @requires ../layouts/article-layouts/ShowMagazine
+* @requires ../layouts/article-layouts/ShowMinimal
+*/
+
 import FullWidth from '../layouts/article-layouts/ShowFullWidth.astro';
 import Magazine from '../layouts/article-layouts/ShowMagazine.astro';
 import Minimal from '../layouts/article-layouts/ShowMinimal.astro';
