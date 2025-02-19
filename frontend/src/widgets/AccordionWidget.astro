@@ -1,14 +1,24 @@
 ---
 /**
- * An accessible accordion widget component for ApostropheCMS content
+ * @module AccordionWidget
+ * @description An accessible accordion widget component for ApostropheCMS content.
+ *
+ * @property {string} [itemBackgroundColor='white'] - Background color of accordion items
+ * @property {string} [headerAlignment='left'] - Alignment of headers ('left'|'center'|'right')
+ * @property {boolean} [allowMultipleOpen=false] - Whether multiple accordion items can be open simultaneously
+ * @property {number} [openIndex=-1] - Index of initially open accordion item (1-based, -1 means all closed)
+ * @property {Array<AccordionItem>} [items=[]] - Accordion items
+ *
+ * @typedef {Object} AccordionItem
+ * @property {string} header - Header text for the accordion item
+ * @property {string} headerColor - Color of the header text
+ * @property {Object} content - Content to be displayed when item is expanded
+ *
  * @component
- * @param {Object} widget - The widget configuration object from ApostropheCMS
- * @param {string} [widget.itemBackgroundColor='white'] - Background color of accordion items
- * @param {string} [widget.headerAlignment='left'] - Alignment of headers ('left'|'center'|'right')
- * @param {boolean} [widget.allowMultipleOpen=false] - Whether multiple accordion items can be open simultaneously
- * @param {number} [widget.openIndex=-1] - Index of initially open accordion item (1-based, -1 means all closed)
- * @param {Array<{header: string, headerColor: string, content: Object}>} [widget.items=[]] - Accordion items
+ * @param {AccordionWidget} props
+ * @returns {astro.AstroComponent} Rendered accordion component
  */
+
 
 const { widget } = Astro.props;
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';

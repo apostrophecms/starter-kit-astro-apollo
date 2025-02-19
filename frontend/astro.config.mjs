@@ -5,6 +5,7 @@ import path from 'path';
 
 // https://astro.build/config
 export default defineConfig({
+  viewTransitions: true,
   output: "server",
   server: {
     port: process.env.PORT ? parseInt(process.env.PORT) : 4321,

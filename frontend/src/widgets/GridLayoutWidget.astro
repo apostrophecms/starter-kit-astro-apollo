@@ -1,6 +1,16 @@
 ---
 /**
- * A customizable grid layout widget component for Astro that integrates with ApostropheCMS
+ * @widget GridLayoutWidget
+ * @typedef {Object} GridLayoutWidget
+ * @property {string} _id - Unique identifier for the widget
+ * @property {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|
+ *            'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|
+ *            'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} layoutType - The type of layout to render
+ * @property {Object} [customGrid] - Custom grid configuration when layoutType is 'custom'
+ * @property {string} [maxWidth] - Maximum width constraint for the layout
+ * @property {string} [overrideClass] - Additional CSS classes to apply
+ * @property {Object} [areaStyles] - Custom styling for areas
+ *
  * @component
  * @param {Object} props - Component props
  * @param {Object} props.widget - The widget configuration object from ApostropheCMS

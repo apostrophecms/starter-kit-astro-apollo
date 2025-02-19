@@ -1,3 +1,28 @@
+/**
+ * @typedef {Object} LayoutArea
+ * @property {string} name - Area name
+ * @property {*} content - Area content
+ * @property {number} colStart - Starting column
+ * @property {number} colSpan - Column span
+ * @property {number} rowStart - Starting row
+ * @property {number} rowSpan - Row span
+ * @property {number} [tabletColSpan] - Tablet column span
+ * @property {number} [mobileColSpan] - Mobile column span
+ */
+
+/**
+ * @typedef {Object} CustomGrid
+ * @property {LayoutArea[]} contentAreas
+ */
+
+/**
+ * @typedef {Object} Widget
+ * @property {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} layoutType
+ * @property {CustomGrid} [customGrid]
+ * @property {Record<string, any>} [content] - Dynamic content properties
+ */
+
+
 export const getLayoutAreas = (widget) => {
   switch (widget.layoutType) {
     case 'asideMainThree':

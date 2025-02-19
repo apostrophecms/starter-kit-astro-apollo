@@ -67,7 +67,8 @@ export const widgetGroups = {
       hero: {},
       accordion: {},
       card: {},
-      link: {}
+      link: {},
+      testimonial: {}
     }
   }
 };

@@ -99,6 +99,7 @@ const getContentSize = (selectedSize) => {
   data-autoplay={autoplay ? '' : null}
   data-slide-duration={slideDuration}
   data-slideshow-id={slideshowId}
+  data-widget-js=true
 >
   <div class='slides'>
     {
@@ -131,12 +132,9 @@ const getContentSize = (selectedSize) => {
             style={`transition: opacity ${transitionSpeed}ms ease-in-out;`}
           >
             <figure class='image is-16by9'>
-              <img
-                {...imageProps}
-                loading={index === 0 ? 'eager' : 'lazy'}
-              />
+              <img {...imageProps} loading={index === 0 ? 'eager' : 'lazy'} />
             </figure>
-            <div class="slide-content-wrapper">
+            <div class='slide-content-wrapper'>
               <div
                 class={`slide-content`}
                 style={`background-color:${getTextBlockBackground(
@@ -271,12 +269,19 @@ const getContentSize = (selectedSize) => {
     background: white;
   }
 </style>
+<script>
+  console.log('Slideshow widget loaded');
+  document.addEventListener('astro:page-load', () => {
+    console.log('Page loaded');
+  });
+</script>
 
 <script>
+  //import { createAposInitializer } from '@apostrophecms/apostrophe-astro/lib/aposInitializer.js';
   /**
- * Manages slideshow functionality including transitions and autoplay
- */
-class Slideshow {
+   * Manages slideshow functionality including transitions and autoplay
+   */
+  class Slideshow {
     constructor(container) {
       this.container = container;
       this.slideshowId = container.dataset.slideshowId;
@@ -345,6 +350,7 @@ class Slideshow {
   const slideshows = new Map();
 
   function initSlideshows() {
+    console.log('Initializing slideshows');
     slideshows.forEach((slideshow) => slideshow.destroy());
     slideshows.clear();
 
@@ -357,11 +363,6 @@ class Slideshow {
       });
     }, 500);
   }
-
-  document.addEventListener('DOMContentLoaded', initSlideshows);
-
-  if (window.apos) {
-    apos.bus.$on('refreshed', initSlideshows);
-    apos.bus.$on('modal-resolved', initSlideshows);
-  }
+  window.aposWidgetInitializer?.register('slideshow', initSlideshows);
+  initSlideshows();
 </script>

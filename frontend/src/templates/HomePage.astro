@@ -1,4 +1,29 @@
 ---
+/**
+ * Homepage Template for ApostropheCMS content
+ *
+ * @template HomePage
+ * @description
+ * Renders the homepage with support for multiple layouts (foundation and showcase).
+ * Handles fallback to default content when CMS data is not provided.
+ *
+ * @requires ../widgets/HeroWidget
+ * @requires ../widgets/SlideshowWidget
+ * @requires @apostrophecms/apostrophe-astro/components/AposArea
+ * @requires ../lib/homepage-defaults
+ *
+ * @typedef {Object} AposProps
+ * @property {Object} page - Page data from ApostropheCMS
+ * @property {('foundation'|'showcase')} [page.layout='foundation'] - Layout type
+ * @property {Object} [page.heroSection] - Hero section data
+ * @property {Object} [page.showcaseSlideshow] - Slideshow data
+ * @property {Object} [page.main] - Main content area data
+ * @property {Object} user - Current user data
+ * @property {Object} query - URL query parameters
+ * @property {Object} global - Global site data
+ *
+ */
+
 import Hero from '../widgets/HeroWidget.astro';
 import Slideshow from '../widgets/SlideshowWidget.astro';
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';

@@ -17,7 +17,9 @@
     "migrate": "cd backend && npm run migrate",
     "serve-frontend": "cd frontend && npm run serve",
     "serve-backend": "cd backend && npm run serve",
-    "load-starter-content": "cd backend && npm run load-starter-content"
+    "load-starter-content": "cd backend && npm run load-starter-content",
+    "create-docs": "jsdoc -c jsdoc.config.json",
+    "serve-docs": "http-server docs"
   },
   "repository": {
     "type": "git",
@@ -33,5 +35,17 @@
   "bugs": {
     "url": "https://github.com/apostrophecms/combined-astro-starter-kit/issues"
   },
-  "homepage": "https://github.com/apostrophecms/combined-astro-starter-kit#readme"
+  "homepage": "https://github.com/apostrophecms/combined-astro-starter-kit#readme",
+  "devDependencies": {
+    "better-doc": "^0.0.1",
+    "better-docs": "^2.7.3",
+    "clean-jsdoc-theme": "^4.3.0",
+    "docdash": "^2.0.2",
+    "http-server": "^14.1.1",
+    "jsdoc": "^4.0.4",
+    "jsdoc-skyceil": "^2.0.0"
+  },
+  "dependencies": {
+    "swiper": "^11.2.2"
+  }
 }

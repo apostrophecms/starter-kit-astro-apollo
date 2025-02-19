@@ -1,3 +1,43 @@
+/**
+ * @typedef {Object} BrandingGroup
+ * @property {string} [brandingType] - Display type for branding ('logo'|'text'|'both')
+ * @property {string} [mobileDisplayPreference] - Mobile display preference ('same'|'logo'|'text'|'both')
+ * @property {Object} [siteLogo] - Site logo configuration
+ * @property {Object} [siteLogo._urls] - URLs for different logo sizes
+ * @property {string} [siteLogo._urls.max] - URL for maximum size logo
+ * @property {string} [siteTitle] - Site title text
+ * @property {string} [siteTextSize] - Text size class for site title
+ * @property {number} [logoMaxHeight] - Maximum height for logo in pixels
+ */
+
+/**
+ * @typedef {Object} HeaderGroup
+ * @property {string} [headerPosition] - Header position type ('fixed'|'fixed-fade')
+ * @property {string} [spacing] - CSS spacing class
+ * @property {string} [headerBackgroundColor] - Background color class name
+ * @property {string} [headerTextColor] - Text color class name
+ * @property {string} [dropdownTextColor] - Dropdown text color class name
+ * @property {string} [headerActiveColor] - Active item background color class name
+ * @property {string} [headerHoverColor] - Hover color class name
+ * @property {number} [transparency] - Header transparency value (0-100)
+ */
+
+/**
+ * @typedef {Object} GlobalData
+ * @property {BrandingGroup} [brandingGroup] - Branding configuration
+ * @property {HeaderGroup} [headerGroup] - Header configuration
+ */
+
+/**
+ * Custom hook for managing site configuration and styling
+ * @param {GlobalData} globalData - Global site configuration data
+ * @returns {Object} Configuration utility functions
+ * @property {function(): string} getHeaderClasses - Get header CSS classes
+ * @property {function(): number} getHeaderTransparency - Get header transparency value
+ * @property {function(boolean): string} getNavItemClasses - Get navigation item CSS classes
+ * @property {function(): string} getDropdownClasses - Get dropdown CSS classes
+ * @property {function(boolean): string} renderBranding - Render branding HTML
+ */
 export function useSiteConfig(globalData) {
   const brandingGroup = globalData?.brandingGroup || {};
   const headerGroup = globalData?.headerGroup || {};

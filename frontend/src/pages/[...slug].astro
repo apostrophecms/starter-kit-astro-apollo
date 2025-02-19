@@ -30,7 +30,50 @@ import '../styles/main.scss';
 
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+console.log('URL params', Astro.url.searchParams);
 ---
+<script>
+  function overrideEmit() {
+    if (window.apos && apos.bus && typeof apos.bus.$emit === 'function' && !apos.bus._emitOverridden) {
+      const originalEmit = apos.bus.$emit;
+      apos.bus.$emit = function(eventName, ...args) {
+        console.log('Apos Event:', {
+          event: eventName,
+          timestamp: new Date().toISOString(),
+          args,
+          page: window.location.pathname
+        });
+        return originalEmit.apply(this, [eventName, ...args]);
+      };
+      apos.bus._emitOverridden = true;
+    }
+  }
+
+  function initLogging() {
+    if (window.apos) {
+      overrideEmit();
+    } else {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        if (window.apos || ++attempts > 10) {
+          clearInterval(interval);
+          if (window.apos) {
+            initLogging();
+          } else {
+            console.warn('Failed to find apos after', attempts, 'attempts');
+          }
+        }
+      }, 300);
+    }
+  }
+
+  initLogging();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initLogging();
+  });
+</script>
+
 <AposLayout title={aposData.page?.title} {aposData} {bodyClass}>
   <Fragment slot='standardHead'>
     <meta name='description' content={aposData.page?.seoDescription} />
