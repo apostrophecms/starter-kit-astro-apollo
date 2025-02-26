@@ -25,6 +25,11 @@ export default apostrophe({
     // Custom extensions
     // Make sure to set the `APOS_BASE_URL` environment variable to the base URL of your Apostrophe site
     '@apostrophecms/seo': {},
+    '@apostrophecms-pro/palette': {},
+    '@apostrophecms-pro/document-versions': {},
+    '@apostrophecms-pro/advanced-permission-group': {},
+    '@apostrophecms-pro/advanced-permission': {},
+    '@apostrophecms-pro/doc-template-library': {},
 
     // pieces
     article: {},
