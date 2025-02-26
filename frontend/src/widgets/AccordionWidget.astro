@@ -23,10 +23,11 @@ const {
 
 const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
 ---
+
 <div
-  class="accordion-widget mb-6"
+  class='accordion-widget mb-6'
   data-allow-multiple={allowMultipleOpen}
-  role="presentation"
+  role='presentation'
 >
   {
     items.map((item, index) => {
@@ -44,22 +45,22 @@ const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
             id={headerId}
             aria-controls={panelId}
             aria-expanded={index === convertedIndex}
-            role="button"
+            role='button'
           >
             <p class={`has-text-${item.headerColor} has-text-weight-semibold`}>
               {item.header}
             </p>
-            <span class="visually-hidden">
+            <span class='visually-hidden'>
               {index === convertedIndex ? 'Click to close' : 'Click to open'}
             </span>
           </summary>
           <div
-            class="accordion-content p-4"
+            class='accordion-content p-4'
             id={panelId}
             aria-labelledby={headerId}
-            role="region"
+            role='region'
           >
-            <div class="content">
+            <div class='content'>
               <AposArea area={item.content} />
             </div>
           </div>
@@ -127,79 +128,92 @@ const convertedIndex = openIndex === -1 ? -1 : openIndex - 1;
 </style>
 
 <script>
-/**
- * Initializes accordion functionality and sets up event listeners
- * for handling accordion interactions
- */
-function initializeAccordion() {
-  const accordionContainers = document.querySelectorAll('.accordion-widget');
+  /**
+   * Initializes accordion functionality and sets up event listeners
+   * for handling accordion interactions
+   */
+  function initializeAccordion() {;
+    const accordionContainers = document.querySelectorAll('.accordion-widget');
 
-  accordionContainers.forEach((accordionContainer) => {
-    const allowMultipleOpen = accordionContainer.hasAttribute('data-allow-multiple');
-    const detailsElements = Array.from(
-      accordionContainer.querySelectorAll('[data-accordion-item]')
-    );
+    accordionContainers.forEach((accordionContainer) => {
+      const allowMultipleOpen = accordionContainer.getAttribute(
+      'data-allow-multiple'
+      ) === 'true';
+      const detailsElements = Array.from(
+        accordionContainer.querySelectorAll('[data-accordion-item]')
+      );
 
-    detailsElements.forEach((detailsElement) => {
-      const summary = detailsElement.querySelector('summary');
+      detailsElements.forEach((detailsElement) => {
+        const summary = detailsElement.querySelector('summary');
 
-      // Update ARIA states on toggle
-      detailsElement.addEventListener('toggle', (event) => {
-        const isOpen = detailsElement.open;
-        summary.setAttribute('aria-expanded', isOpen);
+        // Update ARIA states on toggle
+        detailsElement.addEventListener('toggle', (event) => {
+          const isOpen = detailsElement.open;
+          summary.setAttribute('aria-expanded', isOpen);
 
-        // Update screen reader text
-        const srText = summary.querySelector('.visually-hidden');
-        srText.textContent = isOpen ? 'Click to close' : 'Click to open';
+          // Update screen reader text
+          const srText = summary.querySelector('.visually-hidden');
+          srText.textContent = isOpen ? 'Click to close' : 'Click to open';
 
-        // Close other panels if allowMultipleOpen is false
-        if (isOpen && !allowMultipleOpen) {
-          detailsElements
-            .filter(details => details !== detailsElement)
-            .forEach(details => {
-              details.open = false;
-              const otherSummary = details.querySelector('summary');
-              otherSummary.setAttribute('aria-expanded', 'false');
-              otherSummary.querySelector('.visually-hidden').textContent = 'Click to open';
-            });
-        }
-      });
+          // Close other panels if allowMultipleOpen is false
+          if (isOpen && !allowMultipleOpen) {
+            detailsElements
+              .filter((details) => details !== detailsElement)
+              .forEach((details) => {
+                details.open = false;
+                const otherSummary = details.querySelector('summary');
+                otherSummary.setAttribute('aria-expanded', 'false');
+                otherSummary.querySelector('.visually-hidden').textContent =
+                  'Click to open';
+              });
+          }
+        });
 
-      // Add keyboard navigation
-      summary.addEventListener('keydown', (event) => {
-        const key = event.key;
+        // Add keyboard navigation
+        summary.addEventListener('keydown', (event) => {
+          const key = event.key;
 
-        if (key === 'ArrowUp' || key === 'ArrowDown') {
-          event.preventDefault();
-          const direction = key === 'ArrowUp' ? -1 : 1;
-          const currentIndex = detailsElements.indexOf(detailsElement);
-          const targetIndex = (currentIndex + direction + detailsElements.length) % detailsElements.length;
-          detailsElements[targetIndex].querySelector('summary').focus();
-        }
+          if (key === 'ArrowUp' || key === 'ArrowDown') {
+            event.preventDefault();
+            const direction = key === 'ArrowUp' ? -1 : 1;
+            const currentIndex = detailsElements.indexOf(detailsElement);
+            const targetIndex =
+              (currentIndex + direction + detailsElements.length) %
+              detailsElements.length;
+            detailsElements[targetIndex].querySelector('summary').focus();
+          }
+        });
       });
     });
-  });
-}
-
-// Initialize on DOM content loaded
-document.addEventListener('DOMContentLoaded', initializeAccordion);
-
-// Handle dynamically added accordions
-const observer = new MutationObserver((mutations) => {
-  const hasRelevantChanges = mutations.some(mutation =>
-    Array.from(mutation.addedNodes).some(node =>
-      node.nodeType === 1 && 
-      (node.classList?.contains('accordion-widget') || node.querySelector?.('.accordion-widget'))
-    )
-  );
-
-  if (hasRelevantChanges) {
-    initializeAccordion();
   }
-});
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+  setTimeout(() => {
+    initializeAccordion();
+
+    if (window.apos) {
+      apos.bus.$on('refreshed', initializeAccordion);
+      apos.bus.$on('modal-resolved', initializeAccordion);
+    }
+  }, 300);
+
+  // Handle dynamically added accordions
+  const observer = new MutationObserver((mutations) => {
+    const hasRelevantChanges = mutations.some((mutation) =>
+      Array.from(mutation.addedNodes).some(
+        (node) =>
+          node.nodeType === 1 &&
+          (node.classList?.contains('accordion-widget') ||
+            node.querySelector?.('.accordion-widget'))
+      )
+    );
+
+    if (hasRelevantChanges) {
+      initializeAccordion();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 </script>

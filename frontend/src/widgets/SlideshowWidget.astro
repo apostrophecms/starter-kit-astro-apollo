@@ -344,24 +344,26 @@ class Slideshow {
 
   const slideshows = new Map();
 
-  function initSlideshows() {
-    slideshows.forEach((slideshow) => slideshow.destroy());
-    slideshows.clear();
-
-    setTimeout(() => {
-      document.querySelectorAll('.slideshow-container').forEach((container) => {
-        const slideshowId = container.dataset.slideshowId;
-        if (slideshowId) {
-          slideshows.set(slideshowId, new Slideshow(container));
-        }
-      });
-    }, 500);
-  }
-
-  document.addEventListener('DOMContentLoaded', initSlideshows);
+setTimeout(() => {
+  initSlideshows();
 
   if (window.apos) {
     apos.bus.$on('refreshed', initSlideshows);
     apos.bus.$on('modal-resolved', initSlideshows);
   }
+}, 300);
+
+function initSlideshows() {
+  slideshows.forEach((slideshow) => slideshow.destroy());
+  slideshows.clear();
+
+  setTimeout(() => {
+    document.querySelectorAll('.slideshow-container').forEach((container) => {
+      const slideshowId = container.dataset.slideshowId;
+      if (slideshowId) {
+        slideshows.set(slideshowId, new Slideshow(container));
+      }
+    });
+  }, 100);
+}
 </script>
