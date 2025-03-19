@@ -57,7 +57,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 4,
           rowStart: 1,
           rowSpan: 4,
-          tabletColSpan: 12,
+          tabletColSpan: 4,  // Change from 12 to 4
           mobileColSpan: 12,
         },
         {
@@ -67,7 +67,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 8,
           rowStart: 1,
           rowSpan: 2,
-          tabletColSpan: 12,
+          tabletColSpan: 8,  // Change from 12 to 8
           mobileColSpan: 12,
         },
         {
@@ -77,7 +77,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 8,
           rowStart: 3,
           rowSpan: 2,
-          tabletColSpan: 12,
+          tabletColSpan: 8,  // Change from 12 to 8
           mobileColSpan: 12,
         },
       ];
@@ -91,7 +91,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 8,
           rowStart: 1,
           rowSpan: 2,
-          tabletColSpan: 12,
+          tabletColSpan: 8,  // Change from 12 to 8
           mobileColSpan: 12,
         },
         {
@@ -101,7 +101,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 8,
           rowStart: 3,
           rowSpan: 2,
-          tabletColSpan: 12,
+          tabletColSpan: 8,  // Change from 12 to 8
           mobileColSpan: 12,
         },
         {
@@ -111,7 +111,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 4,
           rowStart: 1,
           rowSpan: 4,
-          tabletColSpan: 12,
+          tabletColSpan: 4,  // Change from 12 to 4
           mobileColSpan: 12,
         },
       ];
@@ -179,7 +179,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 4,
           rowStart: 2,
           rowSpan: 1,
-          tabletColSpan: 6,
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
         {
@@ -189,7 +189,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 4,
           rowStart: 2,
           rowSpan: 1,
-          tabletColSpan: 6,
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
         {
@@ -199,7 +199,7 @@ export const getLayoutAreas = (widget) => {
           colSpan: 4,
           rowStart: 2,
           rowSpan: 1,
-          tabletColSpan: 12,
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
       ];
@@ -207,8 +207,8 @@ export const getLayoutAreas = (widget) => {
     case 'magazineLayout':
       return [
         {
-          name: 'headline',
-          content: widget.headlineContent,
+          name: 'feature',
+          content: widget.featureContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
@@ -217,45 +217,25 @@ export const getLayoutAreas = (widget) => {
           mobileColSpan: 12,
         },
         {
-          name: 'sidebar',
-          content: widget.sidebarContent,
+          name: 'topSidebar',
+          content: widget.topSidebarContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
-          rowSpan: 3,
-          tabletColSpan: 4,
-          mobileColSpan: 12,
-        },
-        {
-          name: 'feature1',
-          content: widget.feature1Content,
-          colStart: 1,
-          colSpan: 4,
-          rowStart: 3,
           rowSpan: 1,
           tabletColSpan: 4,
           mobileColSpan: 12,
         },
         {
-          name: 'feature2',
-          content: widget.feature2Content,
-          colStart: 5,
-          colSpan: 4,
-          rowStart: 3,
-          rowSpan: 1,
-          tabletColSpan: 4,
-          mobileColSpan: 12,
-        },
-        {
-          name: 'feature3',
-          content: widget.feature3Content,
+          name: 'bottomSidebar',
+          content: widget.bottomSidebarContent,
           colStart: 9,
           colSpan: 4,
-          rowStart: 3,
+          rowStart: 2,
           rowSpan: 1,
           tabletColSpan: 4,
           mobileColSpan: 12,
-        },
+        }
       ];
 
     case 'contentHub':
@@ -309,17 +289,7 @@ export const getLayoutAreas = (widget) => {
           rowSpan: 1,
           tabletColSpan: 6,
           mobileColSpan: 12,
-        },
-        {
-          name: 'fullWidth',
-          content: widget.fullWidthContent,
-          colStart: 1,
-          colSpan: 12,
-          rowStart: 5,
-          rowSpan: 1,
-          tabletColSpan: 12,
-          mobileColSpan: 12,
-        },
+        }
       ];
 
     case 'galleryMasonry':
@@ -342,7 +312,7 @@ export const getLayoutAreas = (widget) => {
           rowStart: 1,
           rowSpan: 1,
           tabletColSpan: 4,
-          mobileColSpan: 6,
+          mobileColSpan: 12,
         },
         {
           name: 'side2',
@@ -352,7 +322,7 @@ export const getLayoutAreas = (widget) => {
           rowStart: 2,
           rowSpan: 1,
           tabletColSpan: 4,
-          mobileColSpan: 6,
+          mobileColSpan: 12,
         },
         {
           name: 'bottom',
@@ -374,7 +344,7 @@ export const getLayoutAreas = (widget) => {
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
-          rowSpan: 1,
+          rowSpan: 3,
           tabletColSpan: 8,
           mobileColSpan: 12,
         },
@@ -391,21 +361,21 @@ export const getLayoutAreas = (widget) => {
         {
           name: 'chart',
           content: widget.chartContent,
-          colStart: 1,
-          colSpan: 6,
+          colStart: 9,
+          colSpan: 4,
           rowStart: 2,
           rowSpan: 1,
-          tabletColSpan: 12,
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
         {
           name: 'table',
           content: widget.tableContent,
-          colStart: 7,
-          colSpan: 6,
-          rowStart: 2,
+          colStart: 9,
+          colSpan: 4,
+          rowStart: 3,
           rowSpan: 1,
-          tabletColSpan: 12,
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
       ];

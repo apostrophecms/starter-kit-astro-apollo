@@ -36,10 +36,10 @@ const presetConfigs = {
   twoMainAside: { rows: 4 },
   headerTwoColFooter: { rows: 3 },
   featuredThreeGrid: { rows: 2 },
-  magazineLayout: { rows: 3, gap: '1.5rem' },
-  contentHub: { rows: 5, gap: '2rem' },
+  magazineLayout: { rows: 2, gap: '1.5rem' },
+  contentHub: { rows: 3, gap: '2rem' },
   galleryMasonry: { rows: 3 },
-  dashboardLayout: { rows: 2, gap: '1.5rem' },
+  dashboardLayout: { rows: 3, gap: '1.5rem' },
   productShowcase: { rows: 3, gap: '2rem' }
 };
 
@@ -82,6 +82,7 @@ const getLayoutConfig = (widget) => {
 
 // Get the areas and configuration
 const areas = getLayoutAreas(widget);
+console.log('areas', areas);
 const config = getLayoutConfig(widget);
 
 // Build classes for the layout
@@ -160,7 +161,6 @@ const layoutClasses = [
 
     .custom-layout-area {
       grid-column: span var(--tablet-col-span);
-      grid-row: auto;
     }
   }
 

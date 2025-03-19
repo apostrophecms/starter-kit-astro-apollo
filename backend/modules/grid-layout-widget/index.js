@@ -300,41 +300,25 @@ export default {
             ]
           }
         },
-        headlineContent: {
+        featureContent: {
           type: 'area',
-          label: 'Headline Content',
+          label: 'Feature Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'magazineLayout'
           }
         },
-        sidebarContent: {
+        topSidebarContent: {
           type: 'area',
-          label: 'Sidebar Content',
+          label: 'Top Sidebar Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'magazineLayout'
           }
         },
-        feature1Content: {
+        bottomSidebarContent: {
           type: 'area',
-          label: 'Feature 1',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        feature2Content: {
-          type: 'area',
-          label: 'Feature 2',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        feature3Content: {
-          type: 'area',
-          label: 'Feature 3',
+          label: 'Bottom Sidebar Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'magazineLayout'
@@ -375,14 +359,6 @@ export default {
         section2Content: {
           type: 'area',
           label: 'Section 2',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        fullWidthContent: {
-          type: 'area',
-          label: 'Full Width Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
