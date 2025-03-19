@@ -5,7 +5,7 @@
  * @param {Object} props - Component props
  * @param {Object} props.widget - The widget configuration object from ApostropheCMS
  * @param {string} props.widget._id - Unique identifier for the widget
- * @param {('asideMainThree'|'mainAsideThree'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} props.widget.layoutType - The type of layout to render
+ * @param {('asideMain'|'mainAside'|'asideTwoMain'|'twoMainAside'|'headerTwoColFooter'|'featuredThreeGrid'|'magazineLayout'|'contentHub'|'galleryMasonry'|'dashboardLayout'|'productShowcase'|'custom')} props.widget.layoutType - The type of layout to render
  * @param {Object} [props.widget.customGrid] - Custom grid configuration when layoutType is 'custom'
  * @param {string} [props.widget.maxWidth] - Maximum width constraint for the layout
  * @param {string} [props.widget.overrideClass] - Additional CSS classes to apply
@@ -30,10 +30,10 @@ const GRID_DEFAULTS = {
 
 // Basic preset configurations for different layout types
 const presetConfigs = {
-  asideMainThree: { rows: 3 },
-  mainAsideThree: { rows: 3 },
-  asideTwoMain: { rows: 4 },
-  twoMainAside: { rows: 4 },
+  asideMain: { rows: 2 },
+  mainAside: { rows: 2 },
+  asideTwoMain: { rows: 2 },
+  twoMainAside: { rows: 2 },
   headerTwoColFooter: { rows: 3 },
   featuredThreeGrid: { rows: 2 },
   magazineLayout: { rows: 2, gap: '1.5rem' },
@@ -82,7 +82,6 @@ const getLayoutConfig = (widget) => {
 
 // Get the areas and configuration
 const areas = getLayoutAreas(widget);
-console.log('areas', areas);
 const config = getLayoutConfig(widget);
 
 // Build classes for the layout

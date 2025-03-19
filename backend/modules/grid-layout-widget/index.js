@@ -30,6 +30,23 @@ export default {
       join(__dirname, 'layoutPreviews.html'),
       'utf8'
     );
+
+    const standardLayoutsCondition = {
+      $or: [
+        { layoutType: 'asideMain' },
+        { layoutType: 'mainAside' },
+        { layoutType: 'asideTwoMain' },
+        { layoutType: 'twoMainAside' },
+        { layoutType: 'headerTwoColFooter' },
+        { layoutType: 'featuredThreeGrid' },
+        { layoutType: 'magazineLayout' },
+        { layoutType: 'contentHub' },
+        { layoutType: 'galleryMasonry' },
+        { layoutType: 'dashboardLayout' },
+        { layoutType: 'productShowcase' }
+      ]
+    };
+
     return {
       add: {
         layoutType: {
@@ -40,11 +57,11 @@ export default {
           choices: [
             {
               label: 'Aside + Main Content',
-              value: 'asideMainThree'
+              value: 'asideMain'
             },
             {
               label: 'Main Content + Aside',
-              value: 'mainAsideThree'
+              value: 'mainAside'
             },
             {
               label: 'Aside + Two Main Sections',
@@ -103,21 +120,7 @@ export default {
         areaStyles: {
           type: 'object',
           label: 'Area Styling',
-          if: {
-            $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' },
-              { layoutType: 'asideTwoMain' },
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'headerTwoColFooter' },
-              { layoutType: 'featuredThreeGrid' },
-              { layoutType: 'magazineLayout' },
-              { layoutType: 'contentHub' },
-              { layoutType: 'galleryMasonry' },
-              { layoutType: 'dashboardLayout' },
-              { layoutType: 'productShowcase' }
-            ]
-          },
+          if: standardLayoutsCondition,
           fields: {
             add: {
               minHeight: {
@@ -181,47 +184,37 @@ export default {
             }
           }
         },
-        asideContent: {
-          type: 'area',
-          label: 'Aside Content',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' }
-            ]
-          }
-        },
         mainContent: {
           type: 'area',
-          label: 'Main Content',
+          label: 'Main Content Area',
+          options: baseAreaConfig,
+          if: standardLayoutsCondition
+        },
+        primaryAsideContent: {
+          type: 'area',
+          label: 'Primary Aside',
+          options: baseAreaConfig,
+          if: standardLayoutsCondition
+        },
+        secondaryAsideContent: {
+          type: 'area',
+          label: 'Secondary Aside or Main',
           options: baseAreaConfig,
           if: {
             $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' }
+              { layoutType: 'twoMainAside' },
+              { layoutType: 'asideTwoMain' },
+              { layoutType: 'magazineLayout' },
+              { layoutType: 'featuredThreeGrid' },
+              { layoutType: 'galleryMasonry' },
+              { layoutType: 'dashboardLayout' }
             ]
           }
         },
+        // Layout-specific content areas
         headerContent: {
           type: 'area',
           label: 'Header Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'headerTwoColFooter'
-          }
-        },
-        leftColumnContent: {
-          type: 'area',
-          label: 'Left Column',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'headerTwoColFooter'
-          }
-        },
-        rightColumnContent: {
-          type: 'area',
-          label: 'Right Column',
           options: baseAreaConfig,
           if: {
             layoutType: 'headerTwoColFooter'
@@ -235,30 +228,6 @@ export default {
             layoutType: 'headerTwoColFooter'
           }
         },
-        featuredContent: {
-          type: 'area',
-          label: 'Featured Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
-        columnOneContent: {
-          type: 'area',
-          label: 'Column One',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
-        columnTwoContent: {
-          type: 'area',
-          label: 'Column Two',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
         columnThreeContent: {
           type: 'area',
           label: 'Column Three',
@@ -267,82 +236,9 @@ export default {
             layoutType: 'featuredThreeGrid'
           }
         },
-        asideLongContent: {
+        headlineContent: {
           type: 'area',
-          label: 'Aside Content (Full Height)',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
-        mainTopContent: {
-          type: 'area',
-          label: 'Main Content - Top Section',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
-        mainBottomContent: {
-          type: 'area',
-          label: 'Main Content - Bottom Section',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
-        featureContent: {
-          type: 'area',
-          label: 'Feature Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        topSidebarContent: {
-          type: 'area',
-          label: 'Top Sidebar Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        bottomSidebarContent: {
-          type: 'area',
-          label: 'Bottom Sidebar Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        heroContent: {
-          type: 'area',
-          label: 'Hero Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        featuredHubContent: {
-          type: 'area',
-          label: 'Featured Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        quickLinksContent: {
-          type: 'area',
-          label: 'Quick Links',
+          label: 'Headline Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
@@ -350,7 +246,7 @@ export default {
         },
         section1Content: {
           type: 'area',
-          label: 'Section 1',
+          label: 'Footer Section 1',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
@@ -358,90 +254,26 @@ export default {
         },
         section2Content: {
           type: 'area',
-          label: 'Section 2',
+          label: 'Footer Section 2',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
           }
         },
-        galleryFeaturedContent: {
-          type: 'area',
-          label: 'Featured Gallery Item',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
-          }
-        },
-        gallerySide1Content: {
-          type: 'area',
-          label: 'Side Gallery Item 1',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
-          }
-        },
-        gallerySide2Content: {
-          type: 'area',
-          label: 'Side Gallery Item 2',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
-          }
-        },
         galleryBottomContent: {
           type: 'area',
-          label: 'Bottom Gallery Item',
+          label: 'Bottom Footer Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'galleryMasonry'
           }
         },
-        mainMetricContent: {
+        tertiaryAsideContent: {
           type: 'area',
-          label: 'Main Metric',
+          label: 'Tertiary Aside Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'dashboardLayout'
-          }
-        },
-        sideMetricsContent: {
-          type: 'area',
-          label: 'Side Metrics',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        chartContent: {
-          type: 'area',
-          label: 'Chart',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        tableContent: {
-          type: 'area',
-          label: 'Table',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        mainProductContent: {
-          type: 'area',
-          label: 'Main Product',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'productShowcase'
-          }
-        },
-        productDetailsContent: {
-          type: 'area',
-          label: 'Product Details',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'productShowcase'
           }
         },
         related1Content: {
