@@ -18,6 +18,9 @@ export default {
   icons: {
     'view-grid': 'ViewGrid'
   },
+  init(self) {
+    self.apos.migration.add('fix-areas', self.migrateAreaNames);
+  },
   // We need to pass fields as a function to allow for the preview HTML
   fields(self, options) {
     // Get base widget configuration for all areas
@@ -409,6 +412,238 @@ export default {
             addOverride: true
           }
         }
+      }
+    };
+  },
+  methods(self) {
+    return {
+      async migrateAreaNames() {
+        // Track updates for logging
+        let widgetsUpdated = 0;
+
+        await self.apos.migration.eachWidget(
+          {},
+          async (doc, widget, dotPath) => {
+            if (widget.type !== 'grid-layout') {
+              return;
+            };
+            const updates = {};
+            let hasUpdates = false;
+
+            // Handle layout type changes
+            if (widget.layoutType === 'asideMainThree') {
+              updates[`${dotPath}.layoutType`] = 'asideMain';
+              hasUpdates = true;
+
+              // Map specific areas to standardized areas
+              if (widget.asideContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideContent;
+                updates[`${dotPath}.asideContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'mainAsideThree') {
+              updates[`${dotPath}.layoutType`] = 'mainAside';
+              hasUpdates = true;
+
+              // Map specific areas to standardized areas
+              if (widget.asideContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideContent;
+                updates[`${dotPath}.asideContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'headerTwoColFooter') {
+              // Layout name stays the same but areas changed
+              if (widget.leftColumnContent) {
+                updates[`${dotPath}.mainContent`] = widget.leftColumnContent;
+                updates[`${dotPath}.leftColumnContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.rightColumnContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.rightColumnContent;
+                updates[`${dotPath}.rightColumnContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'featuredThreeGrid') {
+              // Update area names
+              if (widget.featuredContent) {
+                updates[`${dotPath}.mainContent`] = widget.featuredContent;
+                updates[`${dotPath}.featuredContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.columnOneContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.columnOneContent;
+                updates[`${dotPath}.columnOneContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.columnTwoContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.columnTwoContent;
+                updates[`${dotPath}.columnTwoContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'twoMainAside' || widget.layoutType === 'asideTwoMain') {
+              // Map specific areas to standardized areas
+              if (widget.asideLongContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideLongContent;
+                updates[`${dotPath}.asideLongContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.mainTopContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainTopContent;
+                updates[`${dotPath}.mainTopContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.mainBottomContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.mainBottomContent;
+                updates[`${dotPath}.mainBottomContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'magazineLayout') {
+              // Map specific areas to standardized areas
+              if (widget.headlineContent) {
+                updates[`${dotPath}.mainContent`] = widget.headlineContent;
+                updates[`${dotPath}.headlineContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.sidebarContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.sidebarContent;
+                updates[`${dotPath}.sidebarContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.feature1Content) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.feature1Content;
+                updates[`${dotPath}.feature1Content`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'contentHub') {
+              // Map specific areas to standardized areas
+              if (widget.heroContent) {
+                updates[`${dotPath}.mainContent`] = widget.heroContent;
+                updates[`${dotPath}.heroContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.featuredHubContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.featuredHubContent;
+                updates[`${dotPath}.featuredHubContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.quickLinksContent) {
+                updates[`${dotPath}.headlineContent`] = widget.quickLinksContent;
+                updates[`${dotPath}.quickLinksContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'galleryMasonry') {
+              // Map specific areas to standardized areas
+              if (widget.galleryFeaturedContent) {
+                updates[`${dotPath}.mainContent`] = widget.galleryFeaturedContent;
+                updates[`${dotPath}.galleryFeaturedContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.gallerySide1Content) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.gallerySide1Content;
+                updates[`${dotPath}.gallerySide1Content`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.gallerySide2Content) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.gallerySide2Content;
+                updates[`${dotPath}.gallerySide2Content`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'dashboardLayout') {
+              // Map specific areas to standardized areas
+              if (widget.mainMetricContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainMetricContent;
+                updates[`${dotPath}.mainMetricContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.sideMetricsContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.sideMetricsContent;
+                updates[`${dotPath}.sideMetricsContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.chartContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.chartContent;
+                updates[`${dotPath}.chartContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.tableContent) {
+                updates[`${dotPath}.tertiaryAsideContent`] = widget.tableContent;
+                updates[`${dotPath}.tableContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'productShowcase') {
+              // Map specific areas to standardized areas
+              if (widget.mainProductContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainProductContent;
+                updates[`${dotPath}.mainProductContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.productDetailsContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.productDetailsContent;
+                updates[`${dotPath}.productDetailsContent`] = null;
+                hasUpdates = true;
+              }
+            }
+
+            // Only update the document if we have changes to make
+            if (hasUpdates) {
+              widgetsUpdated++;
+
+              // Create a $unset object for fields we want to completely remove
+              const unsetObj = {};
+
+              for (const key in updates) {
+                if (updates[key] === null) {
+                  // Add to unset and remove from updates
+                  unsetObj[key] = '';
+                  delete updates[key];
+                }
+              }
+
+              const updateObj = {};
+              if (Object.keys(updates).length > 0) {
+                updateObj.$set = updates;
+              }
+
+              if (Object.keys(unsetObj).length > 0) {
+                updateObj.$unset = unsetObj;
+              }
+
+              // Only perform update if we have operations to do
+              if (Object.keys(updateObj).length > 0) {
+                return self.apos.doc.db.updateOne(
+                  { _id: doc._id },
+                  updateObj
+                );
+              }
+            }
+          }
+        );
+
+        console.log(`Grid layout migration complete. Updated ${widgetsUpdated} widgets.`);
       }
     };
   }
