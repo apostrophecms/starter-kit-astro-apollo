@@ -1,10 +1,10 @@
 export const getLayoutAreas = (widget) => {
   switch (widget.layoutType) {
-    case 'asideMainThree':
+    case 'asideMain':
       return [
         {
           name: 'aside',
-          content: widget.asideContent,
+          content: widget.primaryAsideContent,
           colStart: 1,
           colSpan: 4,
           rowStart: 1,
@@ -24,7 +24,7 @@ export const getLayoutAreas = (widget) => {
         },
       ];
 
-    case 'mainAsideThree':
+    case 'mainAside':
       return [
         {
           name: 'main',
@@ -38,7 +38,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'aside',
-          content: widget.asideContent,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
@@ -52,32 +52,32 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'aside',
-          content: widget.asideLongContent,
+          content: widget.primaryAsideContent,
           colStart: 1,
           colSpan: 4,
           rowStart: 1,
           rowSpan: 4,
-          tabletColSpan: 4,  // Change from 12 to 4
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
         {
           name: 'main-top',
-          content: widget.mainTopContent,
+          content: widget.mainContent,
           colStart: 5,
           colSpan: 8,
           rowStart: 1,
           rowSpan: 2,
-          tabletColSpan: 8,  // Change from 12 to 8
+          tabletColSpan: 8,
           mobileColSpan: 12,
         },
         {
           name: 'main-bottom',
-          content: widget.mainBottomContent,
+          content: widget.secondaryAsideContent,
           colStart: 5,
           colSpan: 8,
           rowStart: 3,
           rowSpan: 2,
-          tabletColSpan: 8,  // Change from 12 to 8
+          tabletColSpan: 8,
           mobileColSpan: 12,
         },
       ];
@@ -86,32 +86,32 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'main-top',
-          content: widget.mainTopContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
           rowSpan: 2,
-          tabletColSpan: 8,  // Change from 12 to 8
+          tabletColSpan: 8,
           mobileColSpan: 12,
         },
         {
           name: 'main-bottom',
-          content: widget.mainBottomContent,
+          content: widget.secondaryAsideContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 3,
           rowSpan: 2,
-          tabletColSpan: 8,  // Change from 12 to 8
+          tabletColSpan: 8,
           mobileColSpan: 12,
         },
         {
           name: 'aside',
-          content: widget.asideLongContent,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
           rowSpan: 4,
-          tabletColSpan: 4,  // Change from 12 to 4
+          tabletColSpan: 4,
           mobileColSpan: 12,
         },
       ];
@@ -130,7 +130,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'left',
-          content: widget.leftColumnContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 6,
           rowStart: 2,
@@ -140,7 +140,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'right',
-          content: widget.rightColumnContent,
+          content: widget.primaryAsideContent,
           colStart: 7,
           colSpan: 6,
           rowStart: 2,
@@ -164,7 +164,7 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'featured',
-          content: widget.featuredContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 12,
           rowStart: 1,
@@ -174,7 +174,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'col1',
-          content: widget.columnOneContent,
+          content: widget.primaryAsideContent,
           colStart: 1,
           colSpan: 4,
           rowStart: 2,
@@ -184,7 +184,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'col2',
-          content: widget.columnTwoContent,
+          content: widget.secondaryAsideContent,
           colStart: 5,
           colSpan: 4,
           rowStart: 2,
@@ -208,7 +208,7 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'feature',
-          content: widget.featureContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
@@ -218,7 +218,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'topSidebar',
-          content: widget.topSidebarContent,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
@@ -228,7 +228,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'bottomSidebar',
-          content: widget.bottomSidebarContent,
+          content: widget.secondaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 2,
@@ -241,8 +241,8 @@ export const getLayoutAreas = (widget) => {
     case 'contentHub':
       return [
         {
-          name: 'hero',
-          content: widget.heroContent,
+          name: 'headline',
+          content: widget.headlineContent,
           colStart: 1,
           colSpan: 12,
           rowStart: 1,
@@ -252,7 +252,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'featured',
-          content: widget.featuredHubContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 2,
@@ -262,7 +262,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'quickLinks',
-          content: widget.quickLinksContent,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 2,
@@ -296,7 +296,7 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'featured',
-          content: widget.galleryFeaturedContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
@@ -306,7 +306,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'side1',
-          content: widget.gallerySide1Content,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
@@ -316,7 +316,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'side2',
-          content: widget.gallerySide2Content,
+          content: widget.secondaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 2,
@@ -340,7 +340,7 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'mainMetric',
-          content: widget.mainMetricContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 8,
           rowStart: 1,
@@ -350,7 +350,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'sideMetrics',
-          content: widget.sideMetricsContent,
+          content: widget.primaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 1,
@@ -360,7 +360,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'chart',
-          content: widget.chartContent,
+          content: widget.secondaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 2,
@@ -370,7 +370,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'table',
-          content: widget.tableContent,
+          content: widget.tertiaryAsideContent,
           colStart: 9,
           colSpan: 4,
           rowStart: 3,
@@ -384,7 +384,7 @@ export const getLayoutAreas = (widget) => {
       return [
         {
           name: 'mainProduct',
-          content: widget.mainProductContent,
+          content: widget.mainContent,
           colStart: 1,
           colSpan: 6,
           rowStart: 1,
@@ -394,7 +394,7 @@ export const getLayoutAreas = (widget) => {
         },
         {
           name: 'details',
-          content: widget.productDetailsContent,
+          content: widget.primaryAsideContent,
           colStart: 7,
           colSpan: 6,
           rowStart: 1,
