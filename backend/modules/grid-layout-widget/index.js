@@ -18,6 +18,9 @@ export default {
   icons: {
     'view-grid': 'ViewGrid'
   },
+  init(self) {
+    self.apos.migration.add('fix-areas', self.migrateAreaNames);
+  },
   // We need to pass fields as a function to allow for the preview HTML
   fields(self, options) {
     // Get base widget configuration for all areas
@@ -30,6 +33,23 @@ export default {
       join(__dirname, 'layoutPreviews.html'),
       'utf8'
     );
+
+    const standardLayoutsCondition = {
+      $or: [
+        { layoutType: 'asideMain' },
+        { layoutType: 'mainAside' },
+        { layoutType: 'asideTwoMain' },
+        { layoutType: 'twoMainAside' },
+        { layoutType: 'headerTwoColFooter' },
+        { layoutType: 'featuredThreeGrid' },
+        { layoutType: 'magazineLayout' },
+        { layoutType: 'contentHub' },
+        { layoutType: 'galleryMasonry' },
+        { layoutType: 'dashboardLayout' },
+        { layoutType: 'productShowcase' }
+      ]
+    };
+
     return {
       add: {
         layoutType: {
@@ -40,11 +60,11 @@ export default {
           choices: [
             {
               label: 'Aside + Main Content',
-              value: 'asideMainThree'
+              value: 'asideMain'
             },
             {
               label: 'Main Content + Aside',
-              value: 'mainAsideThree'
+              value: 'mainAside'
             },
             {
               label: 'Aside + Two Main Sections',
@@ -103,21 +123,7 @@ export default {
         areaStyles: {
           type: 'object',
           label: 'Area Styling',
-          if: {
-            $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' },
-              { layoutType: 'asideTwoMain' },
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'headerTwoColFooter' },
-              { layoutType: 'featuredThreeGrid' },
-              { layoutType: 'magazineLayout' },
-              { layoutType: 'contentHub' },
-              { layoutType: 'galleryMasonry' },
-              { layoutType: 'dashboardLayout' },
-              { layoutType: 'productShowcase' }
-            ]
-          },
+          if: standardLayoutsCondition,
           fields: {
             add: {
               minHeight: {
@@ -181,47 +187,37 @@ export default {
             }
           }
         },
-        asideContent: {
-          type: 'area',
-          label: 'Aside Content',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' }
-            ]
-          }
-        },
         mainContent: {
           type: 'area',
-          label: 'Main Content',
+          label: 'Main Content Area',
+          options: baseAreaConfig,
+          if: standardLayoutsCondition
+        },
+        primaryAsideContent: {
+          type: 'area',
+          label: 'Primary Aside',
+          options: baseAreaConfig,
+          if: standardLayoutsCondition
+        },
+        secondaryAsideContent: {
+          type: 'area',
+          label: 'Secondary Aside or Main',
           options: baseAreaConfig,
           if: {
             $or: [
-              { layoutType: 'asideMainThree' },
-              { layoutType: 'mainAsideThree' }
+              { layoutType: 'twoMainAside' },
+              { layoutType: 'asideTwoMain' },
+              { layoutType: 'magazineLayout' },
+              { layoutType: 'featuredThreeGrid' },
+              { layoutType: 'galleryMasonry' },
+              { layoutType: 'dashboardLayout' }
             ]
           }
         },
+        // Layout-specific content areas
         headerContent: {
           type: 'area',
           label: 'Header Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'headerTwoColFooter'
-          }
-        },
-        leftColumnContent: {
-          type: 'area',
-          label: 'Left Column',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'headerTwoColFooter'
-          }
-        },
-        rightColumnContent: {
-          type: 'area',
-          label: 'Right Column',
           options: baseAreaConfig,
           if: {
             layoutType: 'headerTwoColFooter'
@@ -235,30 +231,6 @@ export default {
             layoutType: 'headerTwoColFooter'
           }
         },
-        featuredContent: {
-          type: 'area',
-          label: 'Featured Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
-        columnOneContent: {
-          type: 'area',
-          label: 'Column One',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
-        columnTwoContent: {
-          type: 'area',
-          label: 'Column Two',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'featuredThreeGrid'
-          }
-        },
         columnThreeContent: {
           type: 'area',
           label: 'Column Three',
@@ -267,98 +239,9 @@ export default {
             layoutType: 'featuredThreeGrid'
           }
         },
-        asideLongContent: {
-          type: 'area',
-          label: 'Aside Content (Full Height)',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
-        mainTopContent: {
-          type: 'area',
-          label: 'Main Content - Top Section',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
-        mainBottomContent: {
-          type: 'area',
-          label: 'Main Content - Bottom Section',
-          options: baseAreaConfig,
-          if: {
-            $or: [
-              { layoutType: 'twoMainAside' },
-              { layoutType: 'asideTwoMain' }
-            ]
-          }
-        },
         headlineContent: {
           type: 'area',
           label: 'Headline Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        sidebarContent: {
-          type: 'area',
-          label: 'Sidebar Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        feature1Content: {
-          type: 'area',
-          label: 'Feature 1',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        feature2Content: {
-          type: 'area',
-          label: 'Feature 2',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        feature3Content: {
-          type: 'area',
-          label: 'Feature 3',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'magazineLayout'
-          }
-        },
-        heroContent: {
-          type: 'area',
-          label: 'Hero Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        featuredHubContent: {
-          type: 'area',
-          label: 'Featured Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        quickLinksContent: {
-          type: 'area',
-          label: 'Quick Links',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
@@ -366,7 +249,7 @@ export default {
         },
         section1Content: {
           type: 'area',
-          label: 'Section 1',
+          label: 'Footer Section 1',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
@@ -374,98 +257,26 @@ export default {
         },
         section2Content: {
           type: 'area',
-          label: 'Section 2',
+          label: 'Footer Section 2',
           options: baseAreaConfig,
           if: {
             layoutType: 'contentHub'
-          }
-        },
-        fullWidthContent: {
-          type: 'area',
-          label: 'Full Width Content',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'contentHub'
-          }
-        },
-        galleryFeaturedContent: {
-          type: 'area',
-          label: 'Featured Gallery Item',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
-          }
-        },
-        gallerySide1Content: {
-          type: 'area',
-          label: 'Side Gallery Item 1',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
-          }
-        },
-        gallerySide2Content: {
-          type: 'area',
-          label: 'Side Gallery Item 2',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'galleryMasonry'
           }
         },
         galleryBottomContent: {
           type: 'area',
-          label: 'Bottom Gallery Item',
+          label: 'Bottom Footer Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'galleryMasonry'
           }
         },
-        mainMetricContent: {
+        tertiaryAsideContent: {
           type: 'area',
-          label: 'Main Metric',
+          label: 'Tertiary Aside Content',
           options: baseAreaConfig,
           if: {
             layoutType: 'dashboardLayout'
-          }
-        },
-        sideMetricsContent: {
-          type: 'area',
-          label: 'Side Metrics',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        chartContent: {
-          type: 'area',
-          label: 'Chart',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        tableContent: {
-          type: 'area',
-          label: 'Table',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'dashboardLayout'
-          }
-        },
-        mainProductContent: {
-          type: 'area',
-          label: 'Main Product',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'productShowcase'
-          }
-        },
-        productDetailsContent: {
-          type: 'area',
-          label: 'Product Details',
-          options: baseAreaConfig,
-          if: {
-            layoutType: 'productShowcase'
           }
         },
         related1Content: {
@@ -601,6 +412,238 @@ export default {
             addOverride: true
           }
         }
+      }
+    };
+  },
+  methods(self) {
+    return {
+      async migrateAreaNames() {
+        // Track updates for logging
+        let widgetsUpdated = 0;
+
+        await self.apos.migration.eachWidget(
+          {},
+          async (doc, widget, dotPath) => {
+            if (widget.type !== 'grid-layout') {
+              return;
+            };
+            const updates = {};
+            let hasUpdates = false;
+
+            // Handle layout type changes
+            if (widget.layoutType === 'asideMainThree') {
+              updates[`${dotPath}.layoutType`] = 'asideMain';
+              hasUpdates = true;
+
+              // Map specific areas to standardized areas
+              if (widget.asideContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideContent;
+                updates[`${dotPath}.asideContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'mainAsideThree') {
+              updates[`${dotPath}.layoutType`] = 'mainAside';
+              hasUpdates = true;
+
+              // Map specific areas to standardized areas
+              if (widget.asideContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideContent;
+                updates[`${dotPath}.asideContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'headerTwoColFooter') {
+              // Layout name stays the same but areas changed
+              if (widget.leftColumnContent) {
+                updates[`${dotPath}.mainContent`] = widget.leftColumnContent;
+                updates[`${dotPath}.leftColumnContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.rightColumnContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.rightColumnContent;
+                updates[`${dotPath}.rightColumnContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'featuredThreeGrid') {
+              // Update area names
+              if (widget.featuredContent) {
+                updates[`${dotPath}.mainContent`] = widget.featuredContent;
+                updates[`${dotPath}.featuredContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.columnOneContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.columnOneContent;
+                updates[`${dotPath}.columnOneContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.columnTwoContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.columnTwoContent;
+                updates[`${dotPath}.columnTwoContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'twoMainAside' || widget.layoutType === 'asideTwoMain') {
+              // Map specific areas to standardized areas
+              if (widget.asideLongContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.asideLongContent;
+                updates[`${dotPath}.asideLongContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.mainTopContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainTopContent;
+                updates[`${dotPath}.mainTopContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.mainBottomContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.mainBottomContent;
+                updates[`${dotPath}.mainBottomContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'magazineLayout') {
+              // Map specific areas to standardized areas
+              if (widget.headlineContent) {
+                updates[`${dotPath}.mainContent`] = widget.headlineContent;
+                updates[`${dotPath}.headlineContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.sidebarContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.sidebarContent;
+                updates[`${dotPath}.sidebarContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.feature1Content) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.feature1Content;
+                updates[`${dotPath}.feature1Content`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'contentHub') {
+              // Map specific areas to standardized areas
+              if (widget.heroContent) {
+                updates[`${dotPath}.mainContent`] = widget.heroContent;
+                updates[`${dotPath}.heroContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.featuredHubContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.featuredHubContent;
+                updates[`${dotPath}.featuredHubContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.quickLinksContent) {
+                updates[`${dotPath}.headlineContent`] = widget.quickLinksContent;
+                updates[`${dotPath}.quickLinksContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'galleryMasonry') {
+              // Map specific areas to standardized areas
+              if (widget.galleryFeaturedContent) {
+                updates[`${dotPath}.mainContent`] = widget.galleryFeaturedContent;
+                updates[`${dotPath}.galleryFeaturedContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.gallerySide1Content) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.gallerySide1Content;
+                updates[`${dotPath}.gallerySide1Content`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.gallerySide2Content) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.gallerySide2Content;
+                updates[`${dotPath}.gallerySide2Content`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'dashboardLayout') {
+              // Map specific areas to standardized areas
+              if (widget.mainMetricContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainMetricContent;
+                updates[`${dotPath}.mainMetricContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.sideMetricsContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.sideMetricsContent;
+                updates[`${dotPath}.sideMetricsContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.chartContent) {
+                updates[`${dotPath}.secondaryAsideContent`] = widget.chartContent;
+                updates[`${dotPath}.chartContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.tableContent) {
+                updates[`${dotPath}.tertiaryAsideContent`] = widget.tableContent;
+                updates[`${dotPath}.tableContent`] = null;
+                hasUpdates = true;
+              }
+            }
+            else if (widget.layoutType === 'productShowcase') {
+              // Map specific areas to standardized areas
+              if (widget.mainProductContent) {
+                updates[`${dotPath}.mainContent`] = widget.mainProductContent;
+                updates[`${dotPath}.mainProductContent`] = null;
+                hasUpdates = true;
+              }
+
+              if (widget.productDetailsContent) {
+                updates[`${dotPath}.primaryAsideContent`] = widget.productDetailsContent;
+                updates[`${dotPath}.productDetailsContent`] = null;
+                hasUpdates = true;
+              }
+            }
+
+            // Only update the document if we have changes to make
+            if (hasUpdates) {
+              widgetsUpdated++;
+
+              // Create a $unset object for fields we want to completely remove
+              const unsetObj = {};
+
+              for (const key in updates) {
+                if (updates[key] === null) {
+                  // Add to unset and remove from updates
+                  unsetObj[key] = '';
+                  delete updates[key];
+                }
+              }
+
+              const updateObj = {};
+              if (Object.keys(updates).length > 0) {
+                updateObj.$set = updates;
+              }
+
+              if (Object.keys(unsetObj).length > 0) {
+                updateObj.$unset = unsetObj;
+              }
+
+              // Only perform update if we have operations to do
+              if (Object.keys(updateObj).length > 0) {
+                return self.apos.doc.db.updateOne(
+                  { _id: doc._id },
+                  updateObj
+                );
+              }
+            }
+          }
+        );
+
+        console.log(`Grid layout migration complete. Updated ${widgetsUpdated} widgets.`);
       }
     };
   }
