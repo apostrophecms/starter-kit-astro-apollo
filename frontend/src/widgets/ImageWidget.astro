@@ -5,6 +5,7 @@
  * Content editors only need to:
  * - Upload an image
  * - Set alt text
+ * - Set width using the range slider, zero for class based styling
  * - Optionally set a focal point
  *
  * @param {Object} props
@@ -40,6 +41,9 @@ const alt = image?.alt || '';
 const width = image ? getWidth(image) : undefined;
 const height = image ? getHeight(image) : undefined;
 const aspectRatio = width && height ? `${width}/${height}` : undefined;
+
+// Get the width from the range slider
+const sliderWidth = widget?.width || 0;
 ---
 
 <style>
@@ -62,6 +66,7 @@ class={`img-widget mb-6 ${imageOptions?.additionalClasses || ''}`}
   style={`
     object-position: ${objectPosition};
     ${aspectRatio ? `--aspect-ratio: ${aspectRatio};` : ''}
+    ${sliderWidth > 0 ? `width: ${sliderWidth}%;` : ''}
   `.trim()}
   width={width}
   height={height}
