@@ -12,13 +12,15 @@
  * @returns {astro.AstroComponent} - Rendered image component
  */
 
+import sluggo from "sluggo";
 import {
   getAttachmentUrl,
   getAttachmentSrcset,
   getFocalPoint,
   getWidth,
-  getHeight
-} from '../lib/attachments.js';
+  getHeight,
+} from "../lib/attachments.js";
+import Figure from "../components/Figure.astro";
 
 const { widget, imageOptions } = Astro.props;
 const placeholder = widget?.aposPlaceholder;
@@ -26,43 +28,59 @@ const image = widget?._image?.[0];
 
 // Handle missing image gracefully
 if (!placeholder && !image) {
-  console.warn('Image widget: No image or placeholder provided');
+  console.warn("Image widget: No image or placeholder provided");
 }
 
 const src = placeholder
-  ? '/images/image-widget-placeholder.jpg'
+  ? "/images/image-widget-placeholder.jpg"
   : getAttachmentUrl(image);
-const srcset = placeholder ? '' : getAttachmentSrcset(image);
-const objectPosition = placeholder ? 'center center' : getFocalPoint(image);
-const alt = image?.alt || '';
+const srcset = placeholder ? "" : getAttachmentSrcset(image);
+const objectPosition = placeholder ? "center center" : getFocalPoint(image);
+const alt = image?.alt || "";
 
 // Only add width/height if they exist to prevent layout shift
 const width = image ? getWidth(image) : undefined;
 const height = image ? getHeight(image) : undefined;
 const aspectRatio = width && height ? `${width}/${height}` : undefined;
+const imageProps = {
+  src,
+  alt,
+  style: "img-widget__image",
+  srcset,
+  objectPosition,
+  width,
+  height,
+  aspectRatio,
+};
+let link = {
+  url: widget.linkHref,
+  title: widget.linkHrefTitle || widget.caption,
+  target: widget.linkTarget,
+  rel: null,
+};
+switch (widget.linkTo) {
+  case "none": {
+    link = null;
+    break;
+  }
+  case "_url": {
+    link.rel = widget.target === "_blank" ? "noopener noreferrer" : null;
+    break;
+  }
+  default: {
+    // slugify the linkTo value to reference the widget field.
+    const name = "_" + sluggo(widget.linkTo);
+    const item = widget[name]?.[0];
+    link.url = item?._url;
+    link.title = widget.linkTitle || item?.title;
+    break;
+  }
+}
 ---
 
-<style>
-  .img-widget {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-    aspect-ratio: var(--aspect-ratio, auto);
-  }
-</style>
-
-<img
-class={`img-widget mb-6 ${imageOptions?.additionalClasses || ''}`}
-  src={src}
-  alt={alt}
-  loading="lazy"
-  decoding="async"
-  srcset={srcset}
-  style={`
-    object-position: ${objectPosition};
-    ${aspectRatio ? `--aspect-ratio: ${aspectRatio};` : ''}
-  `.trim()}
-  width={width}
-  height={height}
+<Figure
+  image={imageProps}
+  {link}
+  caption={widget.caption}
+  style={`img-widget mb-6 ${imageOptions?.additionalClasses || ""}`}
 />

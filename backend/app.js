@@ -23,7 +23,8 @@ export default apostrophe({
     '@apostrophecms/asset': {},
 
     // Custom extensions
-    // Make sure to set the `APOS_BASE_URL` environment variable to the base URL of your Apostrophe site
+    // Make sure to set the `APOS_BASE_URL` environment variable to the base
+    // URL of your Apostrophe site
     '@apostrophecms/seo': {},
 
     // pieces
