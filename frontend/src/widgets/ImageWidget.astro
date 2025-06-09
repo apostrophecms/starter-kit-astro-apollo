@@ -12,14 +12,14 @@
  * @returns {astro.AstroComponent} - Rendered image component
  */
 
-import sluggo from "sluggo";
 import {
   getAttachmentUrl,
   getAttachmentSrcset,
   getFocalPoint,
   getWidth,
   getHeight,
-} from "../lib/attachments.js";
+} from "@apostrophecms/apostrophe-astro/lib/attachment.js";
+import { slugify } from "@apostrophecms/apostrophe-astro/lib/util.js";
 import Figure from "../components/Figure.astro";
 
 const { widget, imageOptions } = Astro.props;
@@ -69,7 +69,7 @@ switch (widget.linkTo) {
   }
   default: {
     // slugify the linkTo value to reference the widget field.
-    const name = "_" + sluggo(widget.linkTo);
+    const name = "_" + slugify(widget.linkTo);
     const item = widget[name]?.[0];
     link.url = item?._url;
     link.title = widget.linkTitle || item?.title;
