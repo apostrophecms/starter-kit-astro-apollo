@@ -4,7 +4,7 @@
   "description": "Astro frontend for the ApostropheCMS + Astro Apollo template",
   "version": "1.0.0",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "APOS_EXTERNAL_FRONT_KEY=dev astro dev",
     "start": "node ./dist/server/entry.mjs",
     "build": "astro build",
     "serve": "HOST=0.0.0.0 node ./dist/server/entry.mjs",
@@ -16,7 +16,7 @@
     "npm": ">=9.0.0"
   },
   "dependencies": {
-    "@apostrophecms/apostrophe-astro": "^1.2.1",
+    "@apostrophecms/apostrophe-astro": "^1.4.0",
     "@astrojs/node": "^9.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",

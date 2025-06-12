@@ -175,3 +175,15 @@ ol.apos-area-widget__breadcrumbs {
   padding-left: 0;
   margin: 0;
 }
+
+/* Image Widget */
+.img-widget {
+  margin: 0;
+}
+.img-widget img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: var(--aspect-ratio, auto);
+}

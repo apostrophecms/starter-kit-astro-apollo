@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app",
-    "dev": "nodemon",
+    "dev": "APOS_EXTERNAL_FRONT_KEY=dev nodemon",
     "build": "NODE_ENV=production node app @apostrophecms/asset:build",
     "serve": "NODE_ENV=production node app",
     "release": "npm install && npm run build && npm run migrate",
@@ -48,10 +48,10 @@
   "author": "Apostrophe Technologies, Inc.",
   "license": "MIT",
   "dependencies": {
+    "@apostrophecms/mongodb-snapshot": "^1.1.0",
     "@apostrophecms/seo": "^1.3.0",
     "@apostrophecms/vite": "^1.0.0",
-    "apostrophe": "^4.12.0",
-    "@apostrophecms/mongodb-snapshot": "^1.1.0",
+    "apostrophe": "^4.18.0",
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {
