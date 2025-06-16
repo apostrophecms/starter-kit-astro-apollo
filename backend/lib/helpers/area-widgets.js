@@ -16,53 +16,7 @@ export const widgetGroups = {
     widgets: {
       '@apostrophecms/image': {},
       '@apostrophecms/video': {},
-      '@apostrophecms/rich-text': {
-        toolbar: [
-          'styles',
-          '|',
-          'bold',
-          'italic',
-          'strike',
-          'link',
-          'anchor',
-          '|',
-          'bulletList',
-          'orderedList',
-          '|',
-          'alignLeft',
-          'alignCenter',
-          'alignRight',
-          '|',
-          'blockquote',
-          'codeBlock',
-          '|',
-          'horizontalRule',
-          '|',
-          'table',
-          'image',
-          '|',
-          'undo',
-          'redo'
-        ],
-        styles: [
-          {
-            tag: 'p',
-            label: 'Paragraph (P)'
-          },
-          {
-            tag: 'h3',
-            label: 'Heading 3 (H3)'
-          },
-          {
-            tag: 'h4',
-            label: 'Heading 4 (H4)'
-          }
-        ],
-        insert: [
-          'table',
-          'image'
-        ]
-      },
+      '@apostrophecms/rich-text': {},
       slideshow: {},
       hero: {},
       accordion: {},
