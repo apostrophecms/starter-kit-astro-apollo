@@ -1,8 +1,16 @@
 ---
 import AposArea from '@apostrophecms/apostrophe-astro/components/AposArea.astro';
-const { page, user, query } = Astro.props.aposData;
+const { page, user, query, _icon, _article } = Astro.props.aposData;
 const { main } = page;
+const svgSprite = page._icon[0];
+console.log('Icon!!!!!!!!!!!!!!!!!!!', page._icon, page._article)
 ---
 <section class="main-content astro-default-content">
   <AposArea area={main} />
 </section>
+{svgSprite?.file && svgSprite?.svgId && (
+  <svg>
+    <use href={`${svgSprite.file}#${svgSprite.svgId}`}></use>
+  </svg>
+)}
+

@@ -28,7 +28,12 @@ export default apostrophe({
     '@apostrophecms/seo': {},
 
     // pieces
-    article: {},
+    article: {
+      options: {
+        export: true,
+        import: true
+      }
+    },
     author: {},
 
     // pages
@@ -42,6 +47,9 @@ export default apostrophe({
     'hero-widget': {},
     'link-widget': {},
     'slideshow-widget': {},
-    'rows-widget': {}
+    'rows-widget': {},
+    '@apostrophecms/svg-sprite': {},
+    '@apostrophecms/anchors': {},
+    '@apostrophecms/login-totp': {}
   }
 });
