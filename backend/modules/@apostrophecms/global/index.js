@@ -300,50 +300,27 @@ export default {
               ],
               def: 'md'
             },
-            socialPosition: {
-              type: 'select',
-              label: 'Social Icons Position',
-              choices: [
-                { label: 'Top', value: 'top' },
-                { label: 'Bottom', value: 'bottom' }
-              ],
-              def: 'top'
-            },
             // Custom Links
-            footerSections: {
+            footerCustomLinks: {
               type: 'array',
-              label: 'Footer Sections',
-              titleField: 'sectionTitle',
+              label: 'Custom Footer Links',
+              titleField: 'linkText',
               fields: {
                 add: {
-                  sectionTitle: {
+                  linkText: {
                     type: 'string',
-                    label: 'Section Title',
+                    label: 'Link Text',
                     required: true
                   },
-                  links: {
-                    type: 'array',
-                    label: 'Links',
-                    titleField: 'linkText',
-                    fields: {
-                      add: {
-                        linkText: {
-                          type: 'string',
-                          label: 'Link Text',
-                          required: true
-                        },
-                        linkUrl: {
-                          type: 'url',
-                          label: 'Link URL',
-                          required: true
-                        },
-                        openInNewTab: {
-                          type: 'boolean',
-                          label: 'Open in New Tab',
-                          def: false
-                        }
-                      }
-                    }
+                  linkUrl: {
+                    type: 'url',
+                    label: 'Link URL',
+                    required: true
+                  },
+                  openInNewTab: {
+                    type: 'boolean',
+                    label: 'Open in New Tab',
+                    def: false
                   }
                 }
               }
@@ -359,20 +336,6 @@ export default {
               type: 'boolean',
               label: 'Show Current Year',
               def: true
-            },
-            additionalFooterText: {
-              type: 'array',
-              label: 'Additional Footer Text',
-              titleField: 'text',
-              fields: {
-                add: {
-                  text: {
-                    type: 'string',
-                    label: 'Text',
-                    textarea: true
-                  }
-                }
-              }
             }
           }
         }
