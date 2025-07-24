@@ -38,8 +38,9 @@ const linkClasses = [
   'hover-fade'
 ].join(' ');
 
+
 // Extract footer sections
-const footerSections = footer.footerSections || [];
+const footerCustomLinks = footer.footerCustomLinks || [];
 
 // Get link attributes for external links
 const getLinkAttributes = (url: string, openInNewTab?: boolean) => ({
@@ -51,14 +52,13 @@ const getLinkAttributes = (url: string, openInNewTab?: boolean) => ({
     : {})
 });
 
-const socialPosition = footer.socialPosition || 'top';
 const { renderBranding } = useSiteConfig(aposData.global);
 ---
 
 <footer class={footerClasses} role="contentinfo">
   <div class="container">
     {/* Top Social Links */}
-    {footer.socialLinks?.length > 0 && socialPosition === 'top' && (
+    {footer.socialLinks?.length > 0 && (
       <div class="social-links has-text-centered mb-4">
         {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
           const iconName = platformIcons[platform as keyof typeof platformIcons];
@@ -88,88 +88,31 @@ const { renderBranding } = useSiteConfig(aposData.global);
       </div>
     )}
 
-    {/* Main Content Section */}
-    <div class="columns is-multiline is-centered">
-      {footer.showBranding && (
-        <div class="column is-narrow has-text-centered mb-0">
-          <a href="/" class="navbar-item is-size-2" set:html={renderBranding()} />
-        </div>
-      )}
-
-      {/* Navigation Links Section */}
-      {(footerNav.length > 0 || footerSections.length > 0) && (
-        <nav class="column is-12-mobile is-6-tablet is-4-desktop" aria-label="Footer navigation">
-          <div class="columns is-multiline is-centered">
-            {/* Main Navigation */}
-            {footerNav.length > 0 && (
-              <div class="column is-narrow has-text-centered mb-0">
-                <ul class="footer-list">
-                  {footerNav.map((page) => (
-                    <li>
-                      <a 
-                        href={page._url} 
-                        class={`${linkClasses} ${page._url === aposData.page?._url ? 'is-active' : ''}`}
-                      >
-                        {page.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Custom Sections with Links */}
-            {footerSections.map((section) => (
-              <div class="column is-narrow has-text-centered mb-0">
-                <h2 class="footer-heading">{section.sectionTitle}</h2>
-                <ul class="footer-list">
-                  {section.links.map((link) => (
-                    <li>
-                      <a
-                        href={link.linkUrl}
-                        class={linkClasses}
-                        {...getLinkAttributes(link.linkUrl, link.openInNewTab)}
-                      >
-                        {link.linkText}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+    {/* Navigation Links Section */}
+    {footerNav.length > 0 && (
+      <nav class="footer-nav" aria-label="Footer navigation">
+        {/* Main Navigation */}
+        {footerNav.length > 0 && (
+          <ul class="footer-list is-size-6">
+            {footerNav.map((page) => (
+              <li>
+                <a 
+                  href={page._url} 
+                  class={`${linkClasses}`}
+                >
+                  {page.title}
+                </a>
+              </li>
             ))}
-          </div>
-        </nav>
-      )}
-    </div>
+          </ul>
+        )}
+      </nav>
+    )}
 
-    {/* Bottom Social Links */}
-    {footer.socialLinks?.length > 0 && socialPosition === 'bottom' && (
-      <div class="social-links has-text-centered mt-4">
-        {footer.socialLinks.map(({ platform, url, ariaLabel }) => {
-          const iconName = platformIcons[platform as keyof typeof platformIcons];
-          if (!iconName) return null;
-
-          return (
-            <a
-              href={url}
-              class={`${linkClasses} social-icon icon-${footer.socialIconStyle || 'rounded'} ${
-                footer.socialIconSize === 'sm' ? 'is-size-5' : 
-                footer.socialIconSize === 'lg' ? 'is-size-3' : 
-                'is-size-4'
-              }`}
-              {...getLinkAttributes(url)}
-              aria-label={ariaLabel || `Visit our ${platform} page`}
-            >
-              <span class={`icon ${
-                footer.socialIconSize === 'sm' ? 'is-small' : 
-                footer.socialIconSize === 'lg' ? 'is-large' : 
-                'is-medium'
-              }`}>
-                <i class={`fab fa-${iconName}`} aria-hidden="true"></i>
-              </span>
-            </a>
-          );
-        })}
+    {/* Main Content Section */}
+    {footer.showBranding && (
+      <div class="footer-brand column is-narrow has-text-centered mb-0">
+        <a href="/" class="navbar-item is-size-2" set:html={renderBranding()} />
       </div>
     )}
 
@@ -183,6 +126,25 @@ const { renderBranding } = useSiteConfig(aposData.global);
         </small>
       </p>
     </div>
+
+    {/* Custom Links */}
+    {footerCustomLinks.length > 0 && (
+      <nav class="footer-nav footer-nav--custom" aria-label="Footer navigation">
+        {/* Main Navigation */}
+        <ul class="footer-list is-size-7">
+          {footerCustomLinks.map((page) => (
+            <li>
+              <a 
+                href={page.linkUrl}
+                class={`${linkClasses}`} 
+              >
+                {page.linkText}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
   </div>
 </footer>
 
@@ -197,17 +159,25 @@ const { renderBranding } = useSiteConfig(aposData.global);
     }
 
     .footer-list {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
       list-style: none;
       padding: 0;
       margin: 0;
 
-      li {
-        margin-bottom: 0.75rem;
-
-        &:last-child {
+      li:last-child {
           margin-bottom: 0;
-        }
       }
+    }
+
+    .footer-nav--custom {
+      margin: 0.75rem 0;
+    }
+
+    .footer-brand {
+      display: flex;
+      justify-content: center;
     }
 
     a {
@@ -216,10 +186,6 @@ const { renderBranding } = useSiteConfig(aposData.global);
 
       &:hover {
         opacity: 0.8;
-      }
-
-      &.is-active {
-        font-weight: 500;
       }
     }
 
