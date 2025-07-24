@@ -36,7 +36,7 @@ function buildUrl(currentUrl, category) {
 
 <div class="mb-5" >
   <h3 class="title is-4 mb-4">Filter by Category</h3>
-  <div class="tabs is-boxed">
+  <div class="tabs is-boxed is-link-colored">
     <ul>
       {categories.map((cat) => (
         <li class={cat.value === currentCategory ? 'is-active' : ''}>
@@ -51,14 +51,14 @@ function buildUrl(currentUrl, category) {
 
 <style>
   .tabs.is-boxed li.is-active a {
-    background-color: var(--bulma-primary);
-    border-color: var(--bulma-primary);
-    color: #000;
+    background-color: var(--bulma-link) !important;
+    border-color: var(--bulma-link) !important;
+    color: #fff;
   }
 
   .tabs.is-boxed li.is-active a .tag {
     background-color: #fff;
-    color: var(--bulma-primary);
+    color: var(--bulma-link) !important;
   }
 
 </style>
