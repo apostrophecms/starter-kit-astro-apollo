@@ -1,403 +1,297 @@
 #!/usr/bin/env node
 // scripts/generate-static-site.js
+//
+// Builds the Astro site, starts a local preview server, generates a sitemap by
+// reading from an ApostropheCMS backend, crawls all pages concurrently, writes
+// HTML to a static output directory, copies Astro assets, and pulls Apostrophe
+// uploads either from local FS (monorepo) or by downloading referenced image URLs.
+//
+// Usage:
+//   APOS_HOST=http://localhost:3000 APOS_EXTERNAL_FRONT_KEY=... node scripts/generate-static-site.js --out static-dist
+// Options:
+//   --out=dir            Output directory (default: static-dist)
+//   --port=4321          Preview port (default: 4321)
+//   --host=127.0.0.1     Preview host (default: 127.0.0.1)
+//   --concurrency=8      Max concurrent fetches (default: CPU count, capped at 8)
+//   --pieceTypes=a,b,c   Optional: force specific piece types (skips discovery)
+//   --aposHost=...       Override Apostrophe host (defaults to APOS_HOST env)
+//
+// Requires Node 18+ (for fetch).
 
-import { execSync, spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { generateSitemap } from '../src/lib/generateSitemap.js';
+import os from "os";
+import fs from "fs";
+import path from "path";
+import { spawn, execSync } from "child_process";
+import { generateSitemap } from "./generateSitemap.js";
 
-let astroProcess = null;
-
-async function generateStaticSite() {
-  console.log('🚀 Starting static site generation...');
-  
-  try {
-    // Step 1: Ensure ApostropheCMS backend is running
-    console.log('📡 Checking ApostropheCMS backend...');
-    const aposHost = process.env.APOS_HOST || 'http://localhost:3000';
-    
-    try {
-      const response = await fetch(`${aposHost}/api/v1/@apostrophecms/page?limit=1`, {
-        headers: {
-          'APOS-EXTERNAL-FRONT-KEY': process.env.APOS_EXTERNAL_FRONT_KEY
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
-      }
-      console.log('✅ Backend accessible');
-    } catch (error) {
-      console.error('❌ ApostropheCMS backend is not accessible at', aposHost);
-      console.error('Please ensure the backend is running and accessible');
-      process.exit(1);
-    }
-
-    // Step 2: Generate sitemap
-    console.log('🗺️  Generating sitemap...');
-    const sitemap = await generateSitemap();
-    console.log(`Found ${sitemap.length} URLs to generate`);
-
-    // Step 3: Start Astro in production mode
-    console.log('🏗️  Starting Astro server...');
-    
-    // Build the Astro project first
-    console.log('Building Astro project...');
-    execSync('npm run build:ssr', { stdio: 'inherit' });
-    
-    // Start the Astro server
-    astroProcess = spawn('npm', ['run', 'preview'], {
-      stdio: 'pipe',
-      env: {
-        ...process.env,
-        PORT: '4321',
-        APOS_HOST: process.env.APOS_HOST || 'http://localhost:3000',
-        APOS_EXTERNAL_FRONT_KEY: process.env.APOS_EXTERNAL_FRONT_KEY
-      }
-    });
-
-    // Wait for server to be ready
-    await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error('Astro server failed to start within 30 seconds'));
-      }, 30000);
-
-      let serverReady = false;
-
-      astroProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        console.log('Astro:', output.trim());
-        
-        if (output.includes('Local') || output.includes('preview') || output.includes('4321')) {
-          if (!serverReady) {
-            serverReady = true;
-            setTimeout(() => {
-              clearTimeout(timeout);
-              resolve();
-            }, 2000); // Give it a couple extra seconds to be fully ready
-          }
-        }
-      });
-
-      astroProcess.stderr.on('data', (data) => {
-        console.error('Astro Error:', data.toString());
-      });
-
-      astroProcess.on('error', (error) => {
-        clearTimeout(timeout);
-        reject(error);
-      });
-
-      astroProcess.on('exit', (code) => {
-        if (code !== 0) {
-          clearTimeout(timeout);
-          reject(new Error(`Astro process exited with code ${code}`));
-        }
-      });
-    });
-
-    console.log('✅ Astro server started');
-
-    // Step 4: Test server connectivity
-    console.log('🔌 Testing server connectivity...');
-    const astroHost = 'http://localhost:4321';
-    let serverReady = false;
-    let attempts = 0;
-    const maxAttempts = 10;
-
-    while (!serverReady && attempts < maxAttempts) {
-      try {
-        const testResponse = await fetch(`${astroHost}/`, {
-          headers: {
-            'User-Agent': 'Static Site Generator'
-          }
-        });
-        
-        if (testResponse.ok) {
-          serverReady = true;
-          console.log('✅ Server responding correctly');
-        } else {
-          console.log(`Attempt ${attempts + 1}: Server returned ${testResponse.status}`);
-        }
-      } catch (error) {
-        console.log(`Attempt ${attempts + 1}: ${error.message}`);
-      }
-      
-      if (!serverReady) {
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-      }
-    }
-
-    if (!serverReady) {
-      throw new Error('Could not connect to Astro server after 10 attempts');
-    }
-
-    // Step 5: Create static output directory
-    const staticDir = path.join(process.cwd(), 'static-dist');
-    if (fs.existsSync(staticDir)) {
-      fs.rmSync(staticDir, { recursive: true });
-    }
-    fs.mkdirSync(staticDir, { recursive: true });
-
-    // Step 6: Fetch and save each page
-    console.log('📄 Generating static pages...');
-    
-    for (const url of sitemap) {
-      try {
-        console.log(`Generating: ${url}`);
-        
-        const response = await fetch(`${astroHost}${url}`, {
-          headers: {
-            'User-Agent': 'Static Site Generator'
-          }
-        });
-
-        if (!response.ok) {
-          console.warn(`⚠️  Failed to fetch ${url}: ${response.status} ${response.statusText}`);
-          
-          // Try to get more details about the error
-          try {
-            const errorText = await response.text();
-            console.warn(`Error details: ${errorText.substring(0, 200)}...`);
-          } catch (e) {
-            // Ignore if we can't read the error
-          }
-          continue;
-        }
-
-        const html = await response.text();
-        
-        // Basic validation that we got HTML
-        if (!html.includes('<html') && !html.includes('<!DOCTYPE')) {
-          console.warn(`⚠️  ${url} returned content that doesn't look like HTML`);
-          console.warn(`First 100 chars: ${html.substring(0, 100)}`);
-          continue;
-        }
-        
-        // Determine output path
-        let outputPath;
-        if (url === '/') {
-          outputPath = path.join(staticDir, 'index.html');
-        } else {
-          const urlPath = url.slice(1); // Remove leading slash
-          outputPath = path.join(staticDir, urlPath, 'index.html');
-        }
-
-        // Ensure directory exists
-        const outputDir = path.dirname(outputPath);
-        if (!fs.existsSync(outputDir)) {
-          fs.mkdirSync(outputDir, { recursive: true });
-        }
-
-        // Write HTML file
-        fs.writeFileSync(outputPath, html);
-        console.log(`✅ Generated: ${outputPath}`);
-        
-      } catch (error) {
-        console.warn(`⚠️  Failed to generate ${url}:`, error.message);
-        
-        // Add more detailed error information
-        if (error.code === 'ECONNREFUSED') {
-          console.warn('   Connection refused - is the Astro server still running?');
-        } else if (error.code === 'ENOTFOUND') {
-          console.warn('   Host not found - check the server URL');
-        } else if (error.name === 'AbortError') {
-          console.warn('   Request timed out');
-        }
-      }
-    }
-
-    // Step 6: Copy static assets
-    console.log('📁 Copying static assets...');
-    const distDir = path.join(process.cwd(), 'dist');
-    const publicDir = path.join(process.cwd(), 'public');
-    
-    // Copy built assets from dist (CSS, JS, etc.)
-    if (fs.existsSync(distDir)) {
-      console.log('Copying built assets from dist/');
-      
-      // Copy the client assets (CSS, JS, images)
-      const clientDir = path.join(distDir, 'client');
-      if (fs.existsSync(clientDir)) {
-        console.log('Found client assets directory');
-        copyDir(clientDir, staticDir);
-      }
-      
-      // Also copy any root assets from dist
-      const distEntries = fs.readdirSync(distDir, { withFileTypes: true });
-      for (const entry of distEntries) {
-        if (entry.isFile()) {
-          const srcPath = path.join(distDir, entry.name);
-          const destPath = path.join(staticDir, entry.name);
-          fs.copyFileSync(srcPath, destPath);
-          console.log(`Copied: ${entry.name}`);
-        }
-      }
-    } else {
-      console.log('No dist directory found');
-    }
-    
-    // Copy public assets
-    if (fs.existsSync(publicDir)) {
-      console.log('Copying public assets/');
-      copyDir(publicDir, staticDir);
-    } else {
-      console.log('No public directory found');
-    }
-
-    // Step 7: Copy uploads from ApostropheCMS backend
-    console.log('🖼️  Copying ApostropheCMS uploads...');
-    await copyAposUploads(staticDir);
-
-    console.log('✅ Static site generation complete!');
-    console.log(`📦 Output directory: ${staticDir}`);
-    console.log('🌐 Ready to deploy to any static hosting provider!');
-    
-  } catch (error) {
-    console.error('❌ Static site generation failed:', error.message);
-    process.exit(1);
-  } finally {
-    // Clean up: Stop Astro server
-    if (astroProcess) {
-      console.log('🛑 Stopping Astro server...');
-      astroProcess.kill();
-    }
+function parseCliArgs() {
+  const args = process.argv.slice(2);
+  const opts = {};
+  for (const a of args) {
+    const [k, v] = a.split("=");
+    if (k === "--out") opts.out = v;
+    if (k === "--port") opts.port = Number(v);
+    if (k === "--host") opts.host = v;
+    if (k === "--concurrency") opts.concurrency = Number(v);
+    if (k === "--pieceTypes") opts.pieceTypes = v.split(",").map(s => s.trim()).filter(Boolean);
+    if (k === "--aposHost") opts.aposHost = v;
   }
+  return opts;
 }
 
-// Helper function to copy directories
+function fetchWithTimeout(url, opts = {}, ms = 30000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctl.signal }).finally(() => clearTimeout(t));
+}
+
+async function waitForServer(url, { timeoutMs = 60000, intervalMs = 500 } = {}) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetchWithTimeout(url, {}, intervalMs);
+      if (res.ok) return true;
+    } catch { }
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+  throw new Error(`Preview server did not respond at ${url} within ${timeoutMs}ms`);
+}
+
+function cleanDir(dir) {
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+}
+
 function copyDir(src, dest) {
-  if (!fs.existsSync(src)) {
-    console.log(`Source directory doesn't exist: ${src}`);
-    return;
-  }
-  
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-  console.log(`Copying ${entries.length} items from ${src}`);
-  
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    
-    try {
-      if (entry.isDirectory()) {
-        copyDir(srcPath, destPath);
-      } else {
-        fs.copyFileSync(srcPath, destPath);
-        console.log(`  Copied file: ${entry.name}`);
-      }
-    } catch (error) {
-      console.warn(`  Failed to copy ${entry.name}:`, error.message);
-    }
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name);
+    const d = path.join(dest, entry.name);
+    if (entry.isDirectory()) copyDir(s, d);
+    else fs.copyFileSync(s, d);
   }
 }
 
-// Helper function to copy uploads from ApostropheCMS backend
-async function copyAposUploads(staticDir) {
-  // Try to find the backend uploads directory
-  const possiblePaths = [
-    path.join(process.cwd(), '..', 'backend', 'public', 'uploads'),
-    path.join(process.cwd(), '..', '..', 'backend', 'public', 'uploads'),
-    path.join(process.cwd(), '..', 'public', 'uploads')
-  ];
-  
-  let backendUploadsDir = null;
-  
-  for (const possiblePath of possiblePaths) {
-    if (fs.existsSync(possiblePath)) {
-      backendUploadsDir = possiblePath;
-      console.log(`Found backend uploads at: ${possiblePath}`);
-      break;
-    }
+function writeHtmlForPath(rootDir, urlPath, html) {
+  // Map '/about/' -> '<out>/about/index.html', '/' -> '<out>/index.html'
+  const isFile = /\.[a-z0-9]+$/i.test(urlPath);
+  let outPath;
+  if (isFile) {
+    outPath = path.join(rootDir, urlPath.replace(/^\//, ""));
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  } else if (urlPath === "/") {
+    outPath = path.join(rootDir, "index.html");
+  } else {
+    outPath = path.join(rootDir, urlPath.replace(/^\//, ""), "index.html");
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
   }
-  
-  if (!backendUploadsDir) {
-    console.warn('Could not find backend uploads directory. Tried:');
-    possiblePaths.forEach(p => console.warn(`  - ${p}`));
-    console.warn('You may need to manually copy uploads or adjust the path.');
-    return;
-  }
-  
-  const staticUploadsDir = path.join(staticDir, 'uploads');
-  
-  console.log(`Copying uploads from ${backendUploadsDir} to ${staticUploadsDir}`);
-  copyDir(backendUploadsDir, staticUploadsDir);
-  
-  // Count files to show progress
-  try {
-    const files = countFiles(staticUploadsDir);
-    console.log(`✅ Copied ${files} upload files`);
-  } catch (error) {
-    console.log('✅ Upload copy completed');
-  }
+  fs.writeFileSync(outPath, html);
 }
 
-// Helper function to count files in a directory
-function countFiles(dir) {
-  if (!fs.existsSync(dir)) return 0;
-  
-  let count = 0;
-  
-  function countInDir(currentDir) {
-    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        countInDir(path.join(currentDir, entry.name));
-      } else {
-        count++;
-      }
-    }
-  }
-  
-  countInDir(dir);
-  return count;
-}
-
-// Helper function to find all HTML files
-function findHtmlFiles(dir) {
+async function extractImagesFromHtml(staticDir, aposHost) {
+  // Scan generated HTML and download remote images under uploads/
   const htmlFiles = [];
-  
-  function scanDir(currentDir) {
-    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      const fullPath = path.join(currentDir, entry.name);
-      
-      if (entry.isDirectory()) {
-        scanDir(fullPath);
-      } else if (entry.name.endsWith('.html')) {
-        htmlFiles.push(fullPath);
+  (function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(p);
+      else if (entry.isFile() && entry.name.endsWith(".html")) htmlFiles.push(p);
+    }
+  })(staticDir);
+
+  const uploadUrls = new Set();
+  const re = new RegExp(`(?:src|href)=(?:"|')(?:${aposHost.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")})?/uploads/[^"']+`, "gi");
+
+  for (const f of htmlFiles) {
+    const html = fs.readFileSync(f, "utf8");
+    const matches = html.match(re) || [];
+    for (const m of matches) {
+      const url = m.split(/=|['"]/).pop();
+      uploadUrls.add(url);
+    }
+  }
+
+  // Download each to <out>/uploads/...
+  for (const u of uploadUrls) {
+    try {
+      const full = u.startsWith("http") ? u : `${aposHost}${u}`;
+      const rel = full.replace(/^https?:\/\/[^/]+/, ""); // /uploads/...
+      const dest = path.join(staticDir, rel);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      const res = await fetchWithTimeout(full, {}, 60000);
+      if (res.ok) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        fs.writeFileSync(dest, buf);
+      }
+    } catch { }
+  }
+}
+
+async function copyAposUploadsFromFs(staticDir) {
+  // Best-effort local paths for monorepo setups
+  const candidates = [
+    path.join(process.cwd(), "..", "backend", "public", "uploads"),
+    path.join(process.cwd(), "backend", "public", "uploads"),
+    path.join(process.cwd(), "..", "..", "backend", "public", "uploads"),
+    path.join(process.cwd(), "public", "uploads") // sometimes colocated
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p) && fs.statSync(p).isDirectory()) {
+      copyDir(p, path.join(staticDir, "uploads"));
+      return true;
+    }
+  }
+  return false;
+}
+
+async function mapLimit(items, limit, worker) {
+  const q = [...items];
+  const runners = Array.from({ length: limit }, async function run() {
+    while (q.length) {
+      const it = q.shift();
+      try { await worker(it); } catch (e) { console.warn("Fetch error:", e.message); }
+    }
+  });
+  await Promise.all(runners);
+}
+
+// Post-process generated HTML so asset links match Astro SSR shape.
+// Rewrites: /_astro/...  ->  /client/_astro/...
+function fixAssetPaths(outDir) {
+  const htmlFiles = [];
+  (function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(p);
+      else if (entry.isFile() && entry.name.endsWith(".html")) htmlFiles.push(p);
+    }
+  })(outDir);
+
+  const pattern = /\b(href|src)=["']\/_astro\//g;
+
+  let changed = 0;
+  for (const f of htmlFiles) {
+    let html = fs.readFileSync(f, "utf8");
+    if (pattern.test(html)) {
+      html = html.replace(pattern, '$1="/client/_astro/');
+      fs.writeFileSync(f, html);
+      changed++;
+    }
+  }
+  return changed;
+}
+
+
+async function main() {
+  const cli = parseCliArgs();
+  const outDir = path.resolve(cli.out ?? "static-dist");
+  const port = cli.port ?? 4321;
+  const host = cli.host ?? "127.0.0.1";
+  const previewUrl = `http://${host}:${port}`;
+  const concurrency = Math.min(8, Math.max(2, cli.concurrency ?? os.cpus().length));
+  const aposHost = cli.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
+  const frontKey = process.env.APOS_EXTERNAL_FRONT_KEY;
+  if (!frontKey) {
+    console.error("APOS_EXTERNAL_FRONT_KEY is required");
+    process.exit(1);
+  }
+
+  console.log("🛠️  Building Astro...");
+  execSync("npm run build", { stdio: "inherit" });
+
+  console.log("🌐 Starting Astro preview...");
+  const astro = spawn("npm", ["run", "preview", "--", "--host", host, "--port", String(port)], {
+    stdio: ["ignore", "inherit", "inherit"],
+    detached: process.platform !== "win32"
+  });
+
+  // Ensure clean shutdown
+  function shutdown() {
+    if (!astro.killed) {
+      if (process.platform === "win32") {
+        spawn("taskkill", ["/pid", String(astro.pid), "/T", "/F"]);
+      } else {
+        try { process.kill(-astro.pid, "SIGTERM"); } catch { try { astro.kill("SIGTERM"); } catch { } }
       }
     }
   }
-  
-  scanDir(dir);
-  return htmlFiles;
+  process.on("exit", shutdown);
+  process.on("SIGINT", () => { shutdown(); process.exit(1); });
+  process.on("SIGTERM", () => { shutdown(); process.exit(1); });
+
+  // Wait for server
+  console.log(`⏳ Waiting for preview at ${previewUrl} ...`);
+  await waitForServer(previewUrl, { timeoutMs: 90000, intervalMs: 800 });
+  console.log("✅ Preview is up.");
+
+  // Generate sitemap (pages + pieces)
+  console.log("🧭 Generating sitemap from Apostrophe...");
+  const urls = await generateSitemap({
+    aposHost,
+    pieceTypes: cli.pieceTypes
+  });
+  console.log(`📄 ${urls.length} URLs to render.`);
+
+  // Prepare output dir and copy Astro assets
+  console.log("📂 Preparing output directory:", outDir);
+  cleanDir(outDir);
+  // Copy built assets from dist
+  const dist = path.join(process.cwd(), "dist");
+  if (fs.existsSync(dist)) {
+    // Copy everything, then we'll overwrite HTML as needed
+    copyDir(dist, outDir);
+  }
+  // Ensure _astro exists if present
+  const astroAssets = path.join(dist, "_astro");
+  if (fs.existsSync(astroAssets)) {
+    copyDir(astroAssets, path.join(outDir, "_astro"));
+  }
+
+  // Crawl pages concurrently
+  console.log(`🚚 Rendering pages (concurrency: ${concurrency})...`);
+  let done = 0;
+  await mapLimit(urls, concurrency, async (u) => {
+    const pageUrl = new URL(u, previewUrl).toString();
+    const res = await fetchWithTimeout(pageUrl, {}, 60000);
+    if (!res.ok) throw new Error(`GET ${pageUrl} -> ${res.status}`);
+    const html = await res.text();
+    writeHtmlForPath(outDir, new URL(u, "http://dummy").pathname, html);
+    done += 1;
+    if (done % 10 === 0 || done === urls.length) {
+      process.stdout.write(`\r   ${done}/${urls.length} pages`);
+    }
+  });
+  process.stdout.write("\n");
+  // Rewrite asset paths for SSR compatibility (/_astro -> /client/_astro)
+  console.log("🔧 Rewriting asset paths for SSR shape...");
+  const filesUpdated = fixAssetPaths(outDir);
+  console.log(`   Updated ${filesUpdated} HTML file(s).`);
+
+
+  // Apostrophe uploads
+  console.log("🖼️ Handling uploads...");
+  const copied = await copyAposUploadsFromFs(outDir);
+  if (!copied) {
+    console.log("   No local uploads found — scanning HTML and downloading referenced assets...");
+    await extractImagesFromHtml(outDir, aposHost);
+  }
+
+  // 404
+  const notFound = path.join(outDir, "404.html");
+  if (!fs.existsSync(notFound)) {
+    fs.writeFileSync(notFound, "<!doctype html><meta charset='utf-8'><title>Not found</title><h1>404</h1>");
+  }
+
+  console.log("🎉 Static export complete:", outDir);
+  shutdown();
 }
 
-// Handle cleanup on exit
-process.on('SIGINT', () => {
-  if (astroProcess) {
-    astroProcess.kill();
-  }
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  if (astroProcess) {
-    astroProcess.kill();
-  }
-  process.exit(0);
-});
-
-// Allow running this script directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  generateStaticSite();
+  main().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 }
 
-export { generateStaticSite };
+export { main as generateStaticSite };
