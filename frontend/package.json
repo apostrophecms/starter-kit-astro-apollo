@@ -7,9 +7,12 @@
     "dev": "APOS_EXTERNAL_FRONT_KEY=dev astro dev",
     "start": "node ./dist/server/entry.mjs",
     "build": "astro build",
+    "build:ssr": "astro build",
     "serve": "HOST=0.0.0.0 node ./dist/server/entry.mjs",
     "preview": "DEBUG=* astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "generate:sitemap": "node -e \"import('./src/lib/generateSitemap.js').then(m => m.generateSitemap())\"",
+    "static:generate": "node scripts/generate-static-site.js"
   },
   "engines": {
     "node": "^18.17.1 || ^20.3.0 || >=22.0.0",

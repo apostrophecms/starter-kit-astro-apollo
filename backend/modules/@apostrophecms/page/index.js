@@ -12,6 +12,15 @@ export default {
         }
       }
     },
+    publicApiProjection: {
+      title: 1,
+      slug: 1,
+      path: 1,
+      level: 1,
+      rank: 1,
+      _url: 1,
+      type: 1
+    },
     types: [
       {
         name: 'default-page',

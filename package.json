@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Combined ApostropheCMS plus Astro starter kit",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm run install-frontend && npm run install-backend && echo '\\n💡 combined npm install complete'",
@@ -17,7 +18,10 @@
     "migrate": "cd backend && npm run migrate",
     "serve-frontend": "cd frontend && npm run serve",
     "serve-backend": "cd backend && npm run serve",
-    "load-starter-content": "cd backend && npm run load-starter-content"
+    "load-starter-content": "cd backend && npm run load-starter-content",
+    "generate:sitemap": "node -e \"import('./src/lib/generateSitemap.js').then(m => m.generateSitemap())\"",
+    "preview:static": "APOS_STATIC_BUILD=true astro preview",
+    "static:build": "node scripts/build-static.js"
   },
   "repository": {
     "type": "git",

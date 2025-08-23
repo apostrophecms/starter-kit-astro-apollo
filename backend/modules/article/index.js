@@ -5,7 +5,16 @@ export default {
   options: {
     label: 'Article',
     pluralLabel: 'Articles',
-    shortcut: 'Shift+Alt+A'
+    shortcut: 'Shift+Alt+A',
+    // Enable public API access for static generation
+    publicApiProjection: {
+      title: 1,
+      slug: 1,
+      _url: 1,
+      publishDate: 1,
+      category: 1,
+      excerpt: 1
+    }
   },
   fields: {
     add: {
