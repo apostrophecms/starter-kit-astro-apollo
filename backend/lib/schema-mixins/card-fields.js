@@ -1,5 +1,4 @@
 import colorOptionsHelper from '../helpers/color-options.js';
-import textOptionsHelper from '../helpers/typography-options.js';
 
 export const cardFields = {
   cardType: {
@@ -31,10 +30,22 @@ export const cardFields = {
     type: 'select',
     label: 'Card Height',
     choices: [
-      { label: 'Auto', value: '' },
-      { label: 'Small', value: 'is-small' },
-      { label: 'Medium', value: 'is-medium' },
-      { label: 'Large', value: 'is-large' }
+      {
+        label: 'Auto',
+        value: ''
+      },
+      {
+        label: 'Small',
+        value: 'is-small'
+      },
+      {
+        label: 'Medium',
+        value: 'is-medium'
+      },
+      {
+        label: 'Large',
+        value: 'is-large'
+      }
     ],
     def: ''
   },
@@ -67,10 +78,22 @@ export const cardFields = {
     type: 'select',
     label: 'Image Ratio',
     choices: [
-      { label: 'Square (1:1)', value: 'is-1by1' },
-      { label: '4:3', value: 'is-4by3' },
-      { label: '3:2', value: 'is-3by2' },
-      { label: '16:9', value: 'is-16by9' }
+      {
+        label: 'Square (1:1)',
+        value: 'is-1by1'
+      },
+      {
+        label: '4:3',
+        value: 'is-4by3'
+      },
+      {
+        label: '3:2',
+        value: 'is-3by2'
+      },
+      {
+        label: '16:9',
+        value: 'is-16by9'
+      }
     ],
     if: {
       useImageRatio: true,
@@ -103,9 +126,18 @@ export const cardFields = {
     type: 'select',
     label: 'Title Size',
     choices: [
-      { label: 'Normal', value: 'is-4' },
-      { label: 'Large', value: 'is-3' },
-      { label: 'Small', value: 'is-5' }
+      {
+        label: 'Normal',
+        value: 'is-4'
+      },
+      {
+        label: 'Large',
+        value: 'is-3'
+      },
+      {
+        label: 'Small',
+        value: 'is-5'
+      }
     ],
     def: 'is-4'
   },
@@ -138,9 +170,18 @@ export const cardFields = {
     type: 'select',
     label: 'Title & Subtitle Alignment',
     choices: [
-      { label: 'Left', value: 'has-text-left' },
-      { label: 'Center', value: 'has-text-centered' },
-      { label: 'Right', value: 'has-text-right' }
+      {
+        label: 'Left',
+        value: 'has-text-left'
+      },
+      {
+        label: 'Center',
+        value: 'has-text-centered'
+      },
+      {
+        label: 'Right',
+        value: 'has-text-right'
+      }
     ],
     def: 'has-text-left'
   },
@@ -148,9 +189,18 @@ export const cardFields = {
     type: 'select',
     label: 'Content Alignment',
     choices: [
-      { label: 'Left', value: 'has-text-left' },
-      { label: 'Center', value: 'has-text-centered' },
-      { label: 'Right', value: 'has-text-right' }
+      {
+        label: 'Left',
+        value: 'has-text-left'
+      },
+      {
+        label: 'Center',
+        value: 'has-text-centered'
+      },
+      {
+        label: 'Right',
+        value: 'has-text-right'
+      }
     ],
     def: 'has-text-left'
   },
@@ -182,11 +232,26 @@ export const cardFields = {
     type: 'select',
     label: 'Overlay Opacity',
     choices: [
-      { label: 'Very light', value: '20%' },
-      { label: 'Light', value: '30%' },
-      { label: 'Medium', value: '40%' },
-      { label: 'Dark', value: '50%' },
-      { label: 'Very dark', value: '60%' }
+      {
+        label: 'Very light',
+        value: '20%'
+      },
+      {
+        label: 'Light',
+        value: '30%'
+      },
+      {
+        label: 'Medium',
+        value: '40%'
+      },
+      {
+        label: 'Dark',
+        value: '50%'
+      },
+      {
+        label: 'Very dark',
+        value: '60%'
+      }
     ],
     if: {
       $or: [
@@ -225,9 +290,18 @@ export const cardFields = {
     type: 'select',
     label: 'Border Width',
     choices: [
-      { label: 'Thin', value: 'thin' },
-      { label: 'Medium', value: 'medium' },
-      { label: 'Thick', value: 'thick' }
+      {
+        label: 'Thin',
+        value: 'thin'
+      },
+      {
+        label: 'Medium',
+        value: 'medium'
+      },
+      {
+        label: 'Thick',
+        value: 'thick'
+      }
     ],
     def: 'thin',
     if: {
@@ -247,15 +321,15 @@ export const cardFields = {
 export const cardGroups = {
   basics: {
     label: 'Basic Settings',
-    fields: ['cardType']
+    fields: [ 'cardType' ]
   },
   images: {
     label: 'Images',
-    fields: ['_mainImage', 'useImageRatio', 'imageRatio', '_avatar']
+    fields: [ '_mainImage', 'useImageRatio', 'imageRatio', '_avatar' ]
   },
   content: {
     label: 'Content',
-    fields: ['cardTitle', 'subtitle', 'headerAlignment', 'titleSize', 'content', 'contentAlignment']
+    fields: [ 'cardTitle', 'subtitle', 'headerAlignment', 'titleSize', 'content', 'contentAlignment' ]
   },
   styling: {
     label: 'Styling',
@@ -271,6 +345,6 @@ export const cardGroups = {
   },
   footer: {
     label: 'Footer',
-    fields: ['hasFooter', 'footerContent', 'addFooterBorder', 'footerBorderWidth', 'footerBorderColor']
+    fields: [ 'hasFooter', 'footerContent', 'addFooterBorder', 'footerBorderWidth', 'footerBorderColor' ]
   }
 };

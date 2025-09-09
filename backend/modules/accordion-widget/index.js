@@ -51,9 +51,18 @@ export default {
               type: 'select',
               label: 'Header Alignment',
               choices: [
-                { label: 'Left', value: 'left' },
-                { label: 'Center', value: 'center' },
-                { label: 'Right', value: 'right' }
+                {
+                  label: 'Left',
+                  value: 'left'
+                },
+                {
+                  label: 'Center',
+                  value: 'center'
+                },
+                {
+                  label: 'Right',
+                  value: 'right'
+                }
               ],
               def: 'left'
             },
@@ -61,7 +70,7 @@ export default {
               type: 'area',
               label: 'Content',
               options: getWidgetGroups({
-                exclude: ['accordion']
+                exclude: [ 'accordion' ]
               })
             }
           }

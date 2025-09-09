@@ -19,7 +19,8 @@ export default {
     },
     adminLocales: [
       // you can add an object for as many or few of the locales as desired
-      // the user will only be able to select from these locales in the personal preferences menu
+      // the user will only be able to select from these locales
+      // in the personal preferences menu
       {
         label: 'English',
         value: 'en'

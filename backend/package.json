@@ -55,8 +55,7 @@
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {
-    "eslint": "^8.0.0",
-    "eslint-config-apostrophe": "^4.0.0",
+    "eslint-config-apostrophe": "github:apostrophecms/eslint-config-apostrophe#pro-8109-upgrade-dependencies",
     "nodemon": "^3.0.1"
   }
 }

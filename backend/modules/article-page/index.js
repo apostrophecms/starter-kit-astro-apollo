@@ -91,11 +91,11 @@ export default {
     group: {
       basics: {
         label: 'Basics',
-        fields: ['masthead', 'beforeContent', 'sidebarContent', 'afterContent']
+        fields: [ 'masthead', 'beforeContent', 'sidebarContent', 'afterContent' ]
       },
       utility: {
         label: 'Display Options',
-        fields: ['indexLayout', 'showLayout']
+        fields: [ 'indexLayout', 'showLayout' ]
       }
     }
   }

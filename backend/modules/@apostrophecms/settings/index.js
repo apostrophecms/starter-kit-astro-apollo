@@ -6,7 +6,8 @@ export default {
         fields: [ 'password' ]
       },
       displayName: {
-        // The default `title` field is labeled 'Display Name' in the `@apostrophecms/user` module.
+        // The default `title` field is labeled 'Display Name'
+        // in the `@apostrophecms/user` module.
         // Changing this field will **not** change the Username or Slug of the user.
         fields: [ 'title' ],
         reload: true
@@ -19,7 +20,8 @@ export default {
         fields: [ 'lastName', 'firstName' ],
         preview: '{{ firstName }} {{lastName}}'
       },
-      // The `adminLocales` option **must** be configured in the `@apostrophecms/i18n` module for this to be allowed
+      // The `adminLocales` option **must** be configured
+      // in the `@apostrophecms/i18n` module for this to be allowed
       adminLocale: {
         fields: [ 'adminLocale' ]
       }
@@ -31,7 +33,8 @@ export default {
       },
       preferences: {
         label: 'Preferences',
-        // The `adminLocales` option **must** be configured in the `@apostrophecms/i18n` module for this to be allowed
+        // The `adminLocales` option **must** be configured
+        // in the `@apostrophecms/i18n` module for this to be allowed
         subforms: [ 'adminLocale' ]
       }
     }

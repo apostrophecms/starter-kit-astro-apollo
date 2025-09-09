@@ -95,11 +95,26 @@ export default {
     type: 'select',
     label: 'Gradient Angle',
     choices: [
-      { label: 'To Right', value: '90deg' },
-      { label: 'To Bottom Right', value: '135deg' },
-      { label: 'To Bottom', value: '180deg' },
-      { label: 'To Bottom Left', value: '225deg' },
-      { label: 'To Left', value: '270deg' }
+      {
+        label: 'To Right',
+        value: '90deg'
+      },
+      {
+        label: 'To Bottom Right',
+        value: '135deg'
+      },
+      {
+        label: 'To Bottom',
+        value: '180deg'
+      },
+      {
+        label: 'To Bottom Left',
+        value: '225deg'
+      },
+      {
+        label: 'To Left',
+        value: '270deg'
+      }
     ],
     if: {
       backgroundColorType: 'gradient',
@@ -184,11 +199,26 @@ export default {
     type: 'select',
     label: 'Overlay Opacity',
     choices: [
-      { label: 'Very light', value: '20%' },
-      { label: 'Light', value: '30%' },
-      { label: 'Medium', value: '40%' },
-      { label: 'Dark', value: '50%' },
-      { label: 'Very dark', value: '60%' }
+      {
+        label: 'Very light',
+        value: '20%'
+      },
+      {
+        label: 'Light',
+        value: '30%'
+      },
+      {
+        label: 'Medium',
+        value: '40%'
+      },
+      {
+        label: 'Dark',
+        value: '50%'
+      },
+      {
+        label: 'Very dark',
+        value: '60%'
+      }
     ],
     if: {
       enableOverlay: true
