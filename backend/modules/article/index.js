@@ -79,11 +79,11 @@ export default {
     group: {
       basics: {
         label: 'Basic Info',
-        fields: ['_author', 'category', 'publishDate', '_related']
+        fields: [ '_author', 'category', 'publishDate', '_related' ]
       },
       content: {
         label: 'Content',
-        fields: ['_heroImage', 'excerpt', 'mainContent']
+        fields: [ '_heroImage', 'excerpt', 'mainContent' ]
       }
     }
   }

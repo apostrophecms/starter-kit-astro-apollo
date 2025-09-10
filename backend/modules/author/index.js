@@ -41,10 +41,22 @@ export default {
             platform: {
               type: 'select',
               choices: [
-                { label: 'Twitter/X', value: 'twitter' },
-                { label: 'LinkedIn', value: 'linkedin' },
-                { label: 'GitHub', value: 'github' },
-                { label: 'Personal Website', value: 'website' }
+                {
+                  label: 'Twitter/X',
+                  value: 'twitter'
+                },
+                {
+                  label: 'LinkedIn',
+                  value: 'linkedin'
+                },
+                {
+                  label: 'GitHub',
+                  value: 'github'
+                },
+                {
+                  label: 'Personal Website',
+                  value: 'website'
+                }
               ]
             },
             url: {
@@ -63,15 +75,15 @@ export default {
     group: {
       basics: {
         label: 'Basic Info',
-        fields: ['title', 'email', 'profileImage', '_articles']
+        fields: [ 'title', 'email', 'profileImage', '_articles' ]
       },
       content: {
         label: 'Content',
-        fields: ['biography']
+        fields: [ 'biography' ]
       },
       social: {
         label: 'Social Media',
-        fields: ['socialLinks']
+        fields: [ 'socialLinks' ]
       }
     }
   }

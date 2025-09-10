@@ -103,9 +103,18 @@ export default {
               label: 'Header Position',
               help: 'Choose how the header behaves when scrolling',
               choices: [
-                { label: 'Floating - Always Visible', value: 'fixed' },
-                { label: 'Floating - Fade on Scroll', value: 'fixed-fade' },
-                { label: 'Static - Scrolls With Content', value: 'static' }
+                {
+                  label: 'Floating - Always Visible',
+                  value: 'fixed'
+                },
+                {
+                  label: 'Floating - Fade on Scroll',
+                  value: 'fixed-fade'
+                },
+                {
+                  label: 'Static - Scrolls With Content',
+                  value: 'static'
+                }
               ],
               def: 'fixed'
             },
@@ -113,8 +122,14 @@ export default {
               type: 'select',
               label: 'Navigation Alignment',
               choices: [
-                { label: 'Start', value: 'start' },
-                { label: 'End', value: 'end' }
+                {
+                  label: 'Start',
+                  value: 'start'
+                },
+                {
+                  label: 'End',
+                  value: 'end'
+                }
               ],
               def: 'end'
             },
@@ -145,10 +160,22 @@ export default {
               label: 'Header Spacing',
               help: 'Control the spacing around header content',
               choices: [
-                { label: 'None', value: '' },
-                { label: 'Small', value: 'spacing-sm' },
-                { label: 'Medium', value: 'spacing-md' },
-                { label: 'Large', value: 'spacing-lg' }
+                {
+                  label: 'None',
+                  value: ''
+                },
+                {
+                  label: 'Small',
+                  value: 'spacing-sm'
+                },
+                {
+                  label: 'Medium',
+                  value: 'spacing-md'
+                },
+                {
+                  label: 'Large',
+                  value: 'spacing-lg'
+                }
               ],
               def: 'spacing-md'
             },
@@ -252,16 +279,46 @@ export default {
                     label: 'Platform',
                     required: true,
                     choices: [
-                      { label: 'Facebook', value: 'facebook' },
-                      { label: 'Twitter/X', value: 'twitter' },
-                      { label: 'Instagram', value: 'instagram' },
-                      { label: 'LinkedIn', value: 'linkedin' },
-                      { label: 'YouTube', value: 'youtube' },
-                      { label: 'GitHub', value: 'github' },
-                      { label: 'TikTok', value: 'tiktok' },
-                      { label: 'Pinterest', value: 'pinterest' },
-                      { label: 'Discord', value: 'discord' },
-                      { label: 'Mastodon', value: 'mastodon' }
+                      {
+                        label: 'Facebook',
+                        value: 'facebook'
+                      },
+                      {
+                        label: 'Twitter/X',
+                        value: 'twitter'
+                      },
+                      {
+                        label: 'Instagram',
+                        value: 'instagram'
+                      },
+                      {
+                        label: 'LinkedIn',
+                        value: 'linkedin'
+                      },
+                      {
+                        label: 'YouTube',
+                        value: 'youtube'
+                      },
+                      {
+                        label: 'GitHub',
+                        value: 'github'
+                      },
+                      {
+                        label: 'TikTok',
+                        value: 'tiktok'
+                      },
+                      {
+                        label: 'Pinterest',
+                        value: 'pinterest'
+                      },
+                      {
+                        label: 'Discord',
+                        value: 'discord'
+                      },
+                      {
+                        label: 'Mastodon',
+                        value: 'mastodon'
+                      }
                     ]
                   },
                   url: {
@@ -283,10 +340,22 @@ export default {
               type: 'select',
               label: 'Social Icon Style',
               choices: [
-                { label: 'Rounded', value: 'rounded' },
-                { label: 'Circle', value: 'circle' },
-                { label: 'Square', value: 'square' },
-                { label: 'Square Rounded', value: 'square-rounded' }
+                {
+                  label: 'Rounded',
+                  value: 'rounded'
+                },
+                {
+                  label: 'Circle',
+                  value: 'circle'
+                },
+                {
+                  label: 'Square',
+                  value: 'square'
+                },
+                {
+                  label: 'Square Rounded',
+                  value: 'square-rounded'
+                }
               ],
               def: 'rounded'
             },
@@ -294,9 +363,18 @@ export default {
               type: 'select',
               label: 'Social Icon Size',
               choices: [
-                { label: 'Small', value: 'sm' },
-                { label: 'Medium', value: 'md' },
-                { label: 'Large', value: 'lg' }
+                {
+                  label: 'Small',
+                  value: 'sm'
+                },
+                {
+                  label: 'Medium',
+                  value: 'md'
+                },
+                {
+                  label: 'Large',
+                  value: 'lg'
+                }
               ],
               def: 'md'
             },
@@ -344,15 +422,15 @@ export default {
     group: {
       branding: {
         label: 'Branding',
-        fields: ['brandingGroup']
+        fields: [ 'brandingGroup' ]
       },
       header: {
         label: 'Header',
-        fields: ['headerGroup']
+        fields: [ 'headerGroup' ]
       },
       footer: {
         label: 'Footer',
-        fields: ['footerGroup']
+        fields: [ 'footerGroup' ]
       }
     }
   }

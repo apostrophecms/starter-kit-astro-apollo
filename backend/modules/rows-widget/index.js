@@ -152,7 +152,7 @@ export default {
         label: 'Second Column',
         options: getWidgetGroups({
           includeLayouts: true,
-          exclude: ['grid-layout']
+          exclude: [ 'grid-layout' ]
         }),
         if: {
           $or: [
@@ -170,7 +170,7 @@ export default {
         label: 'Third Column',
         options: getWidgetGroups({
           includeLayouts: true,
-          exclude: ['grid-layout']
+          exclude: [ 'grid-layout' ]
         }),
         if: {
           $or: [
@@ -185,7 +185,7 @@ export default {
         label: 'Fourth Column',
         options: getWidgetGroups({
           includeLayouts: true,
-          exclude: ['grid-layout']
+          exclude: [ 'grid-layout' ]
         }),
         if: {
           columnLayout: 'four-equal'

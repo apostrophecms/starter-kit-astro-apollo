@@ -112,11 +112,26 @@ export default {
           type: 'select',
           label: 'Maximum Content Width',
           choices: [
-            { label: 'Full Width', value: '' },
-            { label: 'Extra Narrow (768px)', value: 'max-width-768' },
-            { label: 'Narrow (960px)', value: 'max-width-960' },
-            { label: 'Medium (1152px)', value: 'max-width-1152' },
-            { label: 'Wide (1344px)', value: 'max-width-1344' }
+            {
+              label: 'Full Width',
+              value: ''
+            },
+            {
+              label: 'Extra Narrow (768px)',
+              value: 'max-width-768'
+            },
+            {
+              label: 'Narrow (960px)',
+              value: 'max-width-960'
+            },
+            {
+              label: 'Medium (1152px)',
+              value: 'max-width-1152'
+            },
+            {
+              label: 'Wide (1344px)',
+              value: 'max-width-1344'
+            }
           ],
           def: ''
         },
@@ -135,10 +150,22 @@ export default {
                 type: 'select',
                 label: 'Vertical Alignment',
                 choices: [
-                  { label: 'Top', value: 'start' },
-                  { label: 'Center', value: 'center' },
-                  { label: 'Bottom', value: 'end' },
-                  { label: 'Stretch', value: 'stretch' }
+                  {
+                    label: 'Top',
+                    value: 'start'
+                  },
+                  {
+                    label: 'Center',
+                    value: 'center'
+                  },
+                  {
+                    label: 'Bottom',
+                    value: 'end'
+                  },
+                  {
+                    label: 'Stretch',
+                    value: 'stretch'
+                  }
                 ],
                 def: 'start'
               },
@@ -146,10 +173,22 @@ export default {
                 type: 'select',
                 label: 'Horizontal Alignment',
                 choices: [
-                  { label: 'Left', value: 'start' },
-                  { label: 'Center', value: 'center' },
-                  { label: 'Right', value: 'end' },
-                  { label: 'Stretch', value: 'stretch' }
+                  {
+                    label: 'Left',
+                    value: 'start'
+                  },
+                  {
+                    label: 'Center',
+                    value: 'center'
+                  },
+                  {
+                    label: 'Right',
+                    value: 'end'
+                  },
+                  {
+                    label: 'Stretch',
+                    value: 'stretch'
+                  }
                 ],
                 def: 'stretch'
               },
@@ -381,10 +420,22 @@ export default {
                       type: 'select',
                       label: 'Vertical Alignment',
                       choices: [
-                        { label: 'Top', value: 'start' },
-                        { label: 'Center', value: 'center' },
-                        { label: 'Bottom', value: 'end' },
-                        { label: 'Stretch', value: 'stretch' }
+                        {
+                          label: 'Top',
+                          value: 'start'
+                        },
+                        {
+                          label: 'Center',
+                          value: 'center'
+                        },
+                        {
+                          label: 'Bottom',
+                          value: 'end'
+                        },
+                        {
+                          label: 'Stretch',
+                          value: 'stretch'
+                        }
                       ],
                       def: 'start'
                     },
@@ -402,7 +453,7 @@ export default {
         addOverride: {
           type: 'boolean',
           label: 'Add CSS target override?',
-          help: 'Check this box to add an additional class for custom CSS targeting.',
+          help: 'Check this box to add an additional class for custom CSS targeting.'
         },
         overrideClass: {
           type: 'string',
@@ -441,8 +492,7 @@ export default {
                 updates[`${dotPath}.asideContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'mainAsideThree') {
+            } else if (widget.layoutType === 'mainAsideThree') {
               updates[`${dotPath}.layoutType`] = 'mainAside';
               hasUpdates = true;
 
@@ -452,8 +502,7 @@ export default {
                 updates[`${dotPath}.asideContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'headerTwoColFooter') {
+            } else if (widget.layoutType === 'headerTwoColFooter') {
               // Layout name stays the same but areas changed
               if (widget.leftColumnContent) {
                 updates[`${dotPath}.mainContent`] = widget.leftColumnContent;
@@ -466,8 +515,7 @@ export default {
                 updates[`${dotPath}.rightColumnContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'featuredThreeGrid') {
+            } else if (widget.layoutType === 'featuredThreeGrid') {
               // Update area names
               if (widget.featuredContent) {
                 updates[`${dotPath}.mainContent`] = widget.featuredContent;
@@ -486,8 +534,7 @@ export default {
                 updates[`${dotPath}.columnTwoContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'twoMainAside' || widget.layoutType === 'asideTwoMain') {
+            } else if (widget.layoutType === 'twoMainAside' || widget.layoutType === 'asideTwoMain') {
               // Map specific areas to standardized areas
               if (widget.asideLongContent) {
                 updates[`${dotPath}.primaryAsideContent`] = widget.asideLongContent;
@@ -506,8 +553,7 @@ export default {
                 updates[`${dotPath}.mainBottomContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'magazineLayout') {
+            } else if (widget.layoutType === 'magazineLayout') {
               // Map specific areas to standardized areas
               if (widget.headlineContent) {
                 updates[`${dotPath}.mainContent`] = widget.headlineContent;
@@ -526,8 +572,7 @@ export default {
                 updates[`${dotPath}.feature1Content`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'contentHub') {
+            } else if (widget.layoutType === 'contentHub') {
               // Map specific areas to standardized areas
               if (widget.heroContent) {
                 updates[`${dotPath}.mainContent`] = widget.heroContent;
@@ -546,8 +591,7 @@ export default {
                 updates[`${dotPath}.quickLinksContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'galleryMasonry') {
+            } else if (widget.layoutType === 'galleryMasonry') {
               // Map specific areas to standardized areas
               if (widget.galleryFeaturedContent) {
                 updates[`${dotPath}.mainContent`] = widget.galleryFeaturedContent;
@@ -566,8 +610,7 @@ export default {
                 updates[`${dotPath}.gallerySide2Content`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'dashboardLayout') {
+            } else if (widget.layoutType === 'dashboardLayout') {
               // Map specific areas to standardized areas
               if (widget.mainMetricContent) {
                 updates[`${dotPath}.mainContent`] = widget.mainMetricContent;
@@ -592,8 +635,7 @@ export default {
                 updates[`${dotPath}.tableContent`] = null;
                 hasUpdates = true;
               }
-            }
-            else if (widget.layoutType === 'productShowcase') {
+            } else if (widget.layoutType === 'productShowcase') {
               // Map specific areas to standardized areas
               if (widget.mainProductContent) {
                 updates[`${dotPath}.mainContent`] = widget.mainProductContent;
