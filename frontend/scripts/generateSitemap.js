@@ -1,4 +1,3 @@
-// scripts/generateSitemap.js
 // Generate a list of URLs to statically render by querying an ApostropheCMS backend.
 //
 // Features:
@@ -23,64 +22,91 @@ import path from "path";
 
 function parseCliArgs() {
   const args = process.argv.slice(2);
-  const opts = {};
-  for (const a of args) {
-    const [k, v] = a.split("=");
-    if (k === "--pieceTypes") {
-      opts.pieceTypes = v.split(",").map(s => s.trim()).filter(Boolean);
+  const options = {};
+  
+  for (const arg of args) {
+    const [key, value] = arg.split("=");
+    
+    if (key === "--pieceTypes") {
+      options.pieceTypes = value.split(",").map(type => type.trim()).filter(Boolean);
     }
-    if (k === "--aposHost") opts.aposHost = v;
-    if (k === "--locale") opts.locale = v;
+    if (key === "--aposHost") options.aposHost = value;
+    if (key === "--locale") options.locale = value;
   }
-  return opts;
+  
+  return options;
 }
 
-function fetchWithTimeout(url, opts = {}, ms = 30000) {
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), ms);
-  return fetch(url, { ...opts, signal: ctl.signal }).finally(() => clearTimeout(t));
+function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), timeoutMs);
+  
+  return fetch(url, { ...options, signal: abortController.signal })
+    .finally(() => clearTimeout(timeoutId));
 }
 
-function normalizeUrl(u) {
+function normalizeUrl(urlString) {
   // Ensure leading slash; drop query/hash; keep trailing slash consistency
   try {
-    const url = new URL(u, "http://dummy");
-    let p = url.pathname;
-    if (!p.startsWith("/")) p = "/" + p;
-    // Normalize: directories end with slash; file-like we leave as-is
-    if (!p.endsWith(".html") && !p.endsWith(".htm") && !p.includes(".")) {
-      if (!p.endsWith("/")) p = p + "/";
+    const url = new URL(urlString, "http://dummy");
+    let pathname = url.pathname;
+    
+    if (!pathname.startsWith("/")) {
+      pathname = "/" + pathname;
     }
-    return p;
+    
+    // Normalize: directories end with slash; file-like we leave as-is
+    if (!pathname.endsWith(".html") && !pathname.endsWith(".htm") && !pathname.includes(".")) {
+      if (!pathname.endsWith("/")) {
+        pathname = pathname + "/";
+      }
+    }
+    
+    return pathname;
   } catch {
     // If it's already a path
-    let p = u.split("?")[0].split("#")[0];
-    if (!p.startsWith("/")) p = "/" + p;
-    if (!p.endswith && notFileLike(p) && !p.endsWith("/")) p += "/";
-    return p;
+    let pathname = urlString.split("?")[0].split("#")[0];
+    
+    if (!pathname.startsWith("/")) {
+      pathname = "/" + pathname;
+    }
+    
+    if (!isFileLike(pathname) && !pathname.endsWith("/")) {
+      pathname += "/";
+    }
+    
+    return pathname;
   }
 }
-function notFileLike(p) {
-  return !/\.[a-z0-9]+$/i.test(p);
+
+function isFileLike(pathname) {
+  return /\.[a-z0-9]+$/i.test(pathname);
 }
 
 async function fetchAllPages(aposHost, headers, locale = null) {
   // Primary shape (A3): flat page API
   let url = `${aposHost}/api/v1/@apostrophecms/page?all=1&flat=1&published=1`;
+  
   if (locale) {
     url += `&aposLocale=${locale}`;
   }
   
-  const res = await fetchWithTimeout(url, { headers });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch pages: ${res.status} ${res.statusText}`);
+  const response = await fetchWithTimeout(url, { headers });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch pages: ${response.status} ${response.statusText}`);
   }
-  const json = await res.json();
+  
+  const json = await response.json();
+  
   // Accept either { results: [...] } or array forms
   const pages = Array.isArray(json) ? json : (json.results ?? json);
   const urls = [];
-  for (const p of pages || []) {
-    if (typeof p._url === "string") urls.push(normalizeUrl(p._url));
+  
+  for (const page of pages || []) {
+    if (typeof page._url === "string") {
+      urls.push(normalizeUrl(page._url));
+    }
   }
   
   // Ensure homepage exists - but respect locale context
@@ -93,7 +119,9 @@ async function fetchAllPages(aposHost, headers, locale = null) {
     }
   } else {
     // For non-localized requests, ensure bare homepage
-    if (!urls.includes("/")) urls.push("/");
+    if (!urls.includes("/")) {
+      urls.push("/");
+    }
   }
   
   // Dedup and sort
@@ -103,38 +131,52 @@ async function fetchAllPages(aposHost, headers, locale = null) {
 async function probeCandidates(aposHost, headers) {
   // Try to GET /api/v1 and treat JSON keys as candidate endpoints (common in many setups)
   try {
-    const res = await fetchWithTimeout(`${aposHost}/api/v1/`, { headers });
-    if (!res.ok) return [];
-    const data = await res.json();
+    const response = await fetchWithTimeout(`${aposHost}/api/v1/`, { headers });
+    if (!response.ok) return [];
+    
+    const data = await response.json();
+    
     // Expect an object that may enumerate subresources, but this varies by project.
     if (data && typeof data === "object" && !Array.isArray(data)) {
       return Object.keys(data)
-        .filter(k => typeof data[k] !== "function")
-        .filter(k => !k.startsWith("@apostrophecms/")) // skip core endpoints
-        .filter(k => !["search", "page"].includes(k)); // skip known non-piece
+        .filter(key => typeof data[key] !== "function")
+        .filter(key => !key.startsWith("@apostrophecms/")) // skip core endpoints
+        .filter(key => !["search", "page"].includes(key)); // skip known non-piece
     }
-  } catch {}
+  } catch (error) {
+    // Probing failed, return empty array
+  }
+  
   return [];
 }
 
-async function isPieceEndpoint(aposHost, headers, key, locale = null) {
+async function isPieceEndpoint(aposHost, headers, endpointKey, locale = null) {
   // We will probe /api/v1/<key>?perPage=1 looking for { results: [ { _url } ] }
   try {
-    let url = `${aposHost}/api/v1/${key}?perPage=1`;
+    let url = `${aposHost}/api/v1/${endpointKey}?perPage=1`;
+    
     if (locale) {
       url += `&aposLocale=${locale}`;
     }
     
-    const res = await fetchWithTimeout(url, { headers }, 15000);
-    if (!res.ok) return false;
-    const json = await res.json();
+    const response = await fetchWithTimeout(url, { headers }, 15000);
+    if (!response.ok) return false;
+    
+    const json = await response.json();
     const results = json?.results;
+    
     if (Array.isArray(results) && results.length) {
       return Boolean(results[0]?._url);
     }
+    
     // Some projects return [] but still piece endpoints—try page=1 anyway
-    if (Array.isArray(results) && results.length === 0) return true;
-  } catch {}
+    if (Array.isArray(results) && results.length === 0) {
+      return true;
+    }
+  } catch (error) {
+    // Endpoint check failed
+  }
+  
   return false;
 }
 
@@ -143,82 +185,97 @@ async function discoverPieceTypes(aposHost, headers, locale = null) {
   const candidates = await probeCandidates(aposHost, headers);
 
   // 2) Filter candidates by shape
-  const out = [];
+  const discoveredTypes = [];
   for (const key of candidates) {
-    if (await isPieceEndpoint(aposHost, headers, key, locale)) out.push(key);
+    if (await isPieceEndpoint(aposHost, headers, key, locale)) {
+      discoveredTypes.push(key);
+    }
   }
 
   // 3) If nothing found, try a heuristics pass:
   //    Request a likely piece list endpoint found in many projects.
-  const heuristics = ["article", "news", "product", "blog", "event"];
-  for (const key of heuristics) {
-    if (!out.includes(key) && await isPieceEndpoint(aposHost, headers, key, locale)) {
-      out.push(key);
+  const heuristicTypes = ["article", "news", "product", "blog", "event"];
+  
+  for (const heuristicType of heuristicTypes) {
+    if (!discoveredTypes.includes(heuristicType) && 
+        await isPieceEndpoint(aposHost, headers, heuristicType, locale)) {
+      discoveredTypes.push(heuristicType);
     }
   }
-  return Array.from(new Set(out));
+  
+  return Array.from(new Set(discoveredTypes));
 }
 
 async function fetchAllPieces(aposHost, headers, pieceType, locale = null) {
   const urls = [];
-  let page = 1;
-  const perPage = 100;
+  let currentPage = 1;
+  const itemsPerPage = 100;
+  
   for (;;) {
-    let url = `${aposHost}/api/v1/${pieceType}?page=${page}&perPage=${perPage}`;
+    let url = `${aposHost}/api/v1/${pieceType}?page=${currentPage}&perPage=${itemsPerPage}`;
+    
     if (locale) {
       url += `&aposLocale=${locale}`;
     }
     
-    const res = await fetchWithTimeout(url, { headers }, 30000);
-    if (!res.ok) break;
-    const json = await res.json();
+    const response = await fetchWithTimeout(url, { headers }, 30000);
+    if (!response.ok) break;
+    
+    const json = await response.json();
     const results = json?.results ?? [];
+    
     for (const piece of results) {
-      if (piece?._url) urls.push(normalizeUrl(piece._url));
+      if (piece?._url) {
+        urls.push(normalizeUrl(piece._url));
+      }
     }
-    if (results.length < perPage) break;
-    page += 1;
+    
+    if (results.length < itemsPerPage) break;
+    currentPage += 1;
   }
+  
   return urls;
 }
 
-export async function generateSitemap(opts = {}) {
-  const cli = parseCliArgs();
-  const aposHost = opts.aposHost ?? cli.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
-  const locale = opts.locale ?? cli.locale ?? null;
+export async function generateSitemap(options = {}) {
+  const cliOptions = parseCliArgs();
+  const aposHost = options.aposHost ?? cliOptions.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
+  const locale = options.locale ?? cliOptions.locale ?? null;
   
   const frontKey = process.env.APOS_EXTERNAL_FRONT_KEY;
   if (!frontKey) {
     throw new Error("APOS_EXTERNAL_FRONT_KEY is required in env to read the API");
   }
+  
   const headers = { "APOS-EXTERNAL-FRONT-KEY": frontKey };
 
-  // Pages
+  // Fetch pages
   const pageUrls = await fetchAllPages(aposHost, headers, locale);
 
   // Piece types: either CLI override or discover
-  let pieceTypes = opts.pieceTypes ?? cli.pieceTypes;
+  let pieceTypes = options.pieceTypes ?? cliOptions.pieceTypes;
   if (!pieceTypes) {
     pieceTypes = await discoverPieceTypes(aposHost, headers, locale);
   }
 
+  // Fetch all pieces
   const pieceUrls = [];
-  for (const t of pieceTypes) {
-    const urls = await fetchAllPieces(aposHost, headers, t, locale);
+  for (const pieceType of pieceTypes) {
+    const urls = await fetchAllPieces(aposHost, headers, pieceType, locale);
     pieceUrls.push(...urls);
   }
 
   // Merge, dedupe, sort
-  const all = Array.from(new Set([...pageUrls, ...pieceUrls])).sort();
-  return all;
+  const allUrls = Array.from(new Set([...pageUrls, ...pieceUrls])).sort();
+  return allUrls;
 }
 
 // Allow running directly: prints JSON array to stdout
 if (import.meta.url === `file://${process.argv[1]}`) {
-  generateSitemap().then(list => {
-    process.stdout.write(JSON.stringify(list, null, 2) + "\n");
-  }).catch(err => {
-    console.error(err);
+  generateSitemap().then(urlList => {
+    process.stdout.write(JSON.stringify(urlList, null, 2) + "\n");
+  }).catch(error => {
+    console.error(error);
     process.exit(1);
   });
 }

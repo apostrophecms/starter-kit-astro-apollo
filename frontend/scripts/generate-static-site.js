@@ -16,6 +16,7 @@
 //   --pieceTypes=a,b,c   Optional: force specific piece types (skips discovery)
 //   --aposHost=...       Override Apostrophe host (defaults to APOS_HOST env)
 //   --localeConfig=...   Path to locale configuration file (enables multi-locale)
+//   --retries=3          Number of retries for failed fetches (default: 3)
 
 import os from "os";
 import fs from "fs";
@@ -25,134 +26,224 @@ import { generateSitemap } from "./generateSitemap.js";
 
 function parseCliArgs() {
   const args = process.argv.slice(2);
-  const opts = {};
-  for (const a of args) {
-    const [k, v] = a.split("=");
-    if (k === "--out") opts.out = v;
-    if (k === "--port") opts.port = Number(v);
-    if (k === "--host") opts.host = v;
-    if (k === "--concurrency") opts.concurrency = Number(v);
-    if (k === "--pieceTypes") opts.pieceTypes = v.split(",").map(s => s.trim()).filter(Boolean);
-    if (k === "--aposHost") opts.aposHost = v;
-    if (k === "--localeConfig") opts.localeConfig = v;
+  const options = {};
+  
+  for (const arg of args) {
+    const [key, value] = arg.split("=");
+    if (key === "--out") options.out = value;
+    if (key === "--port") options.port = Number(value);
+    if (key === "--host") options.host = value;
+    if (key === "--concurrency") options.concurrency = Number(value);
+    if (key === "--retries") options.retries = Number(value);
+    if (key === "--pieceTypes") {
+      options.pieceTypes = value.split(",").map(type => type.trim()).filter(Boolean);
+    }
+    if (key === "--aposHost") options.aposHost = value;
+    if (key === "--localeConfig") options.localeConfig = value;
   }
-  return opts;
+  
+  return options;
 }
 
-function fetchWithTimeout(url, opts = {}, ms = 30000) {
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), ms);
-  return fetch(url, { ...opts, signal: ctl.signal }).finally(() => clearTimeout(t));
+function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), timeoutMs);
+  
+  return fetch(url, { ...options, signal: abortController.signal })
+    .finally(() => clearTimeout(timeoutId));
+}
+
+async function fetchWithRetry(url, options = {}, timeoutMs = 30000, retries = 3) {
+  let lastError;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, options, timeoutMs);
+      if (response.ok) return response;
+      
+      // Don't retry 4xx errors (except 429 rate limit)
+      if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+    } catch (error) {
+      lastError = error;
+    }
+    
+    if (attempt < retries) {
+      const delay = Math.min(1000 * Math.pow(2, attempt), 5000); // Exponential backoff, max 5s
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError;
 }
 
 async function waitForServer(url, { timeoutMs = 60000, intervalMs = 500 } = {}) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
+  const startTime = Date.now();
+  
+  while (Date.now() - startTime < timeoutMs) {
     try {
-      const res = await fetchWithTimeout(url, {}, intervalMs);
-      if (res.ok) return true;
-    } catch {}
-    await new Promise(r => setTimeout(r, intervalMs));
+      const response = await fetchWithTimeout(url, {}, intervalMs);
+      if (response.ok) return true;
+    } catch (error) {
+      // Server not ready yet, continue waiting
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
   }
+  
   throw new Error(`Preview server did not respond at ${url} within ${timeoutMs}ms`);
 }
 
-function cleanDir(dir) {
-  fs.rmSync(dir, { recursive: true, force: true });
-  fs.mkdirSync(dir, { recursive: true });
+function cleanDir(directory) {
+  fs.rmSync(directory, { recursive: true, force: true });
+  fs.mkdirSync(directory, { recursive: true });
 }
 
-function copyDir(src, dest) {
-  if (!fs.existsSync(src)) return;
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const s = path.join(src, entry.name);
-    const d = path.join(dest, entry.name);
-    if (entry.isDirectory()) copyDir(s, d);
-    else fs.copyFileSync(s, d);
+function copyDir(sourceDir, destDir) {
+  if (!fs.existsSync(sourceDir)) return;
+  
+  fs.mkdirSync(destDir, { recursive: true });
+  
+  for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+    const sourcePath = path.join(sourceDir, entry.name);
+    const destPath = path.join(destDir, entry.name);
+    
+    if (entry.isDirectory()) {
+      copyDir(sourcePath, destPath);
+    } else {
+      fs.copyFileSync(sourcePath, destPath);
+    }
   }
 }
 
 function writeHtmlForPath(rootDir, urlPath, html) {
   // Map '/about/' -> '<out>/about/index.html', '/' -> '<out>/index.html'
   const isFile = /\.[a-z0-9]+$/i.test(urlPath);
-  let outPath;
+  let outputPath;
+  
   if (isFile) {
-    outPath = path.join(rootDir, urlPath.replace(/^\//, ""));
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    outputPath = path.join(rootDir, urlPath.replace(/^\//, ""));
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   } else if (urlPath === "/") {
-    outPath = path.join(rootDir, "index.html");
+    outputPath = path.join(rootDir, "index.html");
   } else {
-    outPath = path.join(rootDir, urlPath.replace(/^\//, ""), "index.html");
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    outputPath = path.join(rootDir, urlPath.replace(/^\//, ""), "index.html");
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   }
-  fs.writeFileSync(outPath, html);
+  
+  fs.writeFileSync(outputPath, html);
 }
 
 async function extractImagesFromHtml(staticDir, aposHost) {
   // Scan generated HTML and download remote images under uploads/
   const htmlFiles = [];
-  (function walk(dir) {
+  
+  (function walkDirectory(dir) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const p = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(p);
-      else if (entry.isFile() && entry.name.endsWith(".html")) htmlFiles.push(p);
+      const filePath = path.join(dir, entry.name);
+      
+      if (entry.isDirectory()) {
+        walkDirectory(filePath);
+      } else if (entry.isFile() && entry.name.endsWith(".html")) {
+        htmlFiles.push(filePath);
+      }
     }
   })(staticDir);
 
   const uploadUrls = new Set();
-  const re = new RegExp(`(?:src|href)=(?:"|')(?:${aposHost.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")})?/uploads/[^"']+`, "gi");
+  const escapedHost = aposHost.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+  const urlRegex = new RegExp(
+    `(?:src|href)=["'](?:${escapedHost})?/uploads/[^"']+["']`, 
+    "gi"
+  );
 
-  for (const f of htmlFiles) {
-    const html = fs.readFileSync(f, "utf8");
-    const matches = html.match(re) || [];
-    for (const m of matches) {
-      const url = m.split(/=|['"]/).pop();
-      uploadUrls.add(url);
+  for (const htmlFile of htmlFiles) {
+    const htmlContent = fs.readFileSync(htmlFile, "utf8");
+    const matches = htmlContent.matchAll(urlRegex);
+    
+    for (const match of matches) {
+      // Extract URL from the matched attribute
+      const urlMatch = match[0].match(/["']([^"']+)["']/);
+      if (urlMatch) {
+        uploadUrls.add(urlMatch[1]);
+      }
     }
   }
 
-  for (const u of uploadUrls) {
-    try {
-      const full = u.startsWith("http") ? u : `${aposHost}${u}`;
-      const rel = full.replace(/^https?:\/\/[^/]+/, ""); // /uploads/...
-      const dest = path.join(staticDir, rel);
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      const res = await fetchWithTimeout(full, {}, 60000);
-      if (res.ok) {
-        const buf = Buffer.from(await res.arrayBuffer());
-        fs.writeFileSync(dest, buf);
-      }
-    } catch {}
+  if (uploadUrls.size === 0) {
+    console.log("   No upload URLs found in HTML");
+    return;
   }
+
+  console.log(`   Downloading ${uploadUrls.size} upload assets...`);
+  let downloaded = 0;
+  let failed = 0;
+
+  for (const uploadUrl of uploadUrls) {
+    try {
+      const fullUrl = uploadUrl.startsWith("http") ? uploadUrl : `${aposHost}${uploadUrl}`;
+      const relativePath = fullUrl.replace(/^https?:\/\/[^/]+/, ""); // /uploads/...
+      const destPath = path.join(staticDir, relativePath);
+      
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+      
+      const response = await fetchWithRetry(fullUrl, {}, 60000, 2);
+      const buffer = Buffer.from(await response.arrayBuffer());
+      fs.writeFileSync(destPath, buffer);
+      downloaded++;
+    } catch (error) {
+      failed++;
+      console.warn(`   ⚠️  Failed to download: ${uploadUrl}`);
+    }
+  }
+
+  console.log(`   ✓ Downloaded ${downloaded} assets${failed > 0 ? `, ${failed} failed` : ''}`);
 }
 
 async function copyAposUploadsFromFs(staticDir) {
   // Best-effort local paths for monorepo setups
-  const candidates = [
+  const candidatePaths = [
     path.join(process.cwd(), "..", "backend", "public", "uploads"),
     path.join(process.cwd(), "backend", "public", "uploads"),
     path.join(process.cwd(), "..", "..", "backend", "public", "uploads"),
     path.join(process.cwd(), "public", "uploads")
   ];
-  for (const p of candidates) {
-    if (fs.existsSync(p) && fs.statSync(p).isDirectory()) {
-      copyDir(p, path.join(staticDir, "uploads"));
-      return true;
+  
+  for (const candidatePath of candidatePaths) {
+    if (fs.existsSync(candidatePath) && fs.statSync(candidatePath).isDirectory()) {
+      const files = fs.readdirSync(candidatePath);
+      if (files.length > 0) {
+        console.log(`   Copying from: ${candidatePath}`);
+        copyDir(candidatePath, path.join(staticDir, "uploads"));
+        return true;
+      }
     }
   }
+  
   return false;
 }
 
 async function mapLimit(items, limit, worker) {
-  const q = [...items];
-  const runners = Array.from({ length: limit }, async function run() {
-    while (q.length) {
-      const it = q.shift();
-      try { await worker(it); } catch (e) { console.warn("Fetch error:", e.message); }
+  const queue = [...items];
+  const results = { success: 0, failed: 0, errors: [] };
+  
+  const runners = Array.from({ length: limit }, async function processQueue() {
+    while (queue.length) {
+      const item = queue.shift();
+      try {
+        await worker(item);
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({ item, error: error.message });
+      }
     }
   });
+  
   await Promise.all(runners);
+  return results;
 }
 
 async function loadLocaleConfig(configPath) {
@@ -180,142 +271,235 @@ async function loadLocaleConfig(configPath) {
   }
 }
 
+function applyLocalePrefix(urls, localePrefix) {
+  if (!localePrefix) return urls;
+  
+  return urls.map(url => {
+    // Don't double-prefix
+    if (url.startsWith(localePrefix + '/') || url === localePrefix) {
+      return url;
+    }
+    
+    // Add prefix to all paths
+    if (url === '/') {
+      return localePrefix + '/';
+    }
+    
+    return localePrefix + url;
+  });
+}
+
+async function fetchCustom404(previewUrl, outputDir, retries) {
+  // Try to fetch custom 404 page from the preview server
+  try {
+    const response = await fetchWithRetry(`${previewUrl}/404`, {}, 30000, retries);
+    if (response.ok) {
+      const html = await response.text();
+      fs.writeFileSync(path.join(outputDir, "404.html"), html);
+      console.log("   ✓ Custom 404 page generated");
+      return true;
+    }
+  } catch (error) {
+    // Custom 404 not available, will create default
+  }
+  return false;
+}
+
 async function main() {
-  const cli = parseCliArgs();
-  const outDir = path.resolve(cli.out ?? "static-dist");
-  const port = cli.port ?? 4321;
-  const host = cli.host ?? "127.0.0.1";
+  const cliOptions = parseCliArgs();
+  const outputDir = path.resolve(cliOptions.out ?? "static-dist");
+  const port = cliOptions.port ?? 4321;
+  const host = cliOptions.host ?? "127.0.0.1";
   const previewUrl = `http://${host}:${port}`;
-  const concurrency = Math.min(8, Math.max(2, cli.concurrency ?? os.cpus().length));
-  const aposHost = cli.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
+  const concurrency = Math.min(8, Math.max(2, cliOptions.concurrency ?? os.cpus().length));
+  const retries = cliOptions.retries ?? 3;
+  const aposHost = cliOptions.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
   const frontKey = process.env.APOS_EXTERNAL_FRONT_KEY;
+  
   if (!frontKey) {
-    console.error("APOS_EXTERNAL_FRONT_KEY is required");
+    console.error("❌ APOS_EXTERNAL_FRONT_KEY is required");
     process.exit(1);
   }
 
   // Load locale configuration if provided
   let localeConfig = null;
-  if (cli.localeConfig) {
-    localeConfig = await loadLocaleConfig(cli.localeConfig);
+  if (cliOptions.localeConfig) {
+    localeConfig = await loadLocaleConfig(cliOptions.localeConfig);
     console.log(`🌍 Multi-locale mode enabled with locales: ${Object.keys(localeConfig).join(', ')}`);
   }
 
-  console.log("🛠️ Building Astro...");
-  execSync("npm run build", { stdio: "inherit" });
+  console.log("🛠️  Building Astro...");
+  try {
+    execSync("npm run build", { stdio: "inherit" });
+  } catch (error) {
+    console.error("❌ Astro build failed");
+    process.exit(1);
+  }
 
   console.log("🌐 Starting Astro preview...");
-  const astro = spawn("npm", ["run", "preview", "--", "--host", host, "--port", String(port)], {
-    stdio: ["ignore", "inherit", "inherit"],
-    detached: process.platform !== "win32"
-  });
+  const astroProcess = spawn(
+    "npm", 
+    ["run", "preview", "--", "--host", host, "--port", String(port)], 
+    {
+      stdio: ["ignore", "inherit", "inherit"],
+      detached: process.platform !== "win32"
+    }
+  );
 
   function shutdown() {
-    if (!astro.killed) {
+    if (!astroProcess.killed) {
       if (process.platform === "win32") {
-        spawn("taskkill", ["/pid", String(astro.pid), "/T", "/F"]);
+        spawn("taskkill", ["/pid", String(astroProcess.pid), "/T", "/F"]);
       } else {
-        try { process.kill(-astro.pid, "SIGTERM"); } catch { try { astro.kill("SIGTERM"); } catch {} }
+        try {
+          process.kill(-astroProcess.pid, "SIGTERM");
+        } catch {
+          try {
+            astroProcess.kill("SIGTERM");
+          } catch {}
+        }
       }
     }
   }
+  
+  // Ensure cleanup on any exit
   process.on("exit", shutdown);
   process.on("SIGINT", () => { shutdown(); process.exit(1); });
   process.on("SIGTERM", () => { shutdown(); process.exit(1); });
+  process.on("uncaughtException", (error) => { 
+    console.error("❌ Uncaught exception:", error);
+    shutdown(); 
+    process.exit(1); 
+  });
 
-  console.log(`⏳ Waiting for preview at ${previewUrl} ...`);
-  await waitForServer(previewUrl, { timeoutMs: 90000, intervalMs: 800 });
-  console.log("✅ Preview is up.");
+  try {
+    console.log(`⏳ Waiting for preview at ${previewUrl} ...`);
+    await waitForServer(previewUrl, { timeoutMs: 90000, intervalMs: 800 });
+    console.log("✅ Preview is up.");
 
-  console.log("🧭 Generating sitemap from Apostrophe...");
-  
-  let allUrls = [];
-  
-  if (localeConfig) {
-    // Multi-locale: generate sitemap for each locale and combine
-    for (const [locale, config] of Object.entries(localeConfig)) {
-      console.log(`   📋 Fetching URLs for locale: ${locale}`);
-      const urls = await generateSitemap({ 
-        aposHost, 
-        locale,
-        pieceTypes: cli.pieceTypes 
-      });
+    console.log("🧭 Generating sitemap from Apostrophe...");
+    
+    let allUrls = [];
+    
+    if (localeConfig) {
+      // Multi-locale: generate sitemap for each locale and combine
+      for (const [locale, config] of Object.entries(localeConfig)) {
+        console.log(`   📋 Fetching URLs for locale: ${locale}`);
+        const urls = await generateSitemap({ 
+          aposHost, 
+          locale,
+          pieceTypes: cliOptions.pieceTypes 
+        });
+        
+        // Apply locale prefix if configured
+        const prefixedUrls = applyLocalePrefix(urls, config.prefix);
+        
+        allUrls.push(...prefixedUrls);
+        console.log(`   ✓ ${prefixedUrls.length} URLs for ${locale}`);
+      }
       
-      // Apply locale prefix if configured and not already present
-      const prefixedUrls = urls.map(url => {
-        // Check if URL already has the locale prefix
-        if (config.prefix && !url.startsWith(config.prefix + '/') && !url.startsWith(config.prefix) && url !== '/') {
-          return config.prefix + url;
-        } else if (config.prefix && url === '/' && !urls.some(u => u === config.prefix + '/')) {
-          // Only add prefix to root if there's no prefixed root already
-          return config.prefix + '/';
-        }
-        return url;
-      });
-      
-      allUrls.push(...prefixedUrls);
-      console.log(`   ✓ ${prefixedUrls.length} URLs for ${locale}`);
+      // Remove duplicates and sort
+      allUrls = Array.from(new Set(allUrls)).sort();
+    } else {
+      // Single locale (existing behavior)
+      allUrls = await generateSitemap({ aposHost, pieceTypes: cliOptions.pieceTypes });
     }
     
-    // Remove duplicates and sort
-    allUrls = Array.from(new Set(allUrls)).sort();
-  } else {
-    // Single locale (existing behavior)
-    allUrls = await generateSitemap({ aposHost, pieceTypes: cli.pieceTypes });
-  }
-  
-  console.log(`📄 ${allUrls.length} total URLs to render.`);
-
-  console.log("📂 Preparing output directory:", outDir);
-  cleanDir(outDir);
-
-  // Copy **browser assets** in a way that matches the HTML:
-  // - For SSR builds: copy `dist/client/*` directly into `<out>/`
-  // - For SSG builds: copy `dist/*` (which already has `/_astro` etc. at root)
-  const dist = path.join(process.cwd(), "dist");
-  const distClient = path.join(dist, "client");
-  if (fs.existsSync(distClient)) {
-    console.log("📦 Detected SSR build shape — copying dist/client/* to output root...");
-    copyDir(distClient, outDir);
-  } else if (fs.existsSync(dist)) {
-    console.log("📦 Detected static build shape — copying dist/* to output root...");
-    copyDir(dist, outDir);
-  }
-
-  console.log(`🚚 Rendering pages (concurrency: ${concurrency})...`);
-  let done = 0;
-  await mapLimit(allUrls, concurrency, async (u) => {
-    const pageUrl = new URL(u, previewUrl).toString();
-    const res = await fetchWithTimeout(pageUrl, {}, 60000);
-    if (!res.ok) throw new Error(`GET ${pageUrl} -> ${res.status}`);
-    const html = await res.text();
-    writeHtmlForPath(outDir, new URL(u, "http://dummy").pathname, html);
-    done += 1;
-    if (done % 10 === 0 || done === allUrls.length) {
-      process.stdout.write(`\r   ${done}/${allUrls.length} pages`);
+    if (allUrls.length === 0) {
+      console.error("❌ No URLs found to render. Check your Apostrophe connection and data.");
+      throw new Error("Empty sitemap");
     }
-  });
-  process.stdout.write("\n");
+    
+    console.log(`📄 ${allUrls.length} total URLs to render.`);
 
-  console.log("🖼️ Handling uploads...");
-  const copied = await copyAposUploadsFromFs(outDir);
-  if (!copied) {
-    console.log("   No local uploads found — scanning HTML and downloading referenced assets...");
-    await extractImagesFromHtml(outDir, aposHost);
+    console.log("📂 Preparing output directory:", outputDir);
+    cleanDir(outputDir);
+
+    // Copy browser assets
+    const distDir = path.join(process.cwd(), "dist");
+    const distClientDir = path.join(distDir, "client");
+    
+    if (fs.existsSync(distClientDir)) {
+      console.log("📦 Detected SSR build shape – copying dist/client/* to output root...");
+      copyDir(distClientDir, outputDir);
+    } else if (fs.existsSync(distDir)) {
+      console.log("📦 Detected static build shape – copying dist/* to output root...");
+      copyDir(distDir, outputDir);
+    } else {
+      console.warn("⚠️  No dist directory found - assets may be missing");
+    }
+
+    console.log(`🚚 Rendering pages (concurrency: ${concurrency}, retries: ${retries})...`);
+    let completedPages = 0;
+    const totalPages = allUrls.length;
+    
+    const renderResults = await mapLimit(allUrls, concurrency, async (urlPath) => {
+      const pageUrl = new URL(urlPath, previewUrl).toString();
+      const response = await fetchWithRetry(pageUrl, {}, 60000, retries);
+      
+      const html = await response.text();
+      writeHtmlForPath(outputDir, new URL(urlPath, "http://dummy").pathname, html);
+      
+      completedPages += 1;
+      // Update progress more frequently for better feedback
+      if (completedPages % 5 === 0 || completedPages === totalPages) {
+        const percentage = Math.round((completedPages / totalPages) * 100);
+        process.stdout.write(`\r   ${completedPages}/${totalPages} pages (${percentage}%)`);
+      }
+    });
+    
+    process.stdout.write("\n");
+    
+    if (renderResults.failed > 0) {
+      console.warn(`⚠️  ${renderResults.failed} pages failed to render:`);
+      renderResults.errors.slice(0, 5).forEach(({ item, error }) => {
+        console.warn(`   - ${item}: ${error}`);
+      });
+      if (renderResults.errors.length > 5) {
+        console.warn(`   ... and ${renderResults.errors.length - 5} more`);
+      }
+    }
+
+    console.log("🖼️  Handling uploads...");
+    const uploadsCopied = await copyAposUploadsFromFs(outputDir);
+    
+    if (!uploadsCopied) {
+      console.log("   No local uploads found – scanning HTML and downloading referenced assets...");
+      await extractImagesFromHtml(outputDir, aposHost);
+    }
+
+    // Try to get custom 404, fallback to default
+    const has404 = await fetchCustom404(previewUrl, outputDir, retries);
+    if (!has404) {
+      const notFoundPath = path.join(outputDir, "404.html");
+      if (!fs.existsSync(notFoundPath)) {
+        fs.writeFileSync(
+          notFoundPath, 
+          "<!doctype html><meta charset='utf-8'><title>Not found</title><h1>404</h1>"
+        );
+        console.log("   ✓ Default 404 page created");
+      }
+    }
+
+    console.log("🎉 Static export complete:", outputDir);
+    
+    if (renderResults.failed > 0) {
+      console.log(`\n⚠️  Warning: Export completed with ${renderResults.failed} failed pages`);
+      shutdown();
+      process.exit(1); // Exit with error code if some pages failed
+    }
+    
+    shutdown();
+  } catch (error) {
+    console.error("\n❌ Export failed:", error.message);
+    shutdown();
+    process.exit(1);
   }
-
-  const notFound = path.join(outDir, "404.html");
-  if (!fs.existsSync(notFound)) {
-    fs.writeFileSync(notFound, "<!doctype html><meta charset='utf-8'><title>Not found</title><h1>404</h1>");
-  }
-
-  console.log("🎉 Static export complete:", outDir);
-  shutdown();
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(err => {
-    console.error(err);
+  main().catch(error => {
+    console.error(error);
     process.exit(1);
   });
 }
