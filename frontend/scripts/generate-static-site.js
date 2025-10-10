@@ -4,6 +4,8 @@
 // HTML to a static output directory, copies Astro assets, and pulls Apostrophe
 // uploads either from local FS (monorepo) or by downloading referenced image URLs.
 //
+// Multi-locale support: Pass --localeConfig=path/to/config.js to enable multi-locale generation
+//
 // Usage:
 //   APOS_HOST=http://localhost:3000 APOS_EXTERNAL_FRONT_KEY=... node scripts/generate-static-site.js --out static-dist
 // Options:
@@ -13,7 +15,7 @@
 //   --concurrency=8      Max concurrent fetches (default: CPU count, capped at 8)
 //   --pieceTypes=a,b,c   Optional: force specific piece types (skips discovery)
 //   --aposHost=...       Override Apostrophe host (defaults to APOS_HOST env)
-
+//   --localeConfig=...   Path to locale configuration file (enables multi-locale)
 
 import os from "os";
 import fs from "fs";
@@ -32,6 +34,7 @@ function parseCliArgs() {
     if (k === "--concurrency") opts.concurrency = Number(v);
     if (k === "--pieceTypes") opts.pieceTypes = v.split(",").map(s => s.trim()).filter(Boolean);
     if (k === "--aposHost") opts.aposHost = v;
+    if (k === "--localeConfig") opts.localeConfig = v;
   }
   return opts;
 }
@@ -152,6 +155,31 @@ async function mapLimit(items, limit, worker) {
   await Promise.all(runners);
 }
 
+async function loadLocaleConfig(configPath) {
+  try {
+    const fullPath = path.resolve(configPath);
+    const config = (await import(fullPath)).default;
+    
+    // Validate config structure
+    if (!config || typeof config !== 'object') {
+      throw new Error('Locale config must export a default object');
+    }
+    
+    for (const [locale, settings] of Object.entries(config)) {
+      if (!settings.baseUrl) {
+        throw new Error(`Locale "${locale}" missing baseUrl`);
+      }
+      if (settings.prefix === undefined) {
+        settings.prefix = ''; // Default to empty prefix
+      }
+    }
+    
+    return config;
+  } catch (error) {
+    throw new Error(`Failed to load locale config from ${configPath}: ${error.message}`);
+  }
+}
+
 async function main() {
   const cli = parseCliArgs();
   const outDir = path.resolve(cli.out ?? "static-dist");
@@ -166,7 +194,14 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🛠️  Building Astro...");
+  // Load locale configuration if provided
+  let localeConfig = null;
+  if (cli.localeConfig) {
+    localeConfig = await loadLocaleConfig(cli.localeConfig);
+    console.log(`🌍 Multi-locale mode enabled with locales: ${Object.keys(localeConfig).join(', ')}`);
+  }
+
+  console.log("🛠️ Building Astro...");
   execSync("npm run build", { stdio: "inherit" });
 
   console.log("🌐 Starting Astro preview...");
@@ -193,8 +228,43 @@ async function main() {
   console.log("✅ Preview is up.");
 
   console.log("🧭 Generating sitemap from Apostrophe...");
-  const urls = await generateSitemap({ aposHost, pieceTypes: cli.pieceTypes });
-  console.log(`📄 ${urls.length} URLs to render.`);
+  
+  let allUrls = [];
+  
+  if (localeConfig) {
+    // Multi-locale: generate sitemap for each locale and combine
+    for (const [locale, config] of Object.entries(localeConfig)) {
+      console.log(`   📋 Fetching URLs for locale: ${locale}`);
+      const urls = await generateSitemap({ 
+        aposHost, 
+        locale,
+        pieceTypes: cli.pieceTypes 
+      });
+      
+      // Apply locale prefix if configured and not already present
+      const prefixedUrls = urls.map(url => {
+        // Check if URL already has the locale prefix
+        if (config.prefix && !url.startsWith(config.prefix + '/') && !url.startsWith(config.prefix) && url !== '/') {
+          return config.prefix + url;
+        } else if (config.prefix && url === '/' && !urls.some(u => u === config.prefix + '/')) {
+          // Only add prefix to root if there's no prefixed root already
+          return config.prefix + '/';
+        }
+        return url;
+      });
+      
+      allUrls.push(...prefixedUrls);
+      console.log(`   ✓ ${prefixedUrls.length} URLs for ${locale}`);
+    }
+    
+    // Remove duplicates and sort
+    allUrls = Array.from(new Set(allUrls)).sort();
+  } else {
+    // Single locale (existing behavior)
+    allUrls = await generateSitemap({ aposHost, pieceTypes: cli.pieceTypes });
+  }
+  
+  console.log(`📄 ${allUrls.length} total URLs to render.`);
 
   console.log("📂 Preparing output directory:", outDir);
   cleanDir(outDir);
@@ -214,15 +284,15 @@ async function main() {
 
   console.log(`🚚 Rendering pages (concurrency: ${concurrency})...`);
   let done = 0;
-  await mapLimit(urls, concurrency, async (u) => {
+  await mapLimit(allUrls, concurrency, async (u) => {
     const pageUrl = new URL(u, previewUrl).toString();
     const res = await fetchWithTimeout(pageUrl, {}, 60000);
     if (!res.ok) throw new Error(`GET ${pageUrl} -> ${res.status}`);
     const html = await res.text();
     writeHtmlForPath(outDir, new URL(u, "http://dummy").pathname, html);
     done += 1;
-    if (done % 10 === 0 || done === urls.length) {
-      process.stdout.write(`\r   ${done}/${urls.length} pages`);
+    if (done % 10 === 0 || done === allUrls.length) {
+      process.stdout.write(`\r   ${done}/${allUrls.length} pages`);
     }
   });
   process.stdout.write("\n");

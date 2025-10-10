@@ -7,12 +7,13 @@
 // - Fully paginates piece API endpoints
 // - Deduplicates, sorts, and normalizes URLs
 // - CLI override: --pieceTypes=article,product to force types (skips discovery)
+// - Multi-locale support: pass locale to fetch locale-specific content
 //
 // Usage:
 //   node scripts/generateSitemap.js > sitemap.json
 //
 // Exported:
-//   generateSitemap({ aposHost?, headers?, pieceTypes? }) -> Promise<string[]>
+//   generateSitemap({ aposHost?, headers?, pieceTypes?, locale? }) -> Promise<string[]>
 //
 // Notes:
 // - Requires an external front key with read permissions for pages and pieces.
@@ -29,6 +30,7 @@ function parseCliArgs() {
       opts.pieceTypes = v.split(",").map(s => s.trim()).filter(Boolean);
     }
     if (k === "--aposHost") opts.aposHost = v;
+    if (k === "--locale") opts.locale = v;
   }
   return opts;
 }
@@ -62,9 +64,13 @@ function notFileLike(p) {
   return !/\.[a-z0-9]+$/i.test(p);
 }
 
-async function fetchAllPages(aposHost, headers) {
+async function fetchAllPages(aposHost, headers, locale = null) {
   // Primary shape (A3): flat page API
-  const url = `${aposHost}/api/v1/@apostrophecms/page?all=1&flat=1&published=1`;
+  let url = `${aposHost}/api/v1/@apostrophecms/page?all=1&flat=1&published=1`;
+  if (locale) {
+    url += `&aposLocale=${locale}`;
+  }
+  
   const res = await fetchWithTimeout(url, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch pages: ${res.status} ${res.statusText}`);
@@ -76,8 +82,20 @@ async function fetchAllPages(aposHost, headers) {
   for (const p of pages || []) {
     if (typeof p._url === "string") urls.push(normalizeUrl(p._url));
   }
-  // Ensure homepage
-  if (!urls.includes("/")) urls.push("/");
+  
+  // Ensure homepage exists - but respect locale context
+  if (locale) {
+    // For localized requests, look for locale-prefixed homepage
+    const expectedHomepage = `/${locale}/`;
+    if (!urls.includes(expectedHomepage) && !urls.includes("/")) {
+      // Only add bare "/" if no localized homepage found
+      urls.push("/");
+    }
+  } else {
+    // For non-localized requests, ensure bare homepage
+    if (!urls.includes("/")) urls.push("/");
+  }
+  
   // Dedup and sort
   return Array.from(new Set(urls)).sort();
 }
@@ -99,10 +117,15 @@ async function probeCandidates(aposHost, headers) {
   return [];
 }
 
-async function isPieceEndpoint(aposHost, headers, key) {
+async function isPieceEndpoint(aposHost, headers, key, locale = null) {
   // We will probe /api/v1/<key>?perPage=1 looking for { results: [ { _url } ] }
   try {
-    const res = await fetchWithTimeout(`${aposHost}/api/v1/${key}?perPage=1`, { headers }, 15000);
+    let url = `${aposHost}/api/v1/${key}?perPage=1`;
+    if (locale) {
+      url += `&aposLocale=${locale}`;
+    }
+    
+    const res = await fetchWithTimeout(url, { headers }, 15000);
     if (!res.ok) return false;
     const json = await res.json();
     const results = json?.results;
@@ -115,33 +138,38 @@ async function isPieceEndpoint(aposHost, headers, key) {
   return false;
 }
 
-async function discoverPieceTypes(aposHost, headers) {
+async function discoverPieceTypes(aposHost, headers, locale = null) {
   // 1) Try to enumerate via /api/v1 root
   const candidates = await probeCandidates(aposHost, headers);
 
   // 2) Filter candidates by shape
   const out = [];
   for (const key of candidates) {
-    if (await isPieceEndpoint(aposHost, headers, key)) out.push(key);
+    if (await isPieceEndpoint(aposHost, headers, key, locale)) out.push(key);
   }
 
   // 3) If nothing found, try a heuristics pass:
   //    Request a likely piece list endpoint found in many projects.
   const heuristics = ["article", "news", "product", "blog", "event"];
   for (const key of heuristics) {
-    if (!out.includes(key) && await isPieceEndpoint(aposHost, headers, key)) {
+    if (!out.includes(key) && await isPieceEndpoint(aposHost, headers, key, locale)) {
       out.push(key);
     }
   }
   return Array.from(new Set(out));
 }
 
-async function fetchAllPieces(aposHost, headers, pieceType) {
+async function fetchAllPieces(aposHost, headers, pieceType, locale = null) {
   const urls = [];
   let page = 1;
   const perPage = 100;
   for (;;) {
-    const res = await fetchWithTimeout(`${aposHost}/api/v1/${pieceType}?page=${page}&perPage=${perPage}`, { headers }, 30000);
+    let url = `${aposHost}/api/v1/${pieceType}?page=${page}&perPage=${perPage}`;
+    if (locale) {
+      url += `&aposLocale=${locale}`;
+    }
+    
+    const res = await fetchWithTimeout(url, { headers }, 30000);
     if (!res.ok) break;
     const json = await res.json();
     const results = json?.results ?? [];
@@ -157,6 +185,8 @@ async function fetchAllPieces(aposHost, headers, pieceType) {
 export async function generateSitemap(opts = {}) {
   const cli = parseCliArgs();
   const aposHost = opts.aposHost ?? cli.aposHost ?? (process.env.APOS_HOST || "http://localhost:3000");
+  const locale = opts.locale ?? cli.locale ?? null;
+  
   const frontKey = process.env.APOS_EXTERNAL_FRONT_KEY;
   if (!frontKey) {
     throw new Error("APOS_EXTERNAL_FRONT_KEY is required in env to read the API");
@@ -164,17 +194,17 @@ export async function generateSitemap(opts = {}) {
   const headers = { "APOS-EXTERNAL-FRONT-KEY": frontKey };
 
   // Pages
-  const pageUrls = await fetchAllPages(aposHost, headers);
+  const pageUrls = await fetchAllPages(aposHost, headers, locale);
 
   // Piece types: either CLI override or discover
   let pieceTypes = opts.pieceTypes ?? cli.pieceTypes;
   if (!pieceTypes) {
-    pieceTypes = await discoverPieceTypes(aposHost, headers);
+    pieceTypes = await discoverPieceTypes(aposHost, headers, locale);
   }
 
   const pieceUrls = [];
   for (const t of pieceTypes) {
-    const urls = await fetchAllPieces(aposHost, headers, t);
+    const urls = await fetchAllPieces(aposHost, headers, t, locale);
     pieceUrls.push(...urls);
   }
 
