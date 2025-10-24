@@ -5,8 +5,7 @@ export const widgetGroups = {
     label: 'Layout',
     columns: 2,
     widgets: {
-      'grid-layout': {},
-      rows: {}
+      '@apostrophecms/layout': {}
     }
   },
   // Content widgets are the actual content elements users can add

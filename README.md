@@ -245,11 +245,8 @@ Read more in the [`apostrophe-astro` documentation](https://github.com/apostroph
 This project is more opinionated than some of our other project starter kits. It uses the [Bulma CSS framework](https://bulma.io/). For a more streamlined starting point you can use the [Astro Essentials starter kit](https://github.com/apostrophecms/starter-kit-astro-essentials) repository.
 
 ### Widgets
-This project provides the core ApostropheCMS widgets, plus seven additional widgets:
+This project provides the core ApostropheCMS widgets, plus five additional widgets:
 
-- Layout
-    - rows-widget: adds rows with varying numbers of columns for responsive content layout
-    - grid-layout-widget: adds custom or predefined CSS grid-based layouts
 - Content
     - hero-widget: a customizable hero section with options for color gradient, image, or video backgrounds
     - slideshow-widget: a customizable slideshow widget
