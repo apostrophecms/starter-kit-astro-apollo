@@ -40,6 +40,8 @@ export default apostrophe({
     'card-widget': {},
     'hero-widget': {},
     'link-widget': {},
-    'slideshow-widget': {}
+    'slideshow-widget': {},
+    'nested-layout-widget': {},
+    'nested-column-widget': {}
   }
 });

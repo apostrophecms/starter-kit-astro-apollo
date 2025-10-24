@@ -19,7 +19,9 @@ const widgetComponents = {
   'link': LinkWidget,
   'slideshow': SlideshowWidget,
   '@apostrophecms/layout': LayoutWidget,
-  '@apostrophecms/layout-column': LayoutColumnWidget
+  '@apostrophecms/layout-column': LayoutColumnWidget,
+  'nested-layout': LayoutWidget,
+  'nested-column': LayoutColumnWidget
 };
 
 export default widgetComponents;

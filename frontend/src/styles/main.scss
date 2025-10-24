@@ -187,8 +187,3 @@ ol.apos-area-widget__breadcrumbs {
   object-fit: cover;
   aspect-ratio: var(--aspect-ratio, auto);
 }
-
-body {
-  padding-left: clamp(20px, 5vw, 80px);
-  padding-right: clamp(20px, 5vw, 80px);
-}
