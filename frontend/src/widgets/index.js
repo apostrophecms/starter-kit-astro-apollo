@@ -15,13 +15,11 @@ const widgetComponents = {
   '@apostrophecms/rich-text': RichTextWidget,
   '@apostrophecms/image': ImageWidget,
   '@apostrophecms/video': VideoWidget,
-  'grid-layout': GridLayoutWidget,
   'accordion': AccordionWidget,
   'card': CardWidget,
   'hero': HeroWidget,
   'link': LinkWidget,
   'slideshow': SlideshowWidget,
-  'rows': RowsWidget,
   '@apostrophecms/layout': LayoutWidget,
   '@apostrophecms/layout-column': LayoutColumnWidget
 };
