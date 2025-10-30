@@ -83,9 +83,6 @@ A production-ready template combining [ApostropheCMS](https://docs.apostrophecms
   - [🚀 Deploying to production](#-deploying-to-production)
     - [**Using ApostropheCMS hosting (Recommended)**](#using-apostrophecms-hosting-recommended)
     - [**Using 3rd-party hosting**](#using-3rd-party-hosting)
-      - [Backend (ApostropheCMS) Deployment](#backend-apostrophecms-deployment)
-      - [Frontend (Astro) Deployment](#frontend-astro-deployment)
-      - [Netlify Deployment Example](#netlify-deployment-example)
   - [💎 Ready for More?](#-ready-for-more)
     - [🚀 **Apollo Pro Features**](#-apollo-pro-features)
   - [🚑 Need Help?](#-need-help)
@@ -117,11 +114,14 @@ To simplify dependency management, this repository includes several root-level s
    npm install
    ```
 
-2. **Load starter content** (optional, but recommended)
+~~2. **Load starter content** (optional, but recommended)~~
+
    ```bash
    npm run load-starter-content
    ```
-   This fetches a starter database and media files. You'll be prompted to set an admin password.
+  ~~This fetches a starter database and media files. You'll be prompted to set an admin password.~~
+
+  ⚠️ **Temporary note:** Until the new Layout Widget reaches a stable release (one full version cycle), the starter content will continue to include both the legacy `grid-layout` and `rows` widgets. These widgets have been removed from the starter kit, so running `npm run load-starter-content` will currently result in errors.
 
 3. **Start development servers**
    Open two terminals:
