@@ -110,6 +110,12 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
 
+> **📌 Note on Dependency Management**
+> 
+> This starter kit ships with `package-lock.json` in `.gitignore` to avoid merge conflicts during development. 
+> 
+> **For production use:** Remove `package-lock.json` from `.gitignore` in both the `backend/` and `frontend/` folders and commit the lock files to lock your dependencies. This ensures stable, reproducible builds. When you're ready to update dependencies, run `npm update` in each project folder and commit the updated lock files.
+
 To simplify dependency management, this repository includes several root-level scripts for convenience. The `postinstall` script automatically installs dependencies for both the `frontend` and `backend` folders when you run `npm install` at the root.
 
 1. **Install dependencies**
