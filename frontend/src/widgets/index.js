@@ -8,6 +8,8 @@ import HeroWidget from './HeroWidget.astro';
 import LinkWidget from './LinkWidget.astro';
 import SlideshowWidget from './SlideshowWidget.astro';
 import RowsWidget from './RowsWidget.astro';
+import LayoutWidget from '@apostrophecms/apostrophe-astro/widgets/LayoutWidget.astro';
+import LayoutColumnWidget from '@apostrophecms/apostrophe-astro/widgets/LayoutColumnWidget.astro';
 
 const widgetComponents = {
   '@apostrophecms/rich-text': RichTextWidget,
@@ -19,7 +21,9 @@ const widgetComponents = {
   'hero': HeroWidget,
   'link': LinkWidget,
   'slideshow': SlideshowWidget,
-  'rows': RowsWidget
+  'rows': RowsWidget,
+  '@apostrophecms/layout': LayoutWidget,
+  '@apostrophecms/layout-column': LayoutColumnWidget
 };
 
 export default widgetComponents;
