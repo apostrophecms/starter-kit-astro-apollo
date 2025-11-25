@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "node app",
-    "dev": "APOS_EXTERNAL_FRONT_KEY=dev nodemon",
-    "build": "NODE_ENV=production node app @apostrophecms/asset:build",
-    "serve": "NODE_ENV=production node app",
+    "dev": "cross-env APOS_EXTERNAL_FRONT_KEY=dev nodemon",
+    "build": "cross-env NODE_ENV=production node app @apostrophecms/asset:build",
+    "serve": "cross-env NODE_ENV=production node app",
     "release": "npm install && npm run build && npm run migrate",
-    "migrate": "NODE_ENV=production node app @apostrophecms/migration:migrate",
+    "migrate": "cross-env NODE_ENV=production node app @apostrophecms/migration:migrate",
     "load-starter-content": "./scripts/load-starter-content",
     "update-starter-content": "./scripts/update-starter-content"
   },
@@ -52,6 +52,7 @@
     "@apostrophecms/seo": "^1.3.0",
     "@apostrophecms/vite": "^1.0.0",
     "apostrophe": "^4.18.0",
+    "cross-env": "^10.1.0",
     "normalize.css": "^8.0.1"
   },
   "devDependencies": {
