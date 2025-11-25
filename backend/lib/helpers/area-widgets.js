@@ -13,9 +13,10 @@ export const widgetGroups = {
     label: 'Content',
     columns: 3,
     widgets: {
+      '@apostrophecms/rich-text': {},
       '@apostrophecms/image': {},
       '@apostrophecms/video': {},
-      '@apostrophecms/rich-text': {},
+      '@apostrophecms/file': {},
       slideshow: {},
       hero: {},
       accordion: {},
