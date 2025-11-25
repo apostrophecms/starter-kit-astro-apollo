@@ -83,9 +83,6 @@ A production-ready template combining [ApostropheCMS](https://docs.apostrophecms
   - [🚀 Deploying to production](#-deploying-to-production)
     - [**Using ApostropheCMS hosting (Recommended)**](#using-apostrophecms-hosting-recommended)
     - [**Using 3rd-party hosting**](#using-3rd-party-hosting)
-      - [Backend (ApostropheCMS) Deployment](#backend-apostrophecms-deployment)
-      - [Frontend (Astro) Deployment](#frontend-astro-deployment)
-      - [Netlify Deployment Example](#netlify-deployment-example)
   - [💎 Ready for More?](#-ready-for-more)
     - [🚀 **Apollo Pro Features**](#-apollo-pro-features)
   - [🚑 Need Help?](#-need-help)
@@ -117,11 +114,14 @@ To simplify dependency management, this repository includes several root-level s
    npm install
    ```
 
-2. **Load starter content** (optional, but recommended)
+~~2. **Load starter content** (optional, but recommended)~~
+
    ```bash
    npm run load-starter-content
    ```
-   This fetches a starter database and media files. You'll be prompted to set an admin password.
+  ~~This fetches a starter database and media files. You'll be prompted to set an admin password.~~
+
+  ⚠️ **Temporary note:** Until the new Layout Widget reaches a stable release (one full version cycle), the starter content will continue to include both the legacy `grid-layout` and `rows` widgets. These widgets have been removed from the starter kit, so running `npm run load-starter-content` will currently result in errors.
 
 3. **Start development servers**
    Open two terminals:
@@ -245,11 +245,8 @@ Read more in the [`apostrophe-astro` documentation](https://github.com/apostroph
 This project is more opinionated than some of our other project starter kits. It uses the [Bulma CSS framework](https://bulma.io/). For a more streamlined starting point you can use the [Astro Essentials starter kit](https://github.com/apostrophecms/starter-kit-astro-essentials) repository.
 
 ### Widgets
-This project provides the core ApostropheCMS widgets, plus seven additional widgets:
+This project provides the core ApostropheCMS widgets, plus five additional widgets:
 
-- Layout
-    - rows-widget: adds rows with varying numbers of columns for responsive content layout
-    - grid-layout-widget: adds custom or predefined CSS grid-based layouts
 - Content
     - hero-widget: a customizable hero section with options for color gradient, image, or video backgrounds
     - slideshow-widget: a customizable slideshow widget
