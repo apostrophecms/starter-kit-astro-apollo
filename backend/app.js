@@ -36,12 +36,10 @@ export default apostrophe({
     'article-page': {},
 
     // widgets
-    'grid-layout-widget': {},
     'accordion-widget': {},
     'card-widget': {},
     'hero-widget': {},
     'link-widget': {},
-    'slideshow-widget': {},
-    'rows-widget': {}
+    'slideshow-widget': {}
   }
 });

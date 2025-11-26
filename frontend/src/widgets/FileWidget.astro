@@ -1,0 +1,8 @@
+---
+const { widget } = Astro.props;
+const { _file } = widget;
+const file = _file[0];
+---
+<div>
+  { (file && <a href={file._url} download>{file.title}</a>) || 'No file selected' }
+</div>
