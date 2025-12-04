@@ -5,6 +5,7 @@
 /modules/asset/ui/public/site.js
 
 # dependencies
+package-lock.json
 node_modules/
 
 # logs
