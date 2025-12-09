@@ -4,11 +4,11 @@
   "description": "Astro frontend for the ApostropheCMS + Astro Apollo template",
   "version": "1.0.0",
   "scripts": {
-    "dev": "APOS_EXTERNAL_FRONT_KEY=dev astro dev",
+    "dev": "cross-env APOS_EXTERNAL_FRONT_KEY=dev astro dev",
     "start": "node ./dist/server/entry.mjs",
     "build": "astro build",
-    "serve": "HOST=0.0.0.0 node ./dist/server/entry.mjs",
-    "preview": "DEBUG=* astro preview",
+    "serve": "cross-env HOST=0.0.0.0 node ./dist/server/entry.mjs",
+    "preview": "cross-env DEBUG=* astro preview",
     "astro": "astro"
   },
   "engines": {
@@ -16,7 +16,7 @@
     "npm": ">=9.0.0"
   },
   "dependencies": {
-    "@apostrophecms/apostrophe-astro": "^1.4.0",
+    "@apostrophecms/apostrophe-astro": "^1.7.1",
     "@astrojs/node": "^9.0.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
@@ -30,6 +30,7 @@
     "vite": "^5.0.7"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "sass-embedded": "^1.81.0"
   }
 }
