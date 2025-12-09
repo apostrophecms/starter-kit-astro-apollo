@@ -107,6 +107,12 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 
 The codebases located in the `backend` and `frontend` folders should be treated as interlinked but separate projects.
 
+> **📌 Note on Dependency Management**
+> 
+> This starter kit ships with `package-lock.json` in `.gitignore` to avoid merge conflicts during development. 
+> 
+> **For production use:** Remove `package-lock.json` from `.gitignore` in both the `backend/` and `frontend/` folders and commit the lock files to lock your dependencies. This ensures stable, reproducible builds. When you're ready to update dependencies, run `npm update` in each project folder and commit the updated lock files.
+
 To simplify dependency management, this repository includes several root-level scripts for convenience. The `postinstall` script automatically installs dependencies for both the `frontend` and `backend` folders when you run `npm install` at the root.
 
 1. **Install dependencies**
@@ -114,16 +120,15 @@ To simplify dependency management, this repository includes several root-level s
    npm install
    ```
 
-~~2. **Load starter content** (optional, but recommended)~~
+2. **Load starter content** (optional, but recommended)
 
    ```bash
    npm run load-starter-content
    ```
-  ~~This fetches a starter database and media files. You'll be prompted to set an admin password.~~
+  This fetches a starter database and media files. You'll be prompted to set an admin password.
 
-  ⚠️ **Temporary note:** Until the new Layout Widget reaches a stable release (one full version cycle), the starter content will continue to include both the legacy `grid-layout` and `rows` widgets. These widgets have been removed from the starter kit, so running `npm run load-starter-content` will currently result in errors.
 
-3. **Start development servers**
+1. **Start development servers**
    Open two terminals:
    - **Mac/Linux users**: One terminal in `frontend` folder, one in `backend` folder
    - **Windows users**: WSL terminal for `backend` folder, WSL or Windows terminal for `frontend` folder
