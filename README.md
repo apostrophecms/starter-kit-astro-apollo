@@ -1,50 +1,33 @@
-# Apollo Starter Kit for ApostropheCMS + Astro Integration
+# Apollo: ApostropheCMS + Astro Tutorial Project
 
-**Build lightning-fast websites with the editing experience your content team actually wants to use.**
+> [!NOTE]
+> **This repository is the companion codebase for the [ApostropheCMS + Astro tutorial series](https://apostrophecms.com/docs/tutorials/astro/apostrophecms-and-astro.html).** It includes multiple branches that correspond to different stages in the tutorial videos.
+>
+> If you're starting a new project, we recommend one of our actively maintained starter kits instead:
+>
+> - **[Astro Essentials](https://apostrophecms.com/docs/guide/astro-essentials-overview.html)** — a clean, minimal starting point for ApostropheCMS + Astro projects ([repo](https://github.com/apostrophecms/starter-kit-astro-essentials))
+> - **[Astro Demo](https://apostrophecms.com/docs/guide/astro-demo-overview.html)** — a feature-rich reference implementation ([repo](https://github.com/apostrophecms/astro-public-demo))
 
-A production-ready template combining [ApostropheCMS](https://docs.apostrophecms.org/) as a headless backend with [Astro](https://astro.build/) as a modern frontend framework. This template includes a beautiful design system and rich content features, all completely free and open source.
+**Apollo is the companion project for the [ApostropheCMS + Astro tutorial series](https://apostrophecms.com/docs/tutorials/astro/apostrophecms-and-astro.html)** — a complete, production-quality website demonstrating how ApostropheCMS works as a headless backend with Astro as the frontend. Unlike a typical headless setup, the [`apostrophe-astro`](https://github.com/apostrophecms/apostrophe-astro) bridge package preserves full in-context editing while giving you Astro's performance and modern developer experience.
 
-## ✨ What Makes This Special
+## About This Project
 
-- **🚀 Headless CMS with Frontend Integration** - Full ApostropheCMS Admin UI with in-context editing
-- **⚡ Modern Frontend** - Astro for optimal performance and developer experience  
-- **🎨 Production Styled** - Beautiful Bulma-based design system included
-- **📱 Fully Responsive** - Mobile-first approach with modern web standards
-- **💰 Completely Free** - No license fees, perfect for any project size
+The tutorial series has two paths — you don't need to complete one before starting the other, but Path 1 is the best place to begin if you're new to the integration.
 
-## ApostropheCMS + Astro Starter Kits
+**[Path 1: Build a Site](https://apostrophecms.com/docs/tutorials/astro/introducing-apollo.html)**
+A step-by-step walkthrough of the Apollo codebase: setting up your environment, creating pages, widgets, and pieces, and understanding how in-context editing works in practice.
 
-**Choose the right foundation for your project:**
+**[Path 2: Deploy Your Project](https://apostrophecms.com/docs/tutorials/astro/deploying-hybrid-projects.html)**
+Deployment guides ranging from a general overview to a complete two-tier SSR + static deployment walkthrough using Railway and Vercel.
 
-## 🌟 Apollo Starter Kit (This Repository)
-**Perfect if you want:** A production-ready foundation with beautiful design included
+Each tutorial step corresponds to a branch in this repository, so you can follow along or jump directly to any stage.
 
-- **Production-Ready Design**: Complete Bulma-based design system with modern styling
-- **Rich Feature Set**: Advanced widgets, layouts, and pre-styled components
-- **Faster Time-to-Market**: Launch professional sites with minimal additional styling
-- **Content-Rich Sites**: Built-in blog, author relationships, and content management features
-- **Best for**: Teams who want to focus on content and functionality over design from scratch
-
-## 🎯 [Astro Essentials Starter Kit](https://github.com/apostrophecms/starter-kit-astro-essentials)
-**Perfect if you want:** A clean, minimal foundation to build your own design system
-
-- **Minimal & Non-opinionated**: Essential building blocks without imposed design decisions
-- **Core Components**: Basic page types, essential widgets, and clean architecture  
-- **Maximum Flexibility**: Build your own styling approach and component library
-- **Learning Focus**: Understand the ApostropheCMS + Astro integration from the ground up
-- **Best for**: Developers who want full creative control and custom design systems
-
----
-
-**Ready for enterprise features?** [Upgrade to Apollo Pro](https://apostrophecms.com/contact-us) for advanced permissions, automated translations, SEO optimization, document versioning, and more professional capabilities.
+> **New to the series?** Start with [Introducing Apollo](https://apostrophecms.com/docs/tutorials/astro/introducing-apollo.html).
 
 ## Table of Contents
 <!-- TOC -->
-- [Apollo Starter Kit for ApostropheCMS + Astro Integration](#apollo-starter-kit-for-apostrophecms--astro-integration)
-  - [✨ What Makes This Special](#-what-makes-this-special)
-  - [ApostropheCMS + Astro Starter Kits](#apostrophecms--astro-starter-kits)
-  - [🌟 Apollo Starter Kit (This Repository)](#-apollo-starter-kit-this-repository)
-  - [🎯 Astro Essentials Starter Kit](#-astro-essentials-starter-kit)
+- [Apollo: ApostropheCMS + Astro Tutorial Project](#apollo-apostrophecms--astro-tutorial-project)
+  - [About This Project](#about-this-project)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [🚀 Getting Started](#-getting-started)
@@ -97,11 +80,11 @@ Overall, this project utilizes ApostropheCMS as a headless backend with Astro as
 
 ### Prerequisites
 **Required:**
-- Node.js v20 or later (v22 recommended)
-- MongoDB v6.0 or later (local server or Atlas). See the [ApostropheCMS documentation](https://docs.apostrophecms.org/guide/development-setup.html) for setup.
+- Node.js v22 or later (v24 recommended)
+- A database — this tutorial uses MongoDB (v6.0 or later, local server or Atlas), but ApostropheCMS also supports PostgreSQL and SQLite. See [database options](https://apostrophecms.com/docs/guide/using-sqlite-and-postgres.html) or the [development setup guide](https://docs.apostrophecms.org/guide/development-setup.html) for details.
 
 **Windows Users:**
-- Windows Subsystem for Linux 2 (WSL2) required for Apostrophe development. This ensures consistent behavior with image processing tools and file system operations. Learn more about setting up WSL2 from [Microsoft](https://learn.microsoft.com/en-us/windows/wsl/install) and in our [documentation](https://docs.apostrophecms.org/cookbook/windows-development.html).
+- ApostropheCMS now runs natively on Windows. WSL2 is no longer required, but remains the recommended environment for Node.js development on Windows. Learn more about setting up WSL2 from [Microsoft](https://learn.microsoft.com/en-us/windows/wsl/install) and in our [documentation](https://docs.apostrophecms.org/cookbook/windows-development.html).
 
 ### Quick Start
 
@@ -131,7 +114,7 @@ To simplify dependency management, this repository includes several root-level s
 1. **Start development servers**
    Open two terminals:
    - **Mac/Linux users**: One terminal in `frontend` folder, one in `backend` folder
-   - **Windows users**: WSL terminal for `backend` folder, WSL or Windows terminal for `frontend` folder
+   - **Windows users**: Native terminals work for both folders. If using WSL2, use a WSL terminal for the `backend` folder and either terminal for `frontend`.
 
    ```bash
    # Terminal 1 - Backend (use WSL on Windows)
@@ -493,19 +476,23 @@ Third-party hosting will typically require separate servers for the ApostropheCM
 #### Backend (ApostropheCMS) Deployment
 
 Your ApostropheCMS backend requires:
-- Node.js environment (v20 or later recommended)
-- MongoDB database
+- Node.js environment (v22 or later recommended)
+- A database (MongoDB, PostgreSQL, or SQLite — see [database options](https://apostrophecms.com/docs/guide/using-sqlite-and-postgres.html))
 - Asset storage solution (cloud storage like AWS S3)
 
 There are several examples of common deployment strategies in our [documentation](https://docs.apostrophecms.org/guide/hosting.html)
 
 Example deployment steps for a typical provider:
-1. Set up a MongoDB instance (Atlas, DigitalOcean, etc.)
+1. Set up your database (e.g. MongoDB Atlas, a PostgreSQL instance, or SQLite for simple deployments)
 2. Configure your server with Node.js and PM2
 3. Set up your environment variables:
    ```bash
    NODE_ENV=production
-   APOS_MONGODB_URI=YOUR_mongodb_connection_string
+   # Set APOS_DB_URI to match your database — examples:
+   # MongoDB:    APOS_DB_URI=mongodb://user:password@localhost:27017/apos_demo
+   # PostgreSQL: APOS_DB_URI=postgres://user:password@localhost:5432/apos_demo
+   # SQLite:     APOS_DB_URI=sqlite:///absolute/path/to/apos-demo.db
+   APOS_DB_URI=YOUR_database_connection_string
    APOS_EXTERNAL_FRONT_KEY=a_random_string
    APOS_S3_BUCKET=YOUR-bucket-name
    APOS_S3_SECRET=YOUR-s3-secret
