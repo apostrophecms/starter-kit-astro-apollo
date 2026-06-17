@@ -6,7 +6,7 @@
 > If you're starting a new project, we recommend one of our actively maintained starter kits instead:
 >
 > - **[Astro Essentials](https://apostrophecms.com/docs/guide/astro-essentials-overview.html)** — a clean, minimal starting point for ApostropheCMS + Astro projects ([repo](https://github.com/apostrophecms/starter-kit-astro-essentials))
-> - **[Astro Demo](https://apostrophecms.com/docs/guide/astro-demo-overview.html)** — a feature-rich reference implementation ([repo](https://github.com/apostrophecms/astro-public-demo))
+> - **[Astro Demo](https://apostrophecms.com/docs/guide/astro-demo-overview.html)** — a feature-rich reference implementation that makes a great starting point for a proof of concept project.([repo](https://github.com/apostrophecms/astro-public-demo))
 
 **Apollo is the companion project for the [ApostropheCMS + Astro tutorial series](https://apostrophecms.com/docs/tutorials/astro/apostrophecms-and-astro.html)** — a complete, production-quality website demonstrating how ApostropheCMS works as a headless backend with Astro as the frontend. Unlike a typical headless setup, the [`apostrophe-astro`](https://github.com/apostrophecms/apostrophe-astro) bridge package preserves full in-context editing while giving you Astro's performance and modern developer experience.
 
