@@ -32,5 +32,11 @@
   "devDependencies": {
     "cross-env": "^10.1.0",
     "sass-embedded": "^1.81.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "esbuild": true,
+    "fsevents": true,
+    "sharp": true
   }
 }
