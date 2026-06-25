@@ -58,5 +58,14 @@
     "cross-env": "^10.1.0",
     "eslint-config-apostrophe": "^6.0.1",
     "nodemon": "^3.0.1"
+  },
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "better-sqlite3": true,
+    "esbuild": true,
+    "fsevents": true,
+    "sharp": true,
+    "unrs-resolver": true,
+    "vue-demi": true
   }
 }
